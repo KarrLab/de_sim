@@ -1,0 +1,93 @@
+version: 2
+jobs:
+  build:
+    working_directory: /root/project
+    docker:
+      - image: karrlab/wc_env_dependencies:latest
+
+    steps:
+      # Clone repository
+      - checkout
+
+      # Load packages from cache
+      - restore_cache:
+          keys:
+            - v1-{{ arch }}-{{ .Branch }}-{{ checksum "/etc/docker-image-tag" }}-{{ checksum "requirements.txt" }}
+
+      # Python 3 installation tasks
+      - run:
+          name: Install pkg_utils (Python 3)
+          command: pip3 install -U --process-dependency-links git+https://github.com/KarrLab/pkg_utils.git#egg=pkg_utils
+      - run:
+          name: Install karr_lab_build_utils (Python 3)
+          command: pip3 install -U --process-dependency-links git+https://github.com/KarrLab/karr_lab_build_utils.git#egg=karr_lab_build_utils[all]
+      - run:
+          name: Install package configuration files including credentials
+          command: karr_lab_build_utils3 download-install-package-config-files
+      - run:
+          name: Install and upgrade requirements (Python 3)
+          command: |
+            set +e
+            karr_lab_build_utils3 install-requirements
+            karr_lab_build_utils3 upgrade-karr-lab-packages
+      - run:
+          name: Install package (Python 3)
+          command: pip3 install -U --process-dependency-links -e .[all]
+
+      # Save packages to cache
+      - save_cache:
+          key: v1-{{ arch }}-{{ .Branch }}-{{ checksum "/etc/docker-image-tag" }}-{{ checksum "requirements.txt" }}
+          paths:
+            - /usr/local/lib/python3.6/site-packages
+
+      # Test code
+      - run:
+          name: Test code
+          command: |
+            set +e
+
+            karr_lab_build_utils3 run-tests --with-xunit --with-coverage
+            TEST_EXIT_CODE_PY3=$?
+
+            # Calculate exit code and save to file for reading by the next step
+            if [[ $TEST_EXIT_CODE_PY3 -eq 0 ]]; then
+              echo "0" > TEST_EXIT_CODE
+              exit 0
+            else
+              echo "0" > TEST_EXIT_CODE
+              exit 1
+            fi
+
+      # Generate reports, archive results, and send notifications
+      - run:
+          name: Generate reports, archive results, and send notifications
+          when: always
+          command: |
+            if [[ -f TEST_EXIT_CODE ]]; then
+              INSTALLATION_EXIT_CODE=0
+              TEST_EXIT_CODE=$(<TEST_EXIT_CODE)
+            else
+              INSTALLATION_EXIT_CODE=1
+              TEST_EXIT_CODE=1
+            fi
+
+            karr_lab_build_utils3 do-post-test-tasks $INSTALLATION_EXIT_CODE $TEST_EXIT_CODE
+
+      - store_test_results:
+          path: /root/project/tests/reports
+      - store_artifacts:
+          path: /root/project/tests/reports
+          destination: reports
+      - store_artifacts:
+          path: /root/.wc/log
+          destination: log
+      - store_artifacts:
+          path: /root/project/docs/_build/html
+          destination: docs
+
+# workflows:
+#  version: 2
+#  build:
+#    jobs:
+#      - build:
+#          context: karr_lab

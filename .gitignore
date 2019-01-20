@@ -1,0 +1,51 @@
+# compiled files
+*.pyc
+
+# python cache
+__pycache__/
+
+#distribution files
+/build/
+/dist/
+/sdists/
+*.egg-info
+
+# test reports
+tests/reports
+
+# coverage file
+.coverage*
+htmlcov/
+.tox/
+
+# profiling data
+prof/
+
+# .rst-formatted README
+README.rst
+
+# compiled documentation
+docs/source
+docs/_build
+docs/.doctrees/
+
+# pytest .cache directory
+.cache/
+.pytest_cache/
+
+# passwords
+tests/fixtures/secret/
+
+# IDE configuration
+.idea/
+.spyderproject
+.ropeproject
+
+# temporary files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.~lock.*
+Thumbs.db

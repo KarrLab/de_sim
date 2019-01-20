@@ -1,0 +1,5 @@
+downstream_dependencies: 
+  - wc_sim
+email_notifications: 
+  - jonrkarr@gmail.com
+  - arthur.p.goldberg@mssm.edu
