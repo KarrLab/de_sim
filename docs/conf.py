@@ -29,6 +29,7 @@ extensions = [
     'sphinxcontrib.bibtex',
     'sphinxcontrib.googleanalytics',
     'sphinxcontrib.spelling',
+    'sphinxprettysearchresults',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -392,5 +393,5 @@ googleanalytics_id = 'UA-86340737-1'
 
 # -- if RTD, redirect to https://docs.karrlab.org  ------------------------
 
-addmetahtml_content = '<meta http-equiv="refresh" content="0; url=https://docs.karrlab.org/wc_utils" />'
+addmetahtml_content = '<meta http-equiv="refresh" content="0; url=https://docs.karrlab.org/desim" />'
 addmetahtml_enabled = os.getenv('READTHEDOCS', '') == 'True'
