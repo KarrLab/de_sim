@@ -12,10 +12,21 @@ Write an overview
 
 ## Installation
 1. Install dependencies
+    
+    * Python
+    * pip
+
 2. Install this package 
-  ```
-  pip install git+git://github.com/KarrLab/desim#egg=desim
-  ```
+
+    * Install latest release from PyPI
+      ```
+      desim
+      ```
+
+    * Install latest revision from GitHub
+      ```
+      pip install git+https://github.com/KarrLab/desim.git#egg=desim
+      ```
 
 ## Documentation
 Please see the [API documentation](https://docs.karrlab.org/desim).

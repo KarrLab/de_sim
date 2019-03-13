@@ -17,22 +17,26 @@ jobs:
       # Python 3 installation tasks
       - run:
           name: Install pkg_utils (Python 3)
-          command: pip3 install -U --process-dependency-links git+https://github.com/KarrLab/pkg_utils.git#egg=pkg_utils
+          command: pip3 install -U git+https://github.com/KarrLab/pkg_utils.git#egg=pkg_utils
       - run:
           name: Install karr_lab_build_utils (Python 3)
-          command: pip3 install -U --process-dependency-links git+https://github.com/KarrLab/karr_lab_build_utils.git#egg=karr_lab_build_utils[all]
+          command: |
+            pip3 install -U git+https://github.com/KarrLab/log.git#egg=log
+            pip3 install -U git+https://github.com/KarrLab/sphinxcontrib-googleanalytics.git#egg=sphinxcontrib_googleanalytics
+            pip3 install -U git+https://github.com/KarrLab/wc_utils.git#egg=wc_utils[all]
+            pip3 install -U git+https://github.com/KarrLab/karr_lab_build_utils.git#egg=karr_lab_build_utils[all]
       - run:
           name: Install package configuration files including credentials
           command: karr_lab_build_utils3 download-install-package-config-files
       - run:
-          name: Install and upgrade requirements (Python 3)
+          name: Setup Python environment
           command: |
-            set +e
-            karr_lab_build_utils3 install-requirements
-            karr_lab_build_utils3 upgrade-karr-lab-packages
+            if [[ -f .circleci/requirements.txt ]]; then
+              pip3 install -U -r .circleci/requirements.txt
+            fi
       - run:
           name: Install package (Python 3)
-          command: pip3 install -U --process-dependency-links -e .[all]
+          command: pip3 install -U -e .[all]
 
       # Save packages to cache
       - save_cache:

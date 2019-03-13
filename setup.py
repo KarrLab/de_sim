@@ -3,7 +3,7 @@ try:
     import pkg_utils
 except ImportError:
     import pip._internal
-    pip._internal.main(['install', '--process-dependency-links', 'git+https://github.com/KarrLab/pkg_utils.git#egg=pkg_utils'])
+    pip._internal.main(['install', 'pkg_utils'])
     import pkg_utils
 import os
 
