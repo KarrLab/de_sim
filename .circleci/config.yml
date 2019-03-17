@@ -32,7 +32,11 @@ jobs:
           name: Setup Python environment
           command: |
             if [[ -f .circleci/requirements.txt ]]; then
-              pip3 install -U -r .circleci/requirements.txt
+              while IFS="" read -r line || [ -n "$line" ]; do
+                if [[ ! -z "$line" ]] && [[ ! "$line" =~ ^# ]]; then
+                  sudo pip3 install -U "$line"
+                fi
+              done < .circleci/requirements.txt
             fi
       - run:
           name: Install package (Python 3)
