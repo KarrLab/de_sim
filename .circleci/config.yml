@@ -34,7 +34,7 @@ jobs:
             if [[ -f .circleci/requirements.txt ]]; then
               while IFS="" read -r line || [ -n "$line" ]; do
                 if [[ ! -z "$line" ]] && [[ ! "$line" =~ ^# ]]; then
-                  sudo pip3 install -U "$line"
+                  pip3 install -U "$line"
                 fi
               done < .circleci/requirements.txt
             fi
