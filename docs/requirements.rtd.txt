@@ -1,0 +1,7 @@
+sphinx >= 1.8
+sphinx_rtd_theme >= 0.4.2
+sphinxcontrib_addmetahtml >= 0.1.1
+sphinxcontrib_bibtex
+sphinxcontrib_googleanalytics @ git+https://github.com/karrlab/sphinxcontrib-googleanalytics.git#egg=sphinxcontrib_googleanalytics-0.1.1
+sphinxcontrib_spelling
+sphinxprettysearchresults
