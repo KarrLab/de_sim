@@ -25,6 +25,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
+    'sphinx_fontawesome',
     'sphinxcontrib.addmetahtml',
     'sphinxcontrib.bibtex',
     'sphinxcontrib.googleanalytics',
