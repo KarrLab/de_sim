@@ -21,7 +21,6 @@ jobs:
       - run:
           name: Install karr_lab_build_utils (Python 3)
           command: |
-            pip3 install -U git+https://github.com/KarrLab/log.git#egg=log
             pip3 install -U git+https://github.com/KarrLab/sphinxcontrib-googleanalytics.git#egg=sphinxcontrib_googleanalytics
             pip3 install -U git+https://github.com/KarrLab/wc_utils.git#egg=wc_utils[all]
             pip3 install -U git+https://github.com/KarrLab/karr_lab_build_utils.git#egg=karr_lab_build_utils[all]
