@@ -50,7 +50,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'desim'
+project = u'de_sim'
 copyright = u'{}, Karr Lab'.format(datetime.datetime.now().year)
 author = u'Karr Lab'
 
@@ -59,7 +59,7 @@ author = u'Karr Lab'
 # built documents.
 #
 # The short X.Y version.
-filename = os.path.join(os.path.dirname(__file__), '..', 'desim', 'VERSION')
+filename = os.path.join(os.path.dirname(__file__), '..', 'de_sim', 'VERSION')
 with open(filename, 'r') as file:
     version = file.read()
 # The full version, including alpha/beta/rc tags.
@@ -143,9 +143,9 @@ def linkcode_resolve(domain, info):
         return None
     rel_filename = info['module'].replace('.', '/')
     if os.path.isfile(os.path.join(os.path.dirname(__file__), '..', rel_filename + '.py')):
-        return "https://github.com/KarrLab/desim/blob/master/{}.py".format(rel_filename)
+        return "https://github.com/KarrLab/de_sim/blob/master/{}.py".format(rel_filename)
     else:
-        return "https://github.com/KarrLab/desim/blob/master/{}/__init__.py".format(rel_filename)
+        return "https://github.com/KarrLab/de_sim/blob/master/{}/__init__.py".format(rel_filename)
 
 
 # -- napoleon options -----------------------------------------------------
@@ -182,7 +182,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'desim v0.0.1'
+# html_title = u'de_sim v0.0.1'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -282,7 +282,7 @@ html_show_copyright = True
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'desim-doc'
+htmlhelp_basename = 'de_sim-doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -308,7 +308,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'desim.tex', u'desim documentation',
+    (master_doc, 'de_sim.tex', u'de_sim documentation',
      u'Karr Lab', 'manual'),
 ]
 
@@ -350,7 +350,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'desim', u'desim documentation',
+    (master_doc, 'de_sim', u'de_sim documentation',
      [author], 1)
 ]
 
@@ -365,8 +365,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'desim', u'desim documentation',
-     author, 'desim', 'One line description of project.',
+    (master_doc, 'de_sim', u'de_sim documentation',
+     author, 'de_sim', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -394,5 +394,5 @@ googleanalytics_id = 'UA-86340737-1'
 
 # -- if RTD, redirect to https://docs.karrlab.org  ------------------------
 
-addmetahtml_content = '<meta http-equiv="refresh" content="0; url=https://docs.karrlab.org/desim" />'
+addmetahtml_content = '<meta http-equiv="refresh" content="0; url=https://docs.karrlab.org/de_sim" />'
 addmetahtml_enabled = os.getenv('READTHEDOCS', '') == 'True'

@@ -1,4 +1,4 @@
-desim documentation
+de_sim documentation
 ===================
 
 Python framework for discrete event simulation (DES)

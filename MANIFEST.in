@@ -2,7 +2,7 @@
 README.rst
 
 # version
-include desim/VERSION
+include de_sim/VERSION
 
 # license
 include LICENSE
