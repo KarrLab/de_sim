@@ -1,0 +1,149 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.5.4, pytest-3.3.2, py-1.5.2, pluggy-0.6.0
+rootdir: /Users/arthur_at_sinai/tmp/wc_sim, inifile:
+plugins: rerunfailures-3.1, cov-2.5.1
+collected 1 item
+
+tests/core/test_simulation_engine.py 
+Performance test of cyclical messaging network: end simulation time: 100
+Profile for 4 simulation objects:
+Wed Mar  7 13:41:05 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp4lt_2_5o/profile_out_4.out
+
+         28661 function calls (27861 primitive calls) in 0.031 seconds
+
+   Ordered by: cumulative time
+   List reduced from 104 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.031    0.031 {built-in method builtins.exec}
+        1    0.000    0.000    0.031    0.031 <string>:1(<module>)
+        1    0.003    0.003    0.031    0.031 simulation_engine.py:138(simulate)
+      400    0.001    0.000    0.024    0.000 simulation_object.py:381(_SimulationEngine__handle_event)
+      400    0.002    0.000    0.023    0.000 test_simulation_engine.py:103(handle_event)
+      400    0.000    0.000    0.017    0.000 simulation_object.py:309(send_event)
+      400    0.002    0.000    0.016    0.000 simulation_object.py:260(send_event_absolute)
+ 1200/400    0.003    0.000    0.010    0.000 copy.py:137(deepcopy)
+      400    0.001    0.000    0.006    0.000 copy.py:269(_reconstruct)
+      400    0.003    0.000    0.003    0.000 simulation_object.py:90(next_events)
+      400    0.002    0.000    0.003    0.000 copy.py:222(_deepcopy_tuple)
+      400    0.002    0.000    0.002    0.000 simulation_message.py:33(__init__)
+      400    0.001    0.000    0.002    0.000 simulation_object.py:42(schedule_event)
+     1625    0.001    0.000    0.002    0.000 {built-in method builtins.isinstance}
+      804    0.002    0.000    0.002    0.000 {method 'format' of 'str' objects}
+
+
+Profile for 16 simulation objects:
+Wed Mar  7 13:41:05 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp4lt_2_5o/profile_out_16.out
+
+         133173 function calls (129973 primitive calls) in 0.115 seconds
+
+   Ordered by: cumulative time
+   List reduced from 104 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.115    0.115 {built-in method builtins.exec}
+        1    0.000    0.000    0.115    0.115 <string>:1(<module>)
+        1    0.018    0.018    0.115    0.115 simulation_engine.py:138(simulate)
+     1600    0.003    0.000    0.083    0.000 simulation_object.py:381(_SimulationEngine__handle_event)
+     1600    0.006    0.000    0.080    0.000 test_simulation_engine.py:103(handle_event)
+     1600    0.002    0.000    0.062    0.000 simulation_object.py:309(send_event)
+     1600    0.008    0.000    0.060    0.000 simulation_object.py:260(send_event_absolute)
+4800/1600    0.012    0.000    0.036    0.000 copy.py:137(deepcopy)
+     1600    0.005    0.000    0.022    0.000 copy.py:269(_reconstruct)
+     1600    0.006    0.000    0.011    0.000 copy.py:222(_deepcopy_tuple)
+    29017    0.008    0.000    0.008    0.000 simulation_object.py:78(next_event_time)
+     1600    0.003    0.000    0.008    0.000 simulation_object.py:42(schedule_event)
+     6425    0.003    0.000    0.008    0.000 {built-in method builtins.isinstance}
+     3204    0.006    0.000    0.006    0.000 {method 'format' of 'str' objects}
+     1600    0.004    0.000    0.006    0.000 test_simulation_engine.py:95(next_obj)
+
+
+Profile for 64 simulation objects:
+Wed Mar  7 13:41:06 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp4lt_2_5o/profile_out_64.out
+
+         840521 function calls (827721 primitive calls) in 0.614 seconds
+
+   Ordered by: cumulative time
+   List reduced from 104 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.614    0.614 {built-in method builtins.exec}
+        1    0.000    0.000    0.614    0.614 <string>:1(<module>)
+        1    0.172    0.172    0.614    0.614 simulation_engine.py:138(simulate)
+     6400    0.011    0.000    0.314    0.000 simulation_object.py:381(_SimulationEngine__handle_event)
+     6400    0.021    0.000    0.303    0.000 test_simulation_engine.py:103(handle_event)
+     6400    0.006    0.000    0.238    0.000 simulation_object.py:309(send_event)
+     6400    0.031    0.000    0.232    0.000 simulation_object.py:260(send_event_absolute)
+19200/6400    0.047    0.000    0.135    0.000 copy.py:137(deepcopy)
+   424365    0.104    0.000    0.104    0.000 simulation_object.py:78(next_event_time)
+     6400    0.021    0.000    0.080    0.000 copy.py:269(_reconstruct)
+     6400    0.017    0.000    0.038    0.000 copy.py:222(_deepcopy_tuple)
+     6400    0.012    0.000    0.030    0.000 simulation_object.py:42(schedule_event)
+    25625    0.012    0.000    0.030    0.000 {built-in method builtins.isinstance}
+    12804    0.024    0.000    0.024    0.000 {method 'format' of 'str' objects}
+     6400    0.016    0.000    0.023    0.000 simulation_object.py:90(next_events)
+
+
+Profile for 256 simulation objects:
+Wed Mar  7 13:41:17 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp4lt_2_5o/profile_out_256.out
+
+         8280013 function calls (8228813 primitive calls) in 6.228 seconds
+
+   Ordered by: cumulative time
+   List reduced from 104 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    6.228    6.228 {built-in method builtins.exec}
+        1    0.000    0.000    6.228    6.228 <string>:1(<module>)
+        1    2.677    2.677    6.228    6.228 simulation_engine.py:138(simulate)
+  6615857    1.791    0.000    1.791    0.000 simulation_object.py:78(next_event_time)
+    25600    0.062    0.000    1.630    0.000 simulation_object.py:381(_SimulationEngine__handle_event)
+    25600    0.108    0.000    1.568    0.000 test_simulation_engine.py:103(handle_event)
+    25600    0.050    0.000    1.234    0.000 simulation_object.py:309(send_event)
+    25600    0.163    0.000    1.184    0.000 simulation_object.py:260(send_event_absolute)
+76800/25600    0.234    0.000    0.676    0.000 copy.py:137(deepcopy)
+    25600    0.100    0.000    0.406    0.000 copy.py:269(_reconstruct)
+    25600    0.095    0.000    0.210    0.000 copy.py:222(_deepcopy_tuple)
+    25600    0.061    0.000    0.150    0.000 simulation_object.py:42(schedule_event)
+    51204    0.149    0.000    0.149    0.000 {method 'format' of 'str' objects}
+   102425    0.056    0.000    0.148    0.000 {built-in method builtins.isinstance}
+    25600    0.085    0.000    0.126    0.000 simulation_object.py:90(next_events)
+
+
+Profile for 1024 simulation objects:
+Wed Mar  7 13:43:56 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp4lt_2_5o/profile_out_1024.out
+
+         111767781 function calls (111562981 primitive calls) in 91.088 seconds
+
+   Ordered by: cumulative time
+   List reduced from 104 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   91.088   91.088 {built-in method builtins.exec}
+        1    0.000    0.000   91.088   91.088 <string>:1(<module>)
+        1   49.009   49.009   91.088   91.088 simulation_engine.py:138(simulate)
+105111625   32.557    0.000   32.557    0.000 simulation_object.py:78(next_event_time)
+   102400    0.522    0.000    8.741    0.000 simulation_object.py:381(_SimulationEngine__handle_event)
+   102400    0.623    0.000    8.219    0.000 test_simulation_engine.py:103(handle_event)
+   102400    0.169    0.000    6.338    0.000 simulation_object.py:309(send_event)
+   102400    0.900    0.000    6.169    0.000 simulation_object.py:260(send_event_absolute)
+307200/102400    1.117    0.000    3.432    0.000 copy.py:137(deepcopy)
+   102400    0.501    0.000    1.940    0.000 copy.py:269(_reconstruct)
+   102400    0.473    0.000    0.970    0.000 copy.py:222(_deepcopy_tuple)
+   409625    0.304    0.000    0.859    0.000 {built-in method builtins.isinstance}
+   102400    0.499    0.000    0.751    0.000 simulation_object.py:90(next_events)
+   204804    0.745    0.000    0.745    0.000 {method 'format' of 'str' objects}
+   102400    0.292    0.000    0.731    0.000 simulation_object.py:42(schedule_event)
+
+
+Performance summary
+
+#sim obs	# events	run time (s)	events/s
+4	400	   0.070	5750.845
+16	1600	   0.069	23315.798
+64	6400	   0.420	15254.585
+256	25600	   4.029	6354.141
+1024	102400	  63.670	1608.289
+.                                   [100%]
+
+========================== 1 passed in 171.67 seconds ==========================

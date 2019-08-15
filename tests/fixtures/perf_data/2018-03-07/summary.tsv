@@ -1,0 +1,6 @@
+Num. simulation objects	Event queue in simulation engine	Event queue per object
+4	26862	5750.845
+16	27354	23315.798
+64	26386	15254.585
+256	25712	6354.141
+1024	23668	1608.289
