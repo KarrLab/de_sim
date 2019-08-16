@@ -23,8 +23,7 @@ from de_sim.simulation_message import SimulationMessage
 from de_sim.utilities import ConcreteABCMeta
 
 # configure logging
-from .debug_logs import logs as debug_logs
-
+from de_sim.config.debug_logs import logs as debug_logs
 
 # TODO(Arthur): move to engine
 class EventQueue(object):

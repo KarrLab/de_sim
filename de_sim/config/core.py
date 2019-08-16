@@ -1,4 +1,4 @@
-""" wc_sim core configuration
+""" de_sim core configuration
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2016-09-19
@@ -23,11 +23,11 @@ def get_config(extra=None):
         :obj:`configobj.ConfigObj`: nested dictionary with the configuration settings loaded from the configuration source(s).
     """
     paths = wc_utils.config.core.ConfigPaths(
-        default=pkg_resources.resource_filename('wc_sim', 'core/config/core.default.cfg'),
-        schema=pkg_resources.resource_filename('wc_sim', 'core/config/core.schema.cfg'),
+        default=pkg_resources.resource_filename('de_sim', 'config/core.default.cfg'),
+        schema=pkg_resources.resource_filename('de_sim', 'config/core.schema.cfg'),
         user=(
-            'wc_sim.core.core.cfg',
-            os.path.expanduser('~/.wc/wc_sim.core.core.cfg'),
+            'de_sim.core.cfg',
+            os.path.expanduser('~/.wc/de_sim.core.cfg'),
         ),
     )
     return wc_utils.config.core.ConfigManager(paths).get_config(extra=extra)
@@ -43,9 +43,9 @@ def get_debug_logs_config(extra=None):
         :obj:`configobj.ConfigObj`: nested dictionary with the configuration settings loaded from the configuration source(s).
     """
     paths = wc_utils.debug_logs.config.paths.deepcopy()
-    paths.default = pkg_resources.resource_filename('wc_sim', 'core/config/debug.default.cfg')
+    paths.default = pkg_resources.resource_filename('de_sim', 'config/debug.default.cfg')
     paths.user = (
-        'wc_sim.core.debug.cfg',
-        os.path.expanduser('~/.wc/wc_sim.core.debug.cfg'),
+        'de_sim.debug.cfg',
+        os.path.expanduser('~/.wc/de_sim.debug.cfg'),
     )
     return wc_utils.config.core.ConfigManager(paths).get_config(extra=extra)

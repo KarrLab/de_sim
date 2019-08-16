@@ -26,7 +26,7 @@ from tests.some_message_types import InitMsg, Eg1
 from de_sim.shared_state_interface import SharedStateInterface
 from wc_utils.util.misc import most_qual_cls_name
 from wc_utils.util.dict import DictUtil
-from de_sim.debug_logs import logs, config
+from de_sim.config.debug_logs import logs, config
 
 
 ALL_MESSAGE_TYPES = [InitMsg, Eg1]

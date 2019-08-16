@@ -15,10 +15,9 @@ from de_sim.simulation_object import EventQueue, SimulationObject
 from de_sim.errors import SimulatorError
 from de_sim.event import Event
 from de_sim.shared_state_interface import SharedStateInterface
-# from de_sim.config import core
 
 # configuration
-from .debug_logs import logs as debug_logs
+from de_sim.config.debug_logs import logs as debug_logs
 
 
 class SimulationEngine(object):
