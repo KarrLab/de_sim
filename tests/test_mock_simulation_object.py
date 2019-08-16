@@ -7,8 +7,8 @@
 """
 import unittest
 
-from tests.mock_simulation_object import MockSimulationObject
-from tests.some_message_types import Eg1
+from de_sim.testing.mock_simulation_object import MockSimulationObject
+from de_sim.testing.some_message_types import Eg1
 
 
 class Example(MockSimulationObject):

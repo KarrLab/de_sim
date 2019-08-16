@@ -22,7 +22,7 @@ from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import SimulationObject, ApplicationSimulationObject
 from de_sim.template_sim_objs import TemplatePeriodicSimulationObject
 from de_sim.simulation_engine import SimulationEngine
-from tests.some_message_types import InitMsg, Eg1
+from de_sim.testing.some_message_types import InitMsg, Eg1
 from de_sim.shared_state_interface import SharedStateInterface
 from wc_utils.util.misc import most_qual_cls_name
 from wc_utils.util.dict import DictUtil

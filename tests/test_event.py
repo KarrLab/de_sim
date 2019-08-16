@@ -11,9 +11,9 @@ from de_sim.event import Event
 from de_sim.simulation_message import SimulationMessage
 from wc_utils.util.misc import most_qual_cls_name, round_direct
 from wc_utils.util.list import elements_to_str
-from tests.example_simulation_objects import (ALL_MESSAGE_TYPES, TEST_SIM_OBJ_STATE,
+from de_sim.testing.example_simulation_objects import (ALL_MESSAGE_TYPES, TEST_SIM_OBJ_STATE,
     ExampleSimulationObject)
-from tests.some_message_types import InitMsg, Eg1, MsgWithAttrs
+from de_sim.testing.some_message_types import InitMsg, Eg1, MsgWithAttrs
 
 
 class TestEvent(unittest.TestCase):

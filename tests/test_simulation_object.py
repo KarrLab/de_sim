@@ -14,8 +14,8 @@ from de_sim.errors import SimulatorError
 from de_sim.simulation_object import (EventQueue, SimulationObject, ApplicationSimulationObject,
     ApplicationSimulationObjMeta, ApplicationSimulationObjectMetadata)
 from de_sim.simulation_engine import SimulationEngine
-from tests.some_message_types import InitMsg, Eg1, MsgWithAttrs, UnregisteredMsg
-from tests.example_simulation_objects import (ALL_MESSAGE_TYPES, TEST_SIM_OBJ_STATE,
+from de_sim.testing.some_message_types import InitMsg, Eg1, MsgWithAttrs, UnregisteredMsg
+from de_sim.testing.example_simulation_objects import (ALL_MESSAGE_TYPES, TEST_SIM_OBJ_STATE,
     ExampleSimulationObject, ImproperlyRegisteredSimulationObject)
 from wc_utils.util.misc import most_qual_cls_name
 from wc_utils.util.list import is_sorted
