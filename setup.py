@@ -27,7 +27,7 @@ setuptools.setup(
     url="https://github.com/KarrLab/" + name,
     download_url='https://github.com/KarrLab/' + name,
     author="Karr Lab",
-    author_email="karr@mssm.com",
+    author_email="info@karrlab.org",
     license="MIT",
     keywords='discrete event simulation des Python',
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
