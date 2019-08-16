@@ -8,7 +8,12 @@
 
 # de_sim
 
-Write an overview
+`de_sim` provides an object-oriented discrete event simulation
+tool for Python that's similar to Simula.
+Simulation logical processes are objects and they schedule
+simulation events by exchanging messages.
+Simulation applications are composed of multiple
+subclasses of `SimulationObject`.
 
 ## Installation
 1. Install dependencies
