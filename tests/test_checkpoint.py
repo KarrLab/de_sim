@@ -77,7 +77,6 @@ class CheckpointLogTest(unittest.TestCase):
         CheckpointLogger(checkpoint_dir, checkpoint_step, init_time)
         self.assertTrue(os.path.isdir(checkpoint_dir))
 
-"""
     def test_mock_simulator(self):
         checkpoint_dir = self.checkpoint_dir
         checkpoint_step = 2
@@ -146,46 +145,6 @@ class CheckpointLogTest(unittest.TestCase):
         wc_utils.util.types.assert_value_not_equal(chkpt.random_state, final_random_state, check_iterable_ordering=True)
 
 
-def build_mock_model():
-    ''' Create test model:
-
-        L --> R
-
-    * 1 compartment
-    * 2 species
-    * 1 reaction
-    * 1 submodel
-    '''
-    model = wc_lang.Model()
-
-    submodel = model.submodels.create(id='submodel', framework=onto['WC:stochastic_simulation_algorithm'])
-
-    init_volume=wc_lang.InitVolume(mean=1.)
-    compartment_c = model.compartments.create(id='c', init_volume=init_volume)
-    compartment_e = model.compartments.create(id='e', init_volume=init_volume)
-
-    structure = wc_lang.ChemicalStructure(molecular_weight=10.)
-    species_type_L = model.species_types.create(id='L', structure=structure)
-    species_type_R = model.species_types.create(id='R', structure=structure)
-
-    species_L = wc_lang.Species(id='L[c]', species_type=species_type_L, compartment=compartment_c)
-    species_R = wc_lang.Species(id='R[c]', species_type=species_type_R, compartment=compartment_c)
-    species = [species_L, species_R]
-
-    wc_lang.Concentration(species=species_L, value=1., units=unit_registry.parse_units('molecule'))
-    wc_lang.Concentration(species=species_R, value=0., units=unit_registry.parse_units('molecule'))
-
-    reaction = submodel.reactions.create(id='reaction')
-    reaction.rate_laws.create(direction=wc_lang.RateLawDirection.forward,
-                              equation=wc_lang.RateLawEquation(expression='0.0'))
-    reaction.participants.create(species=species_L, coefficient=-1)
-    reaction.participants.create(species=species_R, coefficient=1)
-
-    model.parameters.create(id='mean_doubling_time', value=30. * 60, units=unit_registry.parse_units('s')),
-
-    return model
-
-
 def mock_simulate(metadata, init_time=0, init_state=None, init_random_state=None, checkpoint_dir=None,
                   checkpoint_step=None):
     # initialize
@@ -216,4 +175,3 @@ def mock_simulate(metadata, init_time=0, init_state=None, init_random_state=None
             logger.checkpoint_periodically(time, state, random_state)
 
     return (time, state, random_state.get_state())
-"""

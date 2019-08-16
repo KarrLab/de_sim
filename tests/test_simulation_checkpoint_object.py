@@ -14,8 +14,8 @@ from math import ceil
 from wc_utils.util.rand import RandomStateManager
 from de_sim.simulation_engine import SimulationEngine
 from de_sim.simulation_checkpoint_object import (AbstractCheckpointSimulationObject,
-                                                      CheckpointSimulationObject,
-                                                      AccessStateObjectInterface)
+                                                  CheckpointSimulationObject,
+                                                  AccessStateObjectInterface)
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import ApplicationSimulationObject
 from de_sim.errors import SimulatorError
