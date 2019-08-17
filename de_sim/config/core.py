@@ -9,6 +9,8 @@
 import configobj
 import os
 import pkg_resources
+
+from wc_utils.debug_logs.core import DebugLogsManager
 import wc_utils.config.core
 import wc_utils.debug_logs.config
 
@@ -49,9 +51,24 @@ def get_debug_logs_config(extra=None):
         'de_sim.debug.cfg',
         os.path.expanduser('~/.wc/de_sim.debug.cfg'),
     )
+    '''
     print()
     print('de_sim.config.core.get_debug_logs_config paths:')
     for attr in "default schema user".split():
         print(attr + ': ', end="")
         pprint(getattr(paths, attr))
+    '''
     return wc_utils.config.core.ConfigManager(paths).get_config(extra=extra)
+
+
+def get_debug_logs(extra=None):
+    """ Get debug logs
+
+    Args:
+        extra (:obj:`dict`, optional): additional configuration to override
+
+    Returns:
+        :obj:`wc_utils.debug_logs.core.DebugLogsManager`: a `DebugLogsManager`
+    """
+    config = get_debug_logs_config(extra)
+    return DebugLogsManager().setup_logs(config)

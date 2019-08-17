@@ -15,9 +15,7 @@ from de_sim.simulation_object import EventQueue, SimulationObject
 from de_sim.errors import SimulatorError
 from de_sim.event import Event
 from de_sim.shared_state_interface import SharedStateInterface
-
-# configuration
-from de_sim.config.debug_logs import logs as debug_logs
+from de_sim.config import core
 
 
 class SimulationEngine(object):
@@ -38,6 +36,7 @@ class SimulationEngine(object):
             log or checkpoint the entire state of a simulation; all objects in `shared_state` must
             implement `SharedStateInterface`
         debug_log (:obj:`bool`, optional): whether to output a debug log
+        debug_logs (:obj:` TODO
         stop_condition (:obj:`function`, optional): if provided, a function that takes one argument:
             `time`; a simulation terminates if `stop_condition` returns `True`
         event_counts (:obj:`Counter`): a counter of event types
@@ -53,6 +52,7 @@ class SimulationEngine(object):
         else:
             self.shared_state = shared_state
         self.debug_log = debug_log
+        self.debug_logs = core.get_debug_logs()
         self.set_stop_condition(stop_condition)
         self.time = 0.0
         self.simulation_objects = {}
@@ -227,7 +227,7 @@ class SimulationEngine(object):
 
         # write header to a plot log
         # plot logging is controlled by configuration files pointed to by config_constants and by env vars
-        plotting_logger = debug_logs.get_log('wc.plot.file')
+        plotting_logger = self.debug_logs.get_log('wc.plot.file')
         plotting_logger.debug('# {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()), sim_time=0)
 
         num_events_handled = 0
@@ -282,7 +282,7 @@ class SimulationEngine(object):
     def log_with_time(self, msg, local_call_depth=1):
         """Write a debug log message with the simulation time.
         """
-        debug_logs.get_log('wc.debug.file').debug(msg, sim_time=self.time,
+        self.debug_logs.get_log('wc.debug.file').debug(msg, sim_time=self.time,
             local_call_depth=local_call_depth)
 
     def provide_event_counts(self):

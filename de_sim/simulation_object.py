@@ -20,10 +20,9 @@ from de_sim.errors import SimulatorError
 from wc_utils.util.list import elements_to_str
 from wc_utils.util.misc import most_qual_cls_name, round_direct
 from de_sim.simulation_message import SimulationMessage
+from de_sim.config import core
 from de_sim.utilities import ConcreteABCMeta
 
-# configure logging
-from de_sim.config.debug_logs import logs as debug_logs
 
 # TODO(Arthur): move to engine
 class EventQueue(object):
@@ -41,10 +40,12 @@ class EventQueue(object):
 
     Attributes:
         event_heap (:obj:`list`): a `SimulationEngine`'s heap of events
+        debug_logs (:obj:` TODO
     """
 
     def __init__(self):
         self.event_heap = []
+        self.debug_logs = core.get_debug_logs()
 
     def reset(self):
         self.event_heap = []
@@ -174,7 +175,7 @@ class EventQueue(object):
             event (:obj:`Event`): the Event to log
             local_call_depth (:obj:`int`, optional): the local call depth; default = 1
         """
-        debug_logs.get_log('wc.debug.file').debug("Execute: {} {}:{} {} ({})".format(event.event_time,
+        self.debug_logs.get_log('wc.debug.file').debug("Execute: {} {}:{} {} ({})".format(event.event_time,
                 type(event.receiving_object).__name__,
                 event.receiving_object.name,
                 event.message.__class__.__name__,
@@ -268,6 +269,7 @@ class SimulationObject(object):
         time (:obj:`float`): this simulation object's current simulation time
         num_events (:obj:`int`): number of events processed
         simulator (:obj:`int`): the `SimulationEngine` that uses this `SimulationObject`
+        debug_logs (:obj:` TODO
     """
     def __init__(self, name):
         """ Initialize a SimulationObject.
@@ -281,6 +283,7 @@ class SimulationObject(object):
         self.time = 0.0
         self.num_events = 0
         self.simulator = None
+        self.debug_logs = core.get_debug_logs()
 
     def add(self, simulator):
         """ Add this object to a simulation.
@@ -460,7 +463,7 @@ class SimulationObject(object):
 
         # write events to a plot log
         # plot logging is controlled by configuration files pointed to by config_constants and by env vars
-        logger = debug_logs.get_log('wc.plot.file')
+        logger = self.debug_logs.get_log('wc.plot.file')
         for event in event_list:
             logger.debug(str(event), sim_time=self.time)
 
@@ -485,7 +488,7 @@ class SimulationObject(object):
     def log_with_time(self, msg, local_call_depth=1):
         """ Write a debug log message with the simulation time.
         """
-        debug_logs.get_log('wc.debug.file').debug(msg, sim_time=self.time,
+        self.debug_logs.get_log('wc.debug.file').debug(msg, sim_time=self.time,
             local_call_depth=local_call_depth)
 
 

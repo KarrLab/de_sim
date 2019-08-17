@@ -9,26 +9,27 @@
 import unittest
 import logging2
 
-from de_sim.config import core, debug_logs
+from de_sim.config import core
 from wc_utils.debug_logs.core import DebugLogsManager
-
 
 class TestCore(unittest.TestCase):
 
     def test_get_config(self):
         config = core.get_config()
         self.assertEqual(config['de_sim']['copy_event_bodies'], False)
-        config = core.get_config(extra={'de_sim':
-            {
-                'copy_event_bodies': True
-            }
-        })
+        config = core.get_config(extra={'de_sim': {
+                                        'copy_event_bodies': True
+                                                  }
+                                       })
         self.assertEqual(config['de_sim']['copy_event_bodies'], True)
 
-    def test_debug_logs(self):
+    def test_get_debug_logs(self):
         # test conf hierarchy from debug.default.cfg
-        c = debug_logs.config
+        c = core.get_debug_logs_config()
         for key in ['debug_logs', 'handlers', 'debug.console', 'level']:
             self.assertTrue(key in c)
             c = c[key]
-        self.assertTrue(isinstance(debug_logs.logs.get_log('wc.debug.file'), logging2.loggers.Logger))
+
+        debug_log_manager = core.get_debug_logs()
+        self.assertTrue(isinstance(debug_log_manager, DebugLogsManager))
+        self.assertTrue(isinstance(debug_log_manager.get_log('wc.debug.file'), logging2.loggers.Logger))
