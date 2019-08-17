@@ -12,6 +12,7 @@ import pkg_resources
 import wc_utils.config.core
 import wc_utils.debug_logs.config
 
+from pprint import pprint
 
 def get_config(extra=None):
     """ Get configuration
@@ -48,4 +49,9 @@ def get_debug_logs_config(extra=None):
         'de_sim.debug.cfg',
         os.path.expanduser('~/.wc/de_sim.debug.cfg'),
     )
+    print()
+    print('de_sim.config.core.get_debug_logs_config paths:')
+    for attr in "default schema user".split():
+        print(attr + ': ', end="")
+        pprint(getattr(paths, attr))
     return wc_utils.config.core.ConfigManager(paths).get_config(extra=extra)
