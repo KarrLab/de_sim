@@ -26,4 +26,9 @@ class TestCore(unittest.TestCase):
         self.assertEqual(config['de_sim']['copy_event_bodies'], True)
 
     def test_debug_logs(self):
+        # test conf hierarchy from debug.default.cfg
+        c = debug_logs.config
+        for key in ['debug_logs', 'handlers', 'debug.console', 'level']:
+            self.assertTrue(key in c)
+            c = c[key]
         self.assertTrue(isinstance(debug_logs.logs.get_log('wc.debug.file'), logging2.loggers.Logger))
