@@ -36,7 +36,7 @@ class SimulationEngine(object):
             log or checkpoint the entire state of a simulation; all objects in `shared_state` must
             implement `SharedStateInterface`
         debug_log (:obj:`bool`, optional): whether to output a debug log
-        debug_logs (:obj:` TODO
+        debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
         stop_condition (:obj:`function`, optional): if provided, a function that takes one argument:
             `time`; a simulation terminates if `stop_condition` returns `True`
         event_counts (:obj:`Counter`): a counter of event types

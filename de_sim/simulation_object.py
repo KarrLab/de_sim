@@ -269,7 +269,7 @@ class SimulationObject(object):
         time (:obj:`float`): this simulation object's current simulation time
         num_events (:obj:`int`): number of events processed
         simulator (:obj:`int`): the `SimulationEngine` that uses this `SimulationObject`
-        debug_logs (:obj:` TODO
+        debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
     """
     def __init__(self, name):
         """ Initialize a SimulationObject.
