@@ -10,3 +10,6 @@ include LICENSE
 # requirements
 include requirements.txt
 include requirements.optional.txt
+
+# configuration files
+recursive-include de_sim *.cfg
