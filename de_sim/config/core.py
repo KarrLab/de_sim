@@ -9,6 +9,7 @@
 import configobj
 import os
 import pkg_resources
+from pprint import pprint
 
 from wc_utils.debug_logs.core import DebugLogsManager
 import wc_utils.config.core
