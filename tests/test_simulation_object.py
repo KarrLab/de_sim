@@ -226,37 +226,48 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
         self.assertRegex(str(context.exception), expected_error)
 
         # no such handler
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaises(SimulatorError):
             class BadASO3(ApplicationSimulationObject): event_handlers = [(InitMsg, 'no_such_handler')]
 
         # handler not callable
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaises(SimulatorError):
             class BadASO4(ApplicationSimulationObject):
                 handler_not_callable = 2
                 event_handlers = [(InitMsg, 'handler_not_callable')]
 
+        with self.assertRaises(SimulatorError):
+            class BadASO4_2(ApplicationSimulationObject):
+                handler_not_callable = 'string_not_callable'
+                event_handlers = [(InitMsg, 'handler_not_callable')]
+
         # message must be a subclass of SimulationMessage
         class Obj(object): pass
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaises(SimulatorError):
             class BadASO5(ApplicationSimulationObject):
                 def handler(self, event): pass
                 event_handlers = [(Obj, 'handler')]
 
         # event_handlers isn't iterable over pairs
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaises(SimulatorError):
             class BadASO6(ApplicationSimulationObject):
                 def handler(self, event): pass
                 event_handlers = (InitMsg, 'handler')
 
         # message in messages_sent must be a subclass of SimulationMessage
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaises(SimulatorError):
             class BadASO7(ApplicationSimulationObject):
                 messages_sent = [Obj]
 
         # messages_sent isn't iterable
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaises(SimulatorError):
             class BadASO8(ApplicationSimulationObject):
                 messages_sent = Obj
+
+        # message type repeated
+        with self.assertRaises(SimulatorError):
+            class BadASO9(ApplicationSimulationObject):
+                def handler(self, event): pass
+                event_handlers = [(InitMsg, 'handler'), (InitMsg, 'handler')]
 
     def test_warnings(self):
 

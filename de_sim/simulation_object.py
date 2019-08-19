@@ -389,19 +389,18 @@ class SimulationObject(object):
         """ Register a `SimulationObject`'s event handler methods.
 
         The simulation engine vectors execution of a simulation message to the message's registered
-        event handler method. These relationships are declared in an `ApplicationSimulationObject`'s
-        `metadata.event_handlers_dict` declaration.
-
-        The priority of message execution in an event containing multiple messages
+        event handler method. The priority of message execution in an event containing multiple messages
         is determined by the sequence of tuples in `handlers`.
+        These relationships are stored in an `ApplicationSimulationObject`'s
+        `metadata.event_handlers_dict`.
         Each call to `register_handlers` re-initializes all event handler methods.
 
         Args:
             subclass (:obj:`SimulationObject`): a subclass of `SimulationObject` that is registering
                 the relationships between the simulation messages it receives and the methods that
                 handle them
-            handlers (:obj:`list` of (`SimulationMessage`, method)): a list of tuples, indicating which
-                method should handle which type of `SimulationMessage` in `subclass`; ordered in
+            handlers (:obj:`list` of (`SimulationMessage`, `function`)): a list of tuples, indicating
+                which method should handle which type of `SimulationMessage` in `subclass`; ordered in
                 decreasing priority for handling simulation message types
 
         Raises:
@@ -649,5 +648,5 @@ class ApplicationSimulationObject(SimulationObject, ApplicationSimulationObjectI
             initialized by `AppSimObjAndABCMeta`
     """
 
-    def send_initial_events(self, *args): return
-    def get_state(self): return ''
+    def send_initial_events(self, *args): pass  # pragma: no cover
+    def get_state(self): pass  # pragma: no cover
