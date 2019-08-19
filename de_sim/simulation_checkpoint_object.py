@@ -39,10 +39,10 @@ class AccessStateObjectInterface(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_checkpoint_state(self, time):
-        """ Obtain a checkpoint of the simulation's model state at time `time`
+        """ Obtain a checkpoint of the simulation application's state at time `time`
 
         Returns:
-            :obj:`object`: a checkpoint of the simulation's model state
+            :obj:`object`: a checkpoint of the simulation application's state
         """
         pass  # pragma: no cover
 
