@@ -12,9 +12,6 @@ dirname = os.path.dirname(__file__)
 package_data = {
     name: [
         'VERSION',
-    ],
-    # get config files
-    name: [
         'config/*.cfg',
     ],
 }
