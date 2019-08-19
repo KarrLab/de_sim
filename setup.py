@@ -15,7 +15,7 @@ package_data = {
     ],
     # get config files
     name: [
-        '*cfg',
+        'config/*.cfg',
     ],
 }
 
