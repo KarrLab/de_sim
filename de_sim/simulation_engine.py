@@ -261,10 +261,11 @@ class SimulationEngine(object):
 
                 self.time = next_time
 
-                # assertion won't be violated unless init message sent to negative time or
-                # objects decrease their time.
-                assert next_sim_obj.time <= next_time, ("Dispatching '{}', but object time "
-                    "({}) <= event time ({}) is false".format(next_sim_obj.name, next_sim_obj.time, next_time))
+                # error will only be raised if an init message sent to negative time or
+                # an object decreases its time
+                if next_time < next_sim_obj.time:
+                    raise SimulatorError("Dispatching '{}', but event time ({}) "
+                        "< object time ({})".format(next_sim_obj.name, next_time, next_sim_obj.time))
 
                 # dispatch object that's ready to execute next event
                 next_sim_obj.time = next_time
@@ -275,7 +276,7 @@ class SimulationEngine(object):
                     self.event_counts[e_name] += 1
                 next_sim_obj.__handle_event_list(next_events)
         except SimulatorError as e:
-            print('Simulation ended with error:', e, file=sys.stderr)
+            raise SimulatorError('Simulation ended with error:\n' + str(e))
 
         return num_events_handled
 
@@ -329,6 +330,4 @@ class SimulationEngine(object):
         if not self.debug_log:
             return
         state = self.get_simulation_state()
-        # TODO(Arthur): save this through a logger
-        # print(pprint.pformat(state))
         return pprint.pformat(state)

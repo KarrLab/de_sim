@@ -42,7 +42,6 @@ class ImproperlyRegisteredSimulationObject(ApplicationSimulationObject):
 
     def send_initial_events(self, *args): pass  # pragma: no cover
 
-    def get_state(self):
-        return 'stateless object'
+    def get_state(self): pass  # pragma: no cover
 
     def handler(self, event): pass  # pragma: no cover

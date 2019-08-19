@@ -196,10 +196,10 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.add_object(obj)
         event_queue = self.simulator.event_queue
         event_queue.schedule_event(-1, -1, obj, obj, InitMsg())
-        with self.assertRaises(AssertionError) as context:
+        with self.assertRaises(SimulatorError) as context:
             self.simulator.simulate(5.0)
-        self.assertIn('object time', str(context.exception))
-        self.assertIn('<= event time', str(context.exception))
+        self.assertIn('event time', str(context.exception))
+        self.assertIn('< object time', str(context.exception))
 
         with self.assertRaises(SimulatorError) as context:
             self.simulator.initialize()
