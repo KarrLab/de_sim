@@ -16,7 +16,6 @@ from collections import namedtuple
 from de_sim.sim_metadata import SimulationMetadata, AuthorMetadata, RunMetadata, Comparable
 from wc_utils.util.git import get_repo_metadata, RepoMetadataCollectionType
 from wc_utils.util.misc import as_dict
-import wc_lang
 
 
 SimulationConfig = namedtuple('SimulationConfig', 'time_max time_step changes perturbations random_seed')
