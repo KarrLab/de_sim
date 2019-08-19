@@ -13,6 +13,10 @@ package_data = {
     name: [
         'VERSION',
     ],
+    # get config files
+    name: [
+        '*cfg',
+    ],
 }
 
 # get package metadata
@@ -29,7 +33,7 @@ setuptools.setup(
     author="Karr Lab",
     author_email="info@karrlab.org",
     license="MIT",
-    keywords='discrete event simulation des Python',
+    keywords='discrete event simulation DES Python',
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     package_data=md.package_data,
     install_requires=md.install_requires,
