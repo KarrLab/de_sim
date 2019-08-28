@@ -16,7 +16,7 @@ class Error(Exception):
 
 
 class SimulatorError(Error):
-    """ Exception raised for errors in de_sim.core
+    """ Exception raised for errors in de_sim
 
     Attributes:
         message (:obj:`str`): the exception's message

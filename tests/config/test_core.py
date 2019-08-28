@@ -17,10 +17,7 @@ class TestCore(unittest.TestCase):
     def test_get_config(self):
         config = core.get_config()
         self.assertEqual(config['de_sim']['copy_event_bodies'], False)
-        config = core.get_config(extra={'de_sim': {
-                                        'copy_event_bodies': True
-                                                  }
-                                       })
+        config = core.get_config(extra={'de_sim': {'copy_event_bodies': True}})
         self.assertEqual(config['de_sim']['copy_event_bodies'], True)
 
     def test_get_debug_logs(self):
