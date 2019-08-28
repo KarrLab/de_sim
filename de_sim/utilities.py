@@ -1,4 +1,4 @@
-""" Simulation core utilities
+""" Simulation utilities
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2018-02-26
@@ -6,7 +6,7 @@
 :License: MIT
 """
 from abc import ABCMeta, abstractmethod
-
+from progress.bar import IncrementalBar
 
 class ConcreteABCMeta(ABCMeta):
     """ A concrete subclass of ABCMeta that's used to combine meta classes
@@ -22,3 +22,45 @@ class ConcreteABCMeta(ABCMeta):
         if self.__abstractmethods__:
             raise TypeError("{} has not implemented abstract methods {}".format(
                 self.__name__, ", ".join(self.__abstractmethods__)))
+
+
+class SimulationProgressBar(object):
+    """ Simulation progress bar
+
+    Shows the progress of a simulation towards the time it is scheduled to end, in simulation time
+    """
+
+    def __init__(self, use=False):
+        """ Create a simulation progress bar
+
+        A `SimulationProgressBar` does nothing by default, so that it can be used without an
+        `if` statement and configured at run-time.
+
+        Args:
+            use (:obj:`bool`): whether to use a progress bar
+        """
+        self.use = use
+
+    def start(self, end_time):
+        """ Start the simulation's progress bar
+
+        Args:
+            end_time (:obj:`float`): the simulation's end time
+        """
+        if self.use:
+            self.bar = IncrementalBar('Simulating', max=end_time, suffix = '%(index)d/%(max)d (end time)')
+
+    def progress(self, sim_time):
+        """ Advance the simulation's progress bar
+
+        Args:
+            sim_time (:obj:`float`): the simulation time
+        """
+        if self.use:
+            self.bar.goto(int(sim_time))
+
+    def end(self):
+        """ End the simulation's progress bar
+        """
+        if self.use:
+            self.bar.finish()

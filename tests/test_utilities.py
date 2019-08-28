@@ -7,8 +7,9 @@
 """
 import unittest
 from abc import ABCMeta, abstractmethod
+from capturer import CaptureOutput
 
-from de_sim.utilities import ConcreteABCMeta
+from de_sim.utilities import ConcreteABCMeta, SimulationProgressBar
 
 
 class AbstractBase(object, metaclass=ABCMeta):
@@ -36,3 +37,20 @@ class TestUtilities(unittest.TestCase):
         with self.assertRaises(TypeError) as context:
             class ConcreteClass(AbstractBase, metaclass=CombinedMeta): pass
         self.assertIn("ConcreteClass has not implemented abstract methods", str(context.exception))
+
+    def test_progress(self):
+        unused_bar = SimulationProgressBar()
+        self.assertEqual(unused_bar.start(1), None)
+        self.assertEqual(unused_bar.progress(2), None)
+        self.assertEqual(unused_bar.end(), None)
+
+        used_bar = SimulationProgressBar(True)
+        with CaptureOutput(relay=False) as capturer:
+            duration = 20
+            self.assertEqual(used_bar.start(duration), None)
+            self.assertEqual(used_bar.progress(10), None)
+            self.assertEqual(used_bar.progress(20), None)
+            self.assertEqual(used_bar.end(), None)
+            self.assertTrue('Simulating' in capturer.get_text())
+            self.assertTrue(str(duration) in capturer.get_text())
+            self.assertTrue('end time' in capturer.get_text())

@@ -16,6 +16,7 @@ from de_sim.errors import SimulatorError
 from de_sim.event import Event
 from de_sim.shared_state_interface import SharedStateInterface
 from de_sim.config import core
+from de_sim.utilities import SimulationProgressBar
 
 
 class SimulationEngine(object):
@@ -183,12 +184,12 @@ class SimulationEngine(object):
             data.append('')
         return '\n'.join(data)
 
-    def run(self, end_time, epsilon=None):
+    def run(self, end_time, **kwargs):
         """ Alias for simulate
         """
-        return self.simulate(end_time, epsilon=epsilon)
+        return self.simulate(end_time, **kwargs)
 
-    def simulate(self, end_time, epsilon=None, stop_condition=None):
+    def simulate(self, end_time, epsilon=None, stop_condition=None, progress=False):
         """ Run the simulation
 
         Args:
@@ -198,6 +199,8 @@ class SimulationEngine(object):
                 `epsilon` with `end_time` to ensure the ratio is not too large.
             stop_condition (:obj:`function`, optional): if provided, a function that takes one argument
                 `time`; a simulation terminates if the function returns `True`
+            progress (:obj:`bool`, optional): if `True`, print a bar that dynamically reports the
+                simulation's progress
 
         Returns:
             :obj:`int`: the number of times a simulation object executes `_handle_event()`. This may
@@ -215,6 +218,9 @@ class SimulationEngine(object):
 
         if self.event_queue.empty():
             raise SimulatorError("Simulation has no events")
+
+        # set up progress bar
+        self.progress = SimulationProgressBar(progress)
 
         # ratio of max simulation time to epsilon must not be so large that epsilon is lost
         # in roundoff error
@@ -234,10 +240,13 @@ class SimulationEngine(object):
         self.log_with_time("Simulation to {} starting".format(end_time))
 
         try:
+            self.progress.start(end_time)
+            # todo: perhaps 'while True':
             while self.time <= end_time:
                 # use the stop condition
                 if self.stop_condition is not None and self.stop_condition(self.time):
                     self.log_with_time(" Terminate with stop condition satisfied")
+                    self.progress.end()
                     break
 
                 # TODO(Arthur): provide dynamic control
@@ -251,10 +260,12 @@ class SimulationEngine(object):
 
                 if float('inf') == next_time:
                     self.log_with_time(" No events remain")
+                    self.progress.end()
                     break
 
                 if end_time < next_time:
                     self.log_with_time(" End time exceeded")
+                    self.progress.end()
                     break
 
                 num_events_handled += 1
@@ -275,6 +286,8 @@ class SimulationEngine(object):
                     e_name = ' - '.join([next_sim_obj.__class__.__name__, next_sim_obj.name, e.message.__class__.__name__])
                     self.event_counts[e_name] += 1
                 next_sim_obj.__handle_event_list(next_events)
+                self.progress.progress(next_time)
+
         except SimulatorError as e:
             raise SimulatorError('Simulation ended with error:\n' + str(e))
 

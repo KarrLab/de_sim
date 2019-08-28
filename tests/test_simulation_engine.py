@@ -16,6 +16,7 @@ import pstats
 import copy
 import random
 import warnings
+from capturer import CaptureOutput
 
 from de_sim.config import core
 from de_sim.errors import SimulatorError
@@ -141,14 +142,21 @@ class TestSimulationEngine(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.out_dir)
 
+    def make_one_object_simulation(self):
+        self.simulator.reset()
+        obj = ExampleSimulationObject(obj_name(1))
+        self.simulator.add_object(obj)
+        self.assertEqual(self.simulator.get_object(obj.name), obj)
+        self.simulator.initialize()
+
     def test_one_object_simulation(self):
         for operation in ['simulate', 'run']:
-            obj = ExampleSimulationObject(obj_name(1))
-            self.simulator.reset()
-            self.simulator.add_object(obj)
-            self.assertEqual(self.simulator.get_object(obj.name), obj)
-            self.simulator.initialize()
+            self.make_one_object_simulation()
             self.assertEqual(eval('self.simulator.'+operation+'(5.0)'), 3)
+            for kwargs in [{}, dict(progress=True)]:
+                expr = 'self.simulator.{}(5.0, **{})'.format(operation, kwargs)
+                self.make_one_object_simulation()
+                self.assertEqual(eval(expr), 3)
 
     def test_one_object_simulation_neg_endtime(self):
         obj = ExampleSimulationObject(obj_name(1))
@@ -244,6 +252,17 @@ class TestSimulationEngine(unittest.TestCase):
 
         with self.assertRaisesRegex(SimulatorError, 'stop_condition is not a function'):
             SimulationEngine(stop_condition='hello')
+
+    def test_progress_bar(self):
+        simulator = SimulationEngine()
+        simulator.add_object(PeriodicSimulationObject('name', 1))
+        simulator.initialize()
+        with CaptureOutput(relay=False) as capturer:
+            end_time = 10
+            self.assertEqual(simulator.simulate(end_time, progress=True), end_time)
+            self.assertTrue('Simulating' in capturer.get_text())
+            self.assertTrue(str(end_time) in capturer.get_text())
+            self.assertTrue('end time' in capturer.get_text())
 
     def test_multi_object_simulation_and_reset(self):
         for i in range(1, 4):
