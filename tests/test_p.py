@@ -11,10 +11,16 @@ from sys import stderr
 from capturer import CaptureOutput
 
 
+class TestUtilities0(unittest.TestCase):
+
+    def test(self):
+        print('stderr.isatty()', stderr.isatty())
+
 class TestUtilities1(unittest.TestCase):
 
     def test(self):
-        print(stderr.isatty())
+        print("spam", file=stderr)
+        print('stderr.isatty()', stderr.isatty())
 
 class TestUtilities2(unittest.TestCase):
 
