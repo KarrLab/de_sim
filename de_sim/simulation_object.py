@@ -40,7 +40,7 @@ class EventQueue(object):
 
     Attributes:
         event_heap (:obj:`list`): a `SimulationEngine`'s heap of events
-        debug_logs (:obj:` TODO
+        debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): a `DebugLogsManager`
     """
 
     def __init__(self):
