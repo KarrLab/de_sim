@@ -456,8 +456,6 @@ class SimulationObject(object):
         Raises:
             :obj:`SimulatorError`: if a message in `event_list` has an invalid type
         """
-        # TODO(Arthur): rationalize naming between simulation message, event, & event_list.
-        # The PDES field needs this clarity.
         self.num_events += 1
 
         # write events to a plot log

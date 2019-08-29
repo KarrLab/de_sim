@@ -46,6 +46,10 @@ class SimulationEngine(object):
         Raises:
             :obj:`SimulatorError`: if the `stop_condition` is not callable
     """
+    # Termination messages
+    NO_EVENTS_REMAIN = " No events remain"
+    END_TIME_EXCEEDED = " End time exceeded"
+    TERMINATE_WITH_STOP_CONDITION_SATISFIED = " Terminate with stop condition satisfied"
 
     def __init__(self, shared_state=None, debug_log=False, stop_condition=None):
         if shared_state is None:
@@ -241,15 +245,15 @@ class SimulationEngine(object):
 
         try:
             self.progress.start(end_time)
-            # todo: perhaps 'while True':
+            # TODO(Arthur): perhaps 'while True':
             while self.time <= end_time:
                 # use the stop condition
                 if self.stop_condition is not None and self.stop_condition(self.time):
-                    self.log_with_time(" Terminate with stop condition satisfied")
+                    self.log_with_time(self.TERMINATE_WITH_STOP_CONDITION_SATISFIED)
                     self.progress.end()
                     break
 
-                # TODO(Arthur): provide dynamic control
+                # TODO(Arthur): provide dynamic logging control
                 # self.log_simulation_state()
 
                 # get the earliest next event in the simulation
@@ -259,12 +263,12 @@ class SimulationEngine(object):
                 next_sim_obj = self.event_queue.next_event_obj()
 
                 if float('inf') == next_time:
-                    self.log_with_time(" No events remain")
+                    self.log_with_time(self.NO_EVENTS_REMAIN)
                     self.progress.end()
                     break
 
                 if end_time < next_time:
-                    self.log_with_time(" End time exceeded")
+                    self.log_with_time(self.END_TIME_EXCEEDED)
                     self.progress.end()
                     break
 

@@ -28,7 +28,7 @@ from de_sim.testing.some_message_types import InitMsg, Eg1
 from de_sim.shared_state_interface import SharedStateInterface
 from wc_utils.util.misc import most_qual_cls_name
 from wc_utils.util.dict import DictUtil
-
+config = core.get_debug_logs_config()
 
 ALL_MESSAGE_TYPES = [InitMsg, Eg1]
 
@@ -221,10 +221,9 @@ class TestSimulationEngine(unittest.TestCase):
         self.assertRegex(str(context.exception), "epsilon (.*) plus end time (.*) must exceed end time")
 
     def test_simulation_end(self):
-        # TODO(Arthur): make this a test or discard it
         self.simulator.add_object(BasicExampleSimulationObject('name'))
         self.simulator.initialize()
-        # log "No events remain"
+        # TODO(Arthur): test that the "No events remain" message is logged
         self.simulator.simulate(5.0)
 
     def test_simulation_stop_condition(self):
@@ -236,6 +235,8 @@ class TestSimulationEngine(unittest.TestCase):
         # execute to time <= end_time, with 1st event at time = 1
         self.assertEqual(simulator.simulate(end_time), end_time)
 
+        # TODO(Arthur): fix: this is misleading, because __stop_cond_end is treated like a time, but
+        # simulate() returns a count of events executed
         __stop_cond_end = 3
         def stop_cond_eg(time):
             return __stop_cond_end <= time
@@ -248,7 +249,7 @@ class TestSimulationEngine(unittest.TestCase):
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
         self.assertEqual(simulator.simulate(end_time, stop_condition=stop_cond_eg), __stop_cond_end)
-        # todo: test log of 'Terminate with stop condition satisfied'
+        # TODO(Arthur): test that the 'Terminate with stop condition satisfied' message is logged
 
         with self.assertRaisesRegex(SimulatorError, 'stop_condition is not a function'):
             SimulationEngine(stop_condition='hello')
@@ -294,11 +295,10 @@ class TestSimulationEngine(unittest.TestCase):
 
     def test_cyclical_messaging_network(self):
         # test event times at simulation objects; this test should succeed with any
-        # natural number for num_objs and any non-negative value of sim_duration
+        # natural number for num_objs and any non-negative value of end_time
         self.make_cyclical_messaging_network_sim(10)
         self.simulator.initialize()
-        self.simulator.simulate(20)
-        # todo: this method doesn't contain tests
+        self.assertTrue(0<self.simulator.simulate(20))
 
     def test_message_queues(self):
         warnings.simplefilter("ignore")
@@ -336,7 +336,6 @@ class TestSimulationEngine(unittest.TestCase):
         global config
         config = self.saved_config
 
-    @unittest.skip("todo: fix")
     def test_log_conf(self):
         console_level = config['debug_logs']['handlers']['debug.console']['level']
         self.suspend_logging()
