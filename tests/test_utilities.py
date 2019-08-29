@@ -40,6 +40,7 @@ class TestUtilities(unittest.TestCase):
             class ConcreteClass(AbstractBase, metaclass=CombinedMeta): pass
         self.assertIn("ConcreteClass has not implemented abstract methods", str(context.exception))
 
+    @unittest.skip("performance scaling test; runs slowly")
     def test_progress(self):
         unused_bar = SimulationProgressBar()
         self.assertEqual(unused_bar.start(1), None)
