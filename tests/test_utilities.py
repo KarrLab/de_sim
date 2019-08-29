@@ -17,6 +17,7 @@ class AbstractBase(object, metaclass=ABCMeta):
     @abstractmethod
     def f(self):
         raise NotImplemented
+
     @abstractmethod
     def g(self):
         raise NotImplemented
@@ -31,6 +32,7 @@ class YourMeta(type):
 class CombinedMeta(ConcreteABCMeta, YourMeta): pass
 
 
+from progress.bar import IncrementalBar, Bar
 class TestUtilities(unittest.TestCase):
 
     def test(self):
@@ -54,3 +56,25 @@ class TestUtilities(unittest.TestCase):
             self.assertTrue('Simulating' in capturer.get_text())
             self.assertTrue(str(duration) in capturer.get_text())
             self.assertTrue('end time' in capturer.get_text())
+
+    def test_raw_progress_1(self):
+        bar = IncrementalBar('Simulating', max=10)
+        bar.goto(5)
+        bar.finish()
+
+    def test_raw_progress_2(self):
+        with CaptureOutput(relay=False) as capturer:
+            bar = IncrementalBar('Simulating', max=10)
+            bar.goto(5)
+            bar.finish()
+
+    def test_raw_progress_3(self):
+        bar = Bar('Simulating', max=10)
+        bar.goto(5)
+        bar.finish()
+
+    def test_raw_progress_4(self):
+        with CaptureOutput(relay=False) as capturer:
+            bar = Bar('Simulating', max=10)
+            bar.goto(5)
+            bar.finish()
