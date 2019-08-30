@@ -6,7 +6,8 @@
 :License: MIT
 """
 from abc import ABCMeta, abstractmethod
-from progress.bar import IncrementalBar
+from progressbar.bar import ProgressBar
+
 
 class ConcreteABCMeta(ABCMeta):
     """ A concrete subclass of ABCMeta that's used to combine meta classes
@@ -48,7 +49,7 @@ class SimulationProgressBar(object):
             end_time (:obj:`float`): the simulation's end time
         """
         if self.use:
-            self.bar = IncrementalBar('Simulating', max=end_time, suffix = '%(index)d/%(max)d (end time)')
+            self.bar = ProgressBar(max_value=end_time).start()
 
     def progress(self, sim_time):
         """ Advance the simulation's progress bar
@@ -57,7 +58,7 @@ class SimulationProgressBar(object):
             sim_time (:obj:`float`): the simulation time
         """
         if self.use:
-            self.bar.goto(int(sim_time))
+            self.bar.update(sim_time)
 
     def end(self):
         """ End the simulation's progress bar

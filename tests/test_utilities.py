@@ -32,7 +32,6 @@ class YourMeta(type):
 class CombinedMeta(ConcreteABCMeta, YourMeta): pass
 
 
-from progress.bar import IncrementalBar, Bar
 class TestUtilities(unittest.TestCase):
 
     def test(self):
@@ -40,7 +39,7 @@ class TestUtilities(unittest.TestCase):
             class ConcreteClass(AbstractBase, metaclass=CombinedMeta): pass
         self.assertIn("ConcreteClass has not implemented abstract methods", str(context.exception))
 
-    @unittest.skip("performance scaling test; runs slowly")
+    @unittest.skip('progress tests fail if stderr is closed, which happens with karr_lab_build_utils')
     def test_progress(self):
         unused_bar = SimulationProgressBar()
         self.assertEqual(unused_bar.start(1), None)
@@ -54,28 +53,5 @@ class TestUtilities(unittest.TestCase):
             self.assertEqual(used_bar.progress(10), None)
             self.assertEqual(used_bar.progress(20), None)
             self.assertEqual(used_bar.end(), None)
-            self.assertTrue('Simulating' in capturer.get_text())
-            self.assertTrue(str(duration) in capturer.get_text())
-            self.assertTrue('end time' in capturer.get_text())
-
-    def test_raw_progress_1(self):
-        bar = IncrementalBar('Simulating', max=10)
-        bar.goto(5)
-        bar.finish()
-
-    def test_raw_progress_2(self):
-        with CaptureOutput(relay=False) as capturer:
-            bar = IncrementalBar('Simulating', max=10)
-            bar.goto(5)
-            bar.finish()
-
-    def test_raw_progress_3(self):
-        bar = Bar('Simulating', max=10)
-        bar.goto(5)
-        bar.finish()
-
-    def test_raw_progress_4(self):
-        with CaptureOutput(relay=False) as capturer:
-            bar = Bar('Simulating', max=10)
-            bar.goto(5)
-            bar.finish()
+            self.assertTrue('Elapsed Time' in capturer.get_text())
+            self.assertTrue("of {}".format(duration) in capturer.get_text())

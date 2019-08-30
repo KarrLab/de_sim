@@ -1,2 +1,2 @@
 setuptools
-progress
+progressbar2
