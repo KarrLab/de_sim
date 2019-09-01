@@ -40,7 +40,6 @@ class TestUtilities(unittest.TestCase):
             class ConcreteClass(AbstractBase, metaclass=CombinedMeta): pass
         self.assertIn("ConcreteClass has not implemented abstract methods", str(context.exception))
 
-    #@unittest.skip('progress tests fail if stderr is closed, which happens with karr_lab_build_utils')
     def test_progress(self):
         unused_bar = SimulationProgressBar()
         self.assertEqual(unused_bar.start(1), None)
@@ -61,7 +60,7 @@ class TestUtilities(unittest.TestCase):
                 self.assertTrue("end_time".format(duration) in capturer.get_text())
 
             except ValueError as e:
-                if str(e) == 'ValueError: I/O operation on closed file':
+                if str(e) == 'I/O operation on closed file':
                     print("SimulationProgressBar failed because stderr was closed", file=sys.error)
                     print("See de_sim issue #18", file=sys.error)
                 else:

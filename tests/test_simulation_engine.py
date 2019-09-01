@@ -254,7 +254,6 @@ class TestSimulationEngine(unittest.TestCase):
         with self.assertRaisesRegex(SimulatorError, 'stop_condition is not a function'):
             SimulationEngine(stop_condition='hello')
 
-    # @unittest.skip('progress tests fail if stderr is closed, which happens with karr_lab_build_utils')
     def test_progress_bar(self):
         simulator = SimulationEngine()
         simulator.add_object(PeriodicSimulationObject('name', 1))
@@ -268,7 +267,7 @@ class TestSimulationEngine(unittest.TestCase):
                 self.assertTrue("/{}".format(end_time) in capturer.get_text())
                 self.assertTrue("end_time".format(end_time) in capturer.get_text())
             except ValueError as e:
-                if str(e) == 'ValueError: I/O operation on closed file':
+                if str(e) == 'I/O operation on closed file':
                     print("SimulationProgressBar failed because stderr was closed", file=sys.error)
                     print("See de_sim issue #18", file=sys.error)
                 else:
