@@ -268,8 +268,8 @@ class TestSimulationEngine(unittest.TestCase):
                 self.assertTrue("end_time".format(end_time) in capturer.get_text())
             except ValueError as e:
                 if str(e) == 'I/O operation on closed file':
-                    print("SimulationProgressBar failed because stderr was closed", file=sys.error)
-                    print("See de_sim issue #18", file=sys.error)
+                    print("SimulationProgressBar failed because stderr was closed", file=sys.stderr)
+                    print("See de_sim issue #18", file=sys.stderr)
                 else:
                     self.fail('test_progress failed for unknown reason')
 
