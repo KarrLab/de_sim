@@ -7,6 +7,7 @@
 """
 from abc import ABCMeta, abstractmethod
 from progressbar.bar import ProgressBar
+from progressbar import widgets
 
 
 class ConcreteABCMeta(ABCMeta):
@@ -49,7 +50,16 @@ class SimulationProgressBar(object):
             end_time (:obj:`float`): the simulation's end time
         """
         if self.use:
-            self.bar = ProgressBar(max_value=end_time).start()
+            self.bar = ProgressBar(
+                widgets=[
+                    widgets.Percentage(),
+                    ' ', widgets.SimpleProgress(
+                        format='%(value)d/%(max_value)d (end_time)'),
+                    ' ', widgets.Bar(),
+                    ' ', widgets.Timer(),
+                    ' ', widgets.AdaptiveETA(),
+                ],
+                max_value=end_time).start()
 
     def progress(self, sim_time):
         """ Advance the simulation's progress bar

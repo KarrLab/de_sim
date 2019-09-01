@@ -6,6 +6,7 @@
 :License: MIT
 """
 import unittest
+import sys
 from abc import ABCMeta, abstractmethod
 from capturer import CaptureOutput
 
@@ -39,7 +40,7 @@ class TestUtilities(unittest.TestCase):
             class ConcreteClass(AbstractBase, metaclass=CombinedMeta): pass
         self.assertIn("ConcreteClass has not implemented abstract methods", str(context.exception))
 
-    @unittest.skip('progress tests fail if stderr is closed, which happens with karr_lab_build_utils')
+    #@unittest.skip('progress tests fail if stderr is closed, which happens with karr_lab_build_utils')
     def test_progress(self):
         unused_bar = SimulationProgressBar()
         self.assertEqual(unused_bar.start(1), None)
@@ -47,11 +48,13 @@ class TestUtilities(unittest.TestCase):
         self.assertEqual(unused_bar.end(), None)
 
         used_bar = SimulationProgressBar(True)
-        with CaptureOutput(relay=False) as capturer:
+        with CaptureOutput(relay=True) as capturer:
             duration = 20
             self.assertEqual(used_bar.start(duration), None)
             self.assertEqual(used_bar.progress(10), None)
+            # view intermediate progress
+            print('', file=sys.stderr)
             self.assertEqual(used_bar.progress(20), None)
             self.assertEqual(used_bar.end(), None)
-            self.assertTrue('Elapsed Time' in capturer.get_text())
-            self.assertTrue("of {}".format(duration) in capturer.get_text())
+            self.assertTrue("/{}".format(duration) in capturer.get_text())
+            self.assertTrue("end_time".format(duration) in capturer.get_text())
