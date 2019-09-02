@@ -1,5 +1,5 @@
 # description
-README.rst
+include README.rst
 
 # version
 include de_sim/VERSION
