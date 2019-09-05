@@ -36,7 +36,6 @@ class SimulationEngine(object):
         shared_state (:obj:`list` of :obj:`object`, optional): the shared state of the simulation, needed to
             log or checkpoint the entire state of a simulation; all objects in `shared_state` must
             implement `SharedStateInterface`
-        debug_log (:obj:`bool`, optional): whether to output a debug log
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
         fast_debug_file_logger (:obj:`FastLogger`): a fast logger
         stop_condition (:obj:`function`, optional): if provided, a function that takes one argument:
@@ -52,12 +51,11 @@ class SimulationEngine(object):
     END_TIME_EXCEEDED = " End time exceeded"
     TERMINATE_WITH_STOP_CONDITION_SATISFIED = " Terminate with stop condition satisfied"
 
-    def __init__(self, shared_state=None, debug_log=False, stop_condition=None):
+    def __init__(self, shared_state=None, stop_condition=None):
         if shared_state is None:
             self.shared_state = []
         else:
             self.shared_state = shared_state
-        self.debug_log = debug_log
         self.debug_logs = core.get_debug_logs()
         self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('wc.debug.file'), 'debug')
         self.set_stop_condition(stop_condition)
@@ -255,9 +253,6 @@ class SimulationEngine(object):
                     self.progress.end()
                     break
 
-                # TODO(Arthur): provide dynamic logging control
-                # self.log_simulation_state()
-
                 # get the earliest next event in the simulation
                 self.log_with_time('Simulation Engine launching next object')
                 # get parameters of next event from self.event_queue
@@ -341,11 +336,3 @@ class SimulationEngine(object):
             shared_objects_state.append(state_entry)
         state.append(shared_objects_state)
         return state
-
-    def log_simulation_state(self):
-        """ Log the simulation's state
-        """
-        if not self.debug_log:
-            return
-        state = self.get_simulation_state()
-        return pprint.pformat(state)
