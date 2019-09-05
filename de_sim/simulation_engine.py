@@ -16,7 +16,7 @@ from de_sim.errors import SimulatorError
 from de_sim.event import Event
 from de_sim.shared_state_interface import SharedStateInterface
 from de_sim.config import core
-from de_sim.utilities import SimulationProgressBar
+from de_sim.utilities import SimulationProgressBar, FastLogger
 
 
 class SimulationEngine(object):
@@ -38,6 +38,7 @@ class SimulationEngine(object):
             implement `SharedStateInterface`
         debug_log (:obj:`bool`, optional): whether to output a debug log
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
+        fast_debug_file_logger (:obj:`FastLogger`): a fast logger
         stop_condition (:obj:`function`, optional): if provided, a function that takes one argument:
             `time`; a simulation terminates if `stop_condition` returns `True`
         event_counts (:obj:`Counter`): a counter of event types
@@ -58,6 +59,7 @@ class SimulationEngine(object):
             self.shared_state = shared_state
         self.debug_log = debug_log
         self.debug_logs = core.get_debug_logs()
+        self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('wc.debug.file'), 'debug')
         self.set_stop_condition(stop_condition)
         self.time = 0.0
         self.simulation_objects = {}
@@ -300,8 +302,7 @@ class SimulationEngine(object):
     def log_with_time(self, msg, local_call_depth=1):
         """Write a debug log message with the simulation time.
         """
-        self.debug_logs.get_log('wc.debug.file').debug(msg, sim_time=self.time,
-            local_call_depth=local_call_depth)
+        self.fast_debug_file_logger.fast_log(msg, sim_time=self.time, local_call_depth=local_call_depth)
 
     def provide_event_counts(self):
         """ Provide the simulation's categorized event counts

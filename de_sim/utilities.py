@@ -8,6 +8,7 @@
 from abc import ABCMeta, abstractmethod
 from progressbar.bar import ProgressBar
 from progressbar import widgets
+from logging2.levels import LogLevel
 
 
 class ConcreteABCMeta(ABCMeta):
@@ -75,3 +76,44 @@ class SimulationProgressBar(object):
         """
         if self.use:
             self.bar.finish()
+
+
+# TODO(Arthur): unittest
+class FastLogger(object):
+    """ Cache activity decision to avoid slow logging when not writing logs """
+
+    def __init__(self, logger, level):
+        self.active = self.active_logger(logger, level)
+        self.method = getattr(logger, level)
+
+    def active_logger(self, logger, level):
+        """ Determine whether the logger will write log messages
+
+        Args:
+            logger (:obj:`logging2.Logger`): a logger
+            level (:obj:`str`): a logging level, as used in :obj:`logging2.LogLevel`:
+
+        Raises:
+            :obj:`ValueError`: if `level` is not valid
+
+        Returns:
+            :obj:`bool`: return `True` if the `logger` is active
+        """
+        active = False
+        if level not in set(['debug', 'info', 'warning', 'error', 'exception']):
+            raise ValueError("bad level '{}'".format(level))
+        log_level = getattr(LogLevel, level)
+        for handler in logger._handlers.values():
+            if log_level >= handler.min_level:
+                active = True
+        return active
+
+    def fast_log(self, msg, **kwargs):
+        """ Log, and do it quickly if nothing is being written
+
+        Args:
+            msg (:obj:`str`): the log message
+            kwargs (:obj:`dict`): other logging arguments
+        """
+        if self.active:
+            self.method(msg, **kwargs)

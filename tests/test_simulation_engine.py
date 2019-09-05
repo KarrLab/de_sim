@@ -351,16 +351,15 @@ class TestSimulationEngine(unittest.TestCase):
         self.restore_logging()
         self.assertEqual(config['debug_logs']['handlers']['debug.console']['level'], console_level)
 
-    @unittest.skip("performance scaling test; runs slowly")
     def test_performance(self):
         end_sim_time = 100
-        max_num_sim_objs = 2000
         num_sim_objs = 4
+        max_num_profile_objects = 300
+        max_num_sim_objs = 5000
         print()
         print("Performance test of cyclical messaging network: end simulation time: {}".format(end_sim_time))
-        unprofiled_perf = ["\n#sim obs\t# events\trun time (s)\tevents/s".format()]
+        unprofiled_perf = ["\n#sim obs\t# events\trun time (s)\tevents/s".expandtabs(15)]
 
-        self.suspend_logging()
         while num_sim_objs < max_num_sim_objs:
 
             # measure execution time
@@ -370,23 +369,33 @@ class TestSimulationEngine(unittest.TestCase):
             run_time = time.process_time() - start_time
             self.assertEqual(num_sim_objs*end_sim_time, num_events)
             unprofiled_perf.append("{}\t{}\t{:8.3f}\t{:8.3f}".format(num_sim_objs, num_events,
-                run_time, num_events/run_time))
+                run_time, num_events/run_time).expandtabs(15))
 
             # profile
-            self.prep_simulation(num_sim_objs)
-            out_file = os.path.join(self.out_dir, "profile_out_{}.out".format(num_sim_objs))
-            locals = {'self':self,
-                'end_sim_time':end_sim_time}
-            cProfile.runctx('num_events = self.simulator.simulate(end_sim_time)', {}, locals, filename=out_file)
-            profile = pstats.Stats(out_file)
-            print("Profile for {} simulation objects:".format(num_sim_objs))
-            profile.strip_dirs().sort_stats('cumulative').print_stats(15)
+            if num_sim_objs < max_num_profile_objects:
+                self.prep_simulation(num_sim_objs)
+                out_file = os.path.join(self.out_dir, "profile_out_{}.out".format(num_sim_objs))
+                locals = {'self':self,
+                    'end_sim_time':end_sim_time}
+                cProfile.runctx('num_events = self.simulator.simulate(end_sim_time)', {}, locals, filename=out_file)
+                profile = pstats.Stats(out_file)
+                print("Profile for {} simulation objects:".format(num_sim_objs))
+                profile.strip_dirs().sort_stats('cumulative').print_stats(15)
 
             num_sim_objs *= 4
 
         print('Performance summary')
         print("\n".join(unprofiled_perf))
-        self.restore_logging()
+        '''
+        Results in 2019-09 were:
+            #sim obs       # events       run time (s)   events/s
+            4              400               0.021       19312.756
+            16             1600              0.070       22901.670
+            64             6400              0.351       18239.911
+            256            25600             1.605       15950.325
+            1024           102400            6.979       14672.964
+            4096           409600           34.449       11890.083
+        '''
 
 
 class Delicate(SimulationMessage):
