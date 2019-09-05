@@ -2,7 +2,7 @@
 [![Documentation](https://readthedocs.org/projects/de_sim/badge/?version=latest)](https://docs.karrlab.org/de_sim)
 [![Test results](https://circleci.com/gh/KarrLab/de_sim.svg?style=shield)](https://circleci.com/gh/KarrLab/de_sim)
 [![Test coverage](https://coveralls.io/repos/github/KarrLab/de_sim/badge.svg)](https://coveralls.io/github/KarrLab/de_sim)
-[![Code analysis](https://api.codeclimate.com/v1/badges/b44357806d2f36820c7a/maintainability)](https://codeclimate.com/github/KarrLab/de_sim)
+[![Code analysis](https://api.codeclimate.com/v1/badges/2fa3ece22f571fd36b12/maintainability)](https://codeclimate.com/github/KarrLab/de_sim)
 [![License](https://img.shields.io/github/license/KarrLab/de_sim.svg)](LICENSE)
 ![Analytics](https://ga-beacon.appspot.com/UA-86759801-1/de_sim/README.md?pixel)
 
