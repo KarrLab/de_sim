@@ -16,7 +16,7 @@ class MockSimulationObject(ApplicationSimulationObject):
     """
 
     def __init__(self, name, test_case, **kwargs):
-        """ Init a MockSimulationObject that can unittest a `SimulationObject`s behavior
+        """ Init a MockSimulationObject that can unittest a :obj:`SimulationObject`\ s behavior
 
         Use `self.test_case` and `self.kwargs` to evaluate unit tests
 
