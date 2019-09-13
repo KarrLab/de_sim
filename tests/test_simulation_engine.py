@@ -263,6 +263,9 @@ class TestSimulationEngine(unittest.TestCase):
         with CaptureOutput(relay=True) as capturer:
             try:
                 end_time = 10
+                # open sys.stderr to workaround problem with karr_lab_build_utils run-tests closing it
+                # and progressbar expecting it to remain open
+                print('', file=sys.stderr)
                 self.assertEqual(simulator.simulate(end_time, progress=True), end_time)
                 self.assertTrue("/{}".format(end_time) in capturer.get_text())
                 self.assertTrue("end_time".format(end_time) in capturer.get_text())
