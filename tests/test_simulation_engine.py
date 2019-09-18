@@ -268,8 +268,13 @@ class TestSimulationEngine(unittest.TestCase):
                 self.assertTrue("end_time".format(end_time) in capturer.get_text())
             except ValueError as e:
                 if str(e) == 'I/O operation on closed file':
-                    print("SimulationProgressBar failed because stderr was closed", file=sys.stderr)
-                    print("See de_sim issue #18", file=sys.stderr)
+                    pass
+                    # This ValueError is raised because progressbar expects sys.stderr to remain open
+                    # for an extended time period but karr_lab_build_utils run-tests has closed it.
+                    # Since SimulationProgressBar works and passes tests under naked pytest, and
+                    # progressbar does not want to address the conflict over sys.stderr
+                    # (see https://github.com/WoLpH/python-progressbar/issues/202) we let this
+                    # test fail under karr_lab_build_utils.
                 else:
                     self.fail('test_progress failed for unknown reason')
 
