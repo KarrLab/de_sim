@@ -78,7 +78,6 @@ class SimulationProgressBar(object):
             self.bar.finish()
 
 
-# TODO(Arthur): unittest
 class FastLogger(object):
     """ Cache activity decision to avoid slow logging when not writing logs """
 

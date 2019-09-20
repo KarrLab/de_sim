@@ -356,6 +356,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.restore_logging()
         self.assertEqual(config['debug_logs']['handlers']['debug.console']['level'], console_level)
 
+    @unittest.skip("skip briefly")
     def test_performance(self):
         end_sim_time = 100
         num_sim_objs = 4
