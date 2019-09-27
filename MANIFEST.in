@@ -7,6 +7,9 @@ include de_sim/VERSION
 # license
 include LICENSE
 
+# examples
+recursive-include examples *
+
 # requirements
 include requirements.txt
 include requirements.optional.txt
