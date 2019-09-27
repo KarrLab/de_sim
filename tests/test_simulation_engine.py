@@ -5,30 +5,31 @@
 :License: MIT
 """
 
-import sys
-import os
-import unittest
-import time
-import tempfile
-import shutil
-import cProfile
-import pstats
-import copy
-import random
-import warnings
 from capturer import CaptureOutput
+from logging2 import LogRegister
+from logging2.levels import LogLevel
+import copy
+import cProfile
+import os
+import pstats
+import random
+import shutil
+import sys
+import tempfile
+import time
+import unittest
+import warnings
 
 from de_sim.config import core
 from de_sim.errors import SimulatorError
+from de_sim.shared_state_interface import SharedStateInterface
+from de_sim.simulation_engine import SimulationEngine
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import SimulationObject, ApplicationSimulationObject
 from de_sim.template_sim_objs import TemplatePeriodicSimulationObject
-from de_sim.simulation_engine import SimulationEngine
 from de_sim.testing.some_message_types import InitMsg, Eg1
-from de_sim.shared_state_interface import SharedStateInterface
-from wc_utils.util.misc import most_qual_cls_name
+from de_sim.utilities import FastLogger
 from wc_utils.util.dict import DictUtil
-config = core.get_debug_logs_config()
 
 ALL_MESSAGE_TYPES = [InitMsg, Eg1]
 
@@ -138,6 +139,7 @@ class TestSimulationEngine(unittest.TestCase):
         # create simulator
         self.simulator = SimulationEngine()
         self.out_dir = tempfile.mkdtemp()
+        self.log_names = ['wc.debug.file', 'wc.plot.file']
 
     def tearDown(self):
         shutil.rmtree(self.out_dir)
@@ -300,16 +302,16 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.initialize()
         self.assertEqual(self.simulator.simulate(2.5), 4)
 
-    def make_cyclical_messaging_network_sim(self, num_objs):
+    def make_cyclical_messaging_network_sim(self, simulator, num_objs):
         # make simulation with cyclical messaging network
         sim_objects = [CyclicalMessagesSimulationObject(obj_name(i), i, num_objs, self)
             for i in range(num_objs)]
-        self.simulator.add_objects(sim_objects)
+        simulator.add_objects(sim_objects)
 
     def test_cyclical_messaging_network(self):
         # test event times at simulation objects; this test should succeed with any
         # natural number for num_objs and any non-negative value of end_time
-        self.make_cyclical_messaging_network_sim(10)
+        self.make_cyclical_messaging_network_sim(self.simulator, 10)
         self.simulator.initialize()
         self.assertTrue(0<self.simulator.simulate(20))
 
@@ -328,7 +330,7 @@ class TestSimulationEngine(unittest.TestCase):
 
             messages_sent = [InitMsg]
 
-        self.make_cyclical_messaging_network_sim(4)
+        self.make_cyclical_messaging_network_sim(self.simulator, 4)
         self.simulator.add_object(InactiveSimulationObject())
         self.simulator.initialize()
         queues = self.simulator.message_queues()
@@ -337,33 +339,67 @@ class TestSimulationEngine(unittest.TestCase):
 
     # test simulation performance code:
     def prep_simulation(self, num_sim_objs):
-        self.simulator.reset()
-        self.make_cyclical_messaging_network_sim(num_sim_objs)
-        self.simulator.initialize()
+        self.simulator_for_perf_tests.reset()
+        self.make_cyclical_messaging_network_sim(self.simulator_for_perf_tests, num_sim_objs)
+        self.simulator_for_perf_tests.initialize()
 
-    def suspend_logging(self):
-        self.saved_config = copy.deepcopy(config)
-        DictUtil.set_value(config, 'level', 'error')
+    def suspend_logging(self, log_names, new_level=LogLevel.exception):
+        # cannot use environment variable(s) to modify logging because logging2.Logger() as used
+        # by LoggerConfigurator().from_dict() simply reuses existing logs whose names don't change
+        # instead, modify the levels of existing logs
+        # get all existing levels
+        existing_levels = {}    # map from log name -> handler name -> level
+        for log_name in log_names:
+            existing_levels[log_name] = {}
+            existing_log = LogRegister.get_logger(name=log_name)
+            for handler in existing_log.handlers:
+                existing_levels[log_name][handler.name] = handler.min_level
+        # set levels to new level
+        for log_name in log_names:
+            existing_log = LogRegister.get_logger(name=log_name)
+            for handler in existing_log.handlers:
+                handler.min_level = new_level
+        return existing_levels
 
-    def restore_logging(self):
-        global config
-        config = self.saved_config
+    def restore_logging_levels(self, log_names, existing_levels):
+        for log_name in log_names:
+            existing_log = LogRegister.get_logger(name=log_name)
+            for handler in existing_log.handlers:
+                handler.min_level = existing_levels[log_name][handler.name]
 
-    def test_log_conf(self):
-        console_level = config['debug_logs']['handlers']['debug.console']['level']
-        self.suspend_logging()
-        self.assertEqual(config['debug_logs']['handlers']['debug.console']['level'], 'error')
-        self.restore_logging()
-        self.assertEqual(config['debug_logs']['handlers']['debug.console']['level'], console_level)
+    def test_suspend_restore_logging(self):
+        debug_logs = core.get_debug_logs()
 
-    @unittest.skip("skip briefly")
+        existing_levels = self.suspend_logging(self.log_names)
+        # suspended
+        for log_name in self.log_names:
+            fast_logger = FastLogger(debug_logs.get_log(log_name), 'debug')
+            self.assertEqual(fast_logger.get_level(), LogLevel.exception)
+
+        self.restore_logging_levels(self.log_names, existing_levels)
+        level_by_logger = {}
+        for logger, handler_levels in existing_levels.items():
+            min_level = LogLevel.exception
+            for handler, level in handler_levels.items():
+                if level < min_level:
+                    min_level = level
+            level_by_logger[logger] = min_level
+
+        # restored
+        for log_name in self.log_names:
+            fast_logger = FastLogger(debug_logs.get_log(log_name), 'debug')
+            self.assertEqual(fast_logger.get_level(), level_by_logger[log_name])
+
     def test_performance(self):
+        existing_levels = self.suspend_logging(self.log_names)
+        self.simulator_for_perf_tests = SimulationEngine()
         end_sim_time = 100
         num_sim_objs = 4
         max_num_profile_objects = 300
         max_num_sim_objs = 5000
         print()
-        print("Performance test of cyclical messaging network: end simulation time: {}".format(end_sim_time))
+        print("Performance test of cyclical messaging network: end simulation time: {}".format(
+            end_sim_time))
         unprofiled_perf = ["\n#sim obs\t# events\trun time (s)\tevents/s".expandtabs(15)]
 
         while num_sim_objs < max_num_sim_objs:
@@ -371,7 +407,7 @@ class TestSimulationEngine(unittest.TestCase):
             # measure execution time
             self.prep_simulation(num_sim_objs)
             start_time = time.process_time()
-            num_events = self.simulator.simulate(end_sim_time)
+            num_events = self.simulator_for_perf_tests.simulate(end_sim_time)
             run_time = time.process_time() - start_time
             self.assertEqual(num_sim_objs*end_sim_time, num_events)
             unprofiled_perf.append("{}\t{}\t{:8.3f}\t{:8.3f}".format(num_sim_objs, num_events,
@@ -383,13 +419,15 @@ class TestSimulationEngine(unittest.TestCase):
                 out_file = os.path.join(self.out_dir, "profile_out_{}.out".format(num_sim_objs))
                 locals = {'self':self,
                     'end_sim_time':end_sim_time}
-                cProfile.runctx('num_events = self.simulator.simulate(end_sim_time)', {}, locals, filename=out_file)
+                cProfile.runctx('num_events = self.simulator_for_perf_tests.simulate(end_sim_time)',
+                    {}, locals, filename=out_file)
                 profile = pstats.Stats(out_file)
                 print("Profile for {} simulation objects:".format(num_sim_objs))
                 profile.strip_dirs().sort_stats('cumulative').print_stats(15)
 
             num_sim_objs *= 4
 
+        self.restore_logging_levels(self.log_names, existing_levels)
         print('Performance summary')
         print("\n".join(unprofiled_perf))
         '''

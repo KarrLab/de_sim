@@ -1,3 +1,2 @@
 setuptools
 progressbar2 >= 3.39
-wc_utils
