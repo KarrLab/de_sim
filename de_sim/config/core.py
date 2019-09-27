@@ -42,7 +42,8 @@ def get_debug_logs_config(extra=None):
         extra (:obj:`dict`, optional): additional configuration to override
 
     Returns:
-        :obj:`configobj.ConfigObj`: nested dictionary with the configuration settings loaded from the configuration source(s).
+        :obj:`configobj.ConfigObj`: nested dictionary with the configuration settings loaded from the
+        configuration source(s).
     """
     paths = wc_utils.debug_logs.config.paths.deepcopy()
     paths.default = pkg_resources.resource_filename('de_sim', 'config/debug.default.cfg')

@@ -7,7 +7,6 @@
 """
 
 import datetime
-import pprint
 import sys
 from collections import Counter
 
@@ -58,6 +57,7 @@ class SimulationEngine(object):
             self.shared_state = shared_state
         self.debug_logs = core.get_debug_logs()
         self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('wc.debug.file'), 'debug')
+        self.fast_plotting_logger = FastLogger(self.debug_logs.get_log('wc.plot.file'), 'debug')
         self.set_stop_condition(stop_condition)
         self.time = 0.0
         self.simulation_objects = {}
@@ -237,8 +237,7 @@ class SimulationEngine(object):
 
         # write header to a plot log
         # plot logging is controlled by configuration files pointed to by config_constants and by env vars
-        plotting_logger = self.debug_logs.get_log('wc.plot.file')
-        plotting_logger.debug('# {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()), sim_time=0)
+        self.fast_plotting_logger.fast_log('# {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()), sim_time=0)
 
         num_events_handled = 0
         self.log_with_time("Simulation to {} starting".format(end_time))
