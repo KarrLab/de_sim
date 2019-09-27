@@ -8,7 +8,7 @@
 from abc import ABCMeta, abstractmethod
 from progressbar.bar import ProgressBar
 from progressbar import widgets
-from logging2.levels import LogLevel
+from logging2 import LogLevel
 
 
 class ConcreteABCMeta(ABCMeta):
@@ -79,33 +79,58 @@ class SimulationProgressBar(object):
 
 
 class FastLogger(object):
-    """ Cache activity decision to avoid slow logging when not writing logs """
+    """ Cache activity decision to avoid slow logging when not writing logs
 
-    def __init__(self, logger, level):
-        self.active = self.active_logger(logger, level)
-        self.method = getattr(logger, level)
+    Attributes:
+        active (:obj:`bool`): whether the log is active
+        method (:obj:`method`): the logging method being used, `debug`, `info`, etc.
+    """
+    LOG_LEVELS = set([log_level.name for log_level in LogLevel])
 
-    def active_logger(self, logger, level):
+    def __init__(self, logger, level_used):
+        """
+        Args:
+            logger (:obj:`logging2.Logger`): a logger
+            level_used (:obj:`str`): a logging level, as used in :obj:`logging2.LogLevel`:
+        """
+        self.active = FastLogger.active_logger(logger, level_used)
+        self.method = getattr(logger, level_used)
+        self.logger = logger
+
+    @staticmethod
+    def active_logger(logger, level_used):
         """ Determine whether the logger will write log messages
 
         Args:
             logger (:obj:`logging2.Logger`): a logger
-            level (:obj:`str`): a logging level, as used in :obj:`logging2.LogLevel`:
+            level_used (:obj:`str`): the logging level for this logger
 
         Raises:
-            :obj:`ValueError`: if `level` is not valid
+            :obj:`ValueError`: if `level_used` is not a valid logging level
 
         Returns:
-            :obj:`bool`: return `True` if the `logger` is active
+            :obj:`bool`: return `True` if the `logger` is active, `False` otherwise
         """
         active = False
-        if level not in set(['debug', 'info', 'warning', 'error', 'exception']):
-            raise ValueError("bad level '{}'".format(level))
-        log_level = getattr(LogLevel, level)
-        for handler in logger._handlers.values():
-            if log_level >= handler.min_level:
+        if level_used not in FastLogger.LOG_LEVELS:
+            raise ValueError("bad level '{}'".format(level_used))
+        log_level = LogLevel[level_used]
+        for handler in logger.handlers:
+            if handler.min_level <= log_level:
                 active = True
         return active
+
+    def get_level(self):
+        """ Get the level of this logger
+
+        Returns:
+            :obj:`LogLevel`: the level of this logger
+        """
+        min_of_min = LogLevel.exception
+        for handler in self.logger.handlers:
+            if handler.min_level < min_of_min:
+                min_of_min = handler.min_level
+        return min_of_min
 
     def fast_log(self, msg, **kwargs):
         """ Log, and do it quickly if nothing is being written
