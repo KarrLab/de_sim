@@ -1,2 +1,3 @@
-setuptools
+configobj
 progressbar2 >= 3.39
+setuptools
