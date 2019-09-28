@@ -17,15 +17,7 @@ from de_sim.config import core
 class TestMinimalSimulation(unittest.TestCase):
 
     def setUp(self):
-        self.config = core.get_debug_logs_config()
-        # turn off console logging
-        self.console_level = self.config['debug_logs']['handlers']['debug.console']['level']
-        self.config['debug_logs']['handlers']['debug.console']['level'] = 'error'
         warnings.simplefilter("ignore")
-
-    def tearDown(self):
-        # restore console logging
-        self.config['debug_logs']['handlers']['debug.console']['level'] = self.console_level
 
     def run_minimal_simulation(self, delay, end_time):
         args = Namespace(delay=delay, end_time=end_time)
