@@ -309,7 +309,7 @@ class SimulationObject(object):
         # remove all of this object's state from simulator, and test it properly
         self.simulator = None
 
-    def send_event_absolute(self, event_time, receiving_object, message, copy=True):
+    def send_event_absolute(self, event_time, receiving_object, message, copy=False):
         """ Send a simulation event message with an absolute event time.
 
         Args:
@@ -318,8 +318,8 @@ class SimulationObject(object):
                 execute the event
             message (:obj:`SimulationMessage`): the simulation message which will be carried by the event
             copy (:obj:`bool`, optional): if `True`, copy the message before adding it to the event;
-                `True` by default as a safety measure to avoid unexpected changes to shared objects;
-                    set `False` to optimize
+                set `False` by default to optimize performance; set `True` as a safety measure to avoid
+                unexpected changes to shared objects
 
         Raises:
             :obj:`SimulatorError`: if `event_time` < 0, or
@@ -362,7 +362,7 @@ class SimulationObject(object):
         self.log_with_time("Send: ({}, {:6.2f}) -> ({}, {:6.2f}): {}".format(self.name, self.time,
             receiving_object.name, event_time, message.__class__.__name__))
 
-    def send_event(self, delay, receiving_object, message, copy=True):
+    def send_event(self, delay, receiving_object, message, copy=False):
         """ Send a simulation event message, specifing the event time as a delay.
 
         Args:
@@ -371,8 +371,8 @@ class SimulationObject(object):
                 execute the event
             message (:obj:`SimulationMessage`): the simulation message which will be carried by the event
             copy (:obj:`bool`, optional): if `True`, copy the message before adding it to the event;
-                `True` by default as a safety measure to avoid unexpected changes to shared objects;
-                    set `False` to optimize
+                set `False` by default to optimize performance; set `True` as a safety measure to avoid
+                unexpected changes to shared objects
 
         Raises:
             :obj:`SimulatorError`: if `delay` < 0 or `delay` is NaN, or

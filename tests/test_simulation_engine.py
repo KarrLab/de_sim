@@ -8,7 +8,6 @@
 from capturer import CaptureOutput
 from logging2 import LogRegister
 from logging2.levels import LogLevel
-import copy
 import cProfile
 import os
 import pstats
@@ -423,7 +422,7 @@ class TestSimulationEngine(unittest.TestCase):
                     {}, locals, filename=out_file)
                 profile = pstats.Stats(out_file)
                 print("Profile for {} simulation objects:".format(num_sim_objs))
-                profile.strip_dirs().sort_stats('cumulative').print_stats(15)
+                profile.strip_dirs().sort_stats('cumulative').print_stats(20)
 
             num_sim_objs *= 4
 
@@ -431,14 +430,14 @@ class TestSimulationEngine(unittest.TestCase):
         print('Performance summary')
         print("\n".join(unprofiled_perf))
         '''
-        Results in 2019-09 were:
+        Results on 2019-09-29 were:
             #sim obs       # events       run time (s)   events/s
-            4              400               0.021       19312.756
-            16             1600              0.070       22901.670
-            64             6400              0.351       18239.911
-            256            25600             1.605       15950.325
-            1024           102400            6.979       14672.964
-            4096           409600           34.449       11890.083
+            4              400               0.030       13124.738
+            16             1600              0.140       11438.032
+            64             6400              0.602       10632.815
+            256            25600             2.519       10163.297
+            1024           102400           16.648       6150.755
+            4096           409600           45.671       8968.404
         '''
 
 
