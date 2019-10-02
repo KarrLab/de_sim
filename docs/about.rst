@@ -1,6 +1,8 @@
 About
 =====
 
+We present a discrete event simulator called DE-Sim which provides an easy-to-use interface for creating and running object-oriented simulations.
+
 ----------------------
 License
 ----------------------
