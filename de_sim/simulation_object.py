@@ -260,9 +260,6 @@ class SimulationObject(object):
     the object's name (which must be unique), its simulation time, a queue of received events,
     and a send_event() method.
 
-        Args:
-            send_time (:obj:`float`): the simulation time at which the message was generated (sent)
-
     Attributes:
         name (:obj:`str`): this simulation object's name, which is unique across all simulation objects
             handled by a `SimulationEngine`
