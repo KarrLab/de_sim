@@ -194,7 +194,6 @@ class EventQueue(object):
         Args:
             sim_obj (:obj:`SimulationObject`, optional): if provided, return only events to be
                 received by `sim_obj`
-            `EventQueue`'s values in a :obj:`list`
             as_list (:obj:`bool`, optional): if set, return the `EventQueue`'s values in a :obj:`list`
             separator (:obj:`str`, optional): the field separator used if the values are returned as
                 a string
