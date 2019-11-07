@@ -139,7 +139,7 @@ class TestCheckpointSimulationObjects(unittest.TestCase):
         self.simulator.initialize()
 
         def endpoints(duration, period):
-            # provide the number of end points at 0, period, 2 * period, ... in [0, duration]
+            # the number of time points in 0, period, 2 * period, ..., int(duration / period) * period
             quotient = duration / period
             return int(quotient) + 1
 
