@@ -14,8 +14,8 @@ from math import ceil
 from wc_utils.util.rand import RandomStateManager
 from de_sim.simulation_engine import SimulationEngine
 from de_sim.simulation_checkpoint_object import (AbstractCheckpointSimulationObject,
-                                                  CheckpointSimulationObject,
-                                                  AccessStateObjectInterface)
+                                                 CheckpointSimulationObject,
+                                                 AccessStateObjectInterface)
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import ApplicationSimulationObject
 from de_sim.errors import SimulatorError
@@ -51,7 +51,7 @@ class PeriodicLinearUpdatingSimuObj(ApplicationSimulationObject):
         super().__init__(name)
 
     def send_initial_events(self):
-        self.send_event(self.delay, self, MessageSentToSelf())
+        self.send_event(0, self, MessageSentToSelf())
 
     def handle_simulation_event(self, event):
         self.simulation_state.set(self.a * self.time + self.b)
@@ -129,25 +129,31 @@ class TestCheckpointSimulationObjects(unittest.TestCase):
             self.assertTrue(linear_prediction - self.a * self.update_period <= value <= linear_prediction)
 
     def test_checkpoint_simulation_object(self):
-        '''
-        Run a simulation with CheckpointSimulationObject and another object.
-        Take checkpoints and test them.
-        '''
+        # Run a simulation with a CheckpointSimulationObject and another object.
+        # Take checkpoints and test them.
+
         # prepare
         checkpointing_obj = CheckpointSimulationObject('checkpointing_obj', self.checkpoint_period,
                                                        self.checkpoint_dir, self.state)
         self.simulator.add_objects([self.updating_obj, checkpointing_obj])
         self.simulator.initialize()
 
+        def endpoints(duration, period):
+            # provide the number of end points at 0, period, 2 * period, ... in [0, duration]
+            quotient = duration / period
+            return int(quotient) + 1
+
         # run
-        run_time = 241
-        expected_num_events = int(run_time/self.update_period) + int(run_time/self.checkpoint_period)
+        run_time = 22
+        expected_num_events = endpoints(run_time, self.update_period) + \
+            endpoints(run_time, self.checkpoint_period)
         num_events = self.simulator.run(run_time)
 
         # check results
         self.assertEqual(expected_num_events, num_events)
         expected_checkpoint_times = [float(t) for t in
-                                     range(0, self.checkpoint_period * int(run_time/self.checkpoint_period) + 1, self.checkpoint_period)]
+                                     range(0, self.checkpoint_period * int(run_time/self.checkpoint_period) + 1,
+                                           self.checkpoint_period)]
         checkpoints = Checkpoint.list_checkpoints(self.checkpoint_dir)
         self.assertEqual(expected_checkpoint_times, checkpoints)
         checkpoint = Checkpoint.get_checkpoint(self.checkpoint_dir)

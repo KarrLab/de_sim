@@ -211,7 +211,8 @@ class SimulationEngine(object):
 
         Returns:
             :obj:`int`: the number of times a simulation object executes `_handle_event()`. This may
-                be smaller than the number of events sent, because simultaneous events are handled together.
+                be smaller than the number of events sent, because simultaneous events at one
+                simulation object are handled together.
 
         Raises:
             :obj:`SimulatorError`: if the ratio of `end_time` to `epsilon` is so large that `epsilon`

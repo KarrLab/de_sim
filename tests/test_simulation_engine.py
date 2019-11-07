@@ -234,7 +234,7 @@ class TestSimulationEngine(unittest.TestCase):
         simulator.initialize()
         end_time = 10
         # execute to time <= end_time, with 1st event at time = 1
-        self.assertEqual(simulator.simulate(end_time), end_time)
+        self.assertEqual(simulator.simulate(end_time), end_time + 1)
 
         # TODO(Arthur): fix: this is misleading, because __stop_cond_end is treated like a time, but
         # simulate() returns a count of events executed
@@ -244,12 +244,12 @@ class TestSimulationEngine(unittest.TestCase):
         simulator = SimulationEngine(stop_condition=stop_cond_eg)
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
-        self.assertEqual(simulator.simulate(end_time), __stop_cond_end)
+        self.assertEqual(simulator.simulate(end_time), __stop_cond_end + 1)
 
         simulator = SimulationEngine()
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
-        self.assertEqual(simulator.simulate(end_time, stop_condition=stop_cond_eg), __stop_cond_end)
+        self.assertEqual(simulator.simulate(end_time, stop_condition=stop_cond_eg), __stop_cond_end + 1)
         # TODO(Arthur): test that the 'Terminate with stop condition satisfied' message is logged
 
         with self.assertRaisesRegex(SimulatorError, 'stop_condition is not a function'):
@@ -264,7 +264,7 @@ class TestSimulationEngine(unittest.TestCase):
         with CaptureOutput(relay=True) as capturer:
             try:
                 end_time = 10
-                self.assertEqual(simulator.simulate(end_time, progress=True), end_time)
+                self.assertEqual(simulator.simulate(end_time, progress=True), end_time + 1)
                 self.assertTrue("/{}".format(end_time) in capturer.get_text())
                 self.assertTrue("end_time".format(end_time) in capturer.get_text())
             except ValueError as e:
