@@ -267,6 +267,7 @@ class SimulationObject(object):
         simulator (:obj:`int`): the `SimulationEngine` that uses this `SimulationObject`
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
     """
+    # todo: fix: add optional time_tiebreaker to each  SimulationObject
     def __init__(self, name):
         """ Initialize a SimulationObject.
 
@@ -516,6 +517,7 @@ class ApplicationSimulationObjMeta(type):
     EVENT_HANDLERS = 'event_handlers'
     # messages sent list keyword
     MESSAGES_SENT = 'messages_sent'
+    # todo: fix: add optional receiving_class_priority attribute, which can be any ordered object
 
     def __new__(cls, clsname, superclasses, namespace):
         """

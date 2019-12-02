@@ -19,6 +19,7 @@ class Event(object):
     attribute must be structured as specified in the `message_types` module.
 
     As per David Jefferson's thinking, the event queue is ordered by data provided by the
+    # todo: fix
     simulation application, in particular (event time, receiving object name).
     This is implemented by the comparison operators for Event below. This ordering achieves
     deterministic and reproducible simulations. (See Jefferson's LLNL course.)
@@ -56,6 +57,7 @@ class Event(object):
         Returns:
             :obj:`bool`: `True` if this `Event` occurs earlier than `other`
         """
+        # todo: fix: compare events on (time, time_tiebreaker)
         return ((self.event_time, self.receiving_object.name) <
             (other.event_time, other.receiving_object.name))
 
@@ -79,6 +81,7 @@ class Event(object):
         Returns:
             :obj:`bool`: `True` if this `Event` occurs later than `other`
         """
+        # todo: fix
         return ((self.event_time, self.receiving_object.name) >
             (other.event_time, other.receiving_object.name))
 
@@ -140,7 +143,6 @@ class Event(object):
 
         Rendering the content assumes that `sending_object` and `receiving_object`
         have name attributes.
-        # TODO(Arthur): document contents of a rendered event
 
         Args:
             round_w_direction (:obj:`bool`, optional): if set, round times to strings indicating
