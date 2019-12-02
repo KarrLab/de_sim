@@ -6,22 +6,24 @@
 :License: MIT
 """
 
-from copy import deepcopy
-import heapq
-import abc
 from abc import ABCMeta
-import warnings
-import inspect
+from copy import deepcopy
+from enum import IntEnum
+import abc
 import collections
+import heapq
+import inspect
 import math
+import sys
+import warnings
 
-from de_sim.event import Event
+from de_sim.config import core
 from de_sim.errors import SimulatorError
+from de_sim.event import Event
+from de_sim.simulation_message import SimulationMessage
+from de_sim.utilities import ConcreteABCMeta, FastLogger
 from wc_utils.util.list import elements_to_str
 from wc_utils.util.misc import most_qual_cls_name, round_direct
-from de_sim.simulation_message import SimulationMessage
-from de_sim.config import core
-from de_sim.utilities import ConcreteABCMeta, FastLogger
 
 
 # TODO(Arthur): move to engine
@@ -263,23 +265,33 @@ class SimulationObject(object):
         name (:obj:`str`): this simulation object's name, which is unique across all simulation objects
             handled by a `SimulationEngine`
         time (:obj:`float`): this simulation object's current simulation time
+        event_time_tiebreaker (:obj:`str`): the least significant component of an object's 'sub-tme'
+            priority, which orders simultaneous events received by different instances of the same
+            `ApplicationSimulationObject`
         num_events (:obj:`int`): number of events processed
         simulator (:obj:`int`): the `SimulationEngine` that uses this `SimulationObject`
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
     """
-    # todo: fix: add optional time_tiebreaker to each  SimulationObject
-    def __init__(self, name):
+    def __init__(self, name, **kwargs):
         """ Initialize a SimulationObject.
 
         Create its event queue, initialize its name, and set its start time to 0.
 
         Args:
-            name: string; the object's unique name, used as a key in the dict of objects
+            name (:obj:`str`): the object's unique name, used as a key in the dict of objects
+            kwargs (:obj:`dict`): which can contain:
+            event_time_tiebreaker (:obj:`str`, optional): used to break ties among simultaneous
+                events; must be unique across all instances of an `ApplicationSimulationObject`
+                class; defaults to `name`
         """
         self.name = name
         self.time = 0.0
         self.num_events = 0
         self.simulator = None
+        if 'event_time_tiebreaker' in kwargs and kwargs['event_time_tiebreaker']:
+            self.event_time_tiebreaker = kwargs['event_time_tiebreaker']
+        else:
+            self.event_time_tiebreaker = name
         self.debug_logs = core.get_debug_logs()
         self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('wc.debug.file'), 'debug')
         self.fast_plot_file_logger = FastLogger(self.debug_logs.get_log('wc.plot.file'), 'debug')
@@ -472,6 +484,15 @@ class SimulationObject(object):
                 raise SimulatorError("No handler registered for Simulation message type: '{}'".format(
                     event.message.__class__.__name__))
 
+    @property
+    def class_event_priority(self):
+        """ Get the event priority of this simulation object's class
+
+        Returns:
+            :obj:`int`: the event priority of this simulation object's class
+        """
+        return self.__class__.metadata.class_priority
+
     def render_event_queue(self):
         """ Format an event queue as a string
 
@@ -495,6 +516,26 @@ class ApplicationSimulationObjectInterface(object, metaclass=ABCMeta):  # pragma
     def get_state(self): pass
 
 
+class SimObjClassPriority(IntEnum):
+    """ Execution priority for simulation object classes, used as `class_priority` values
+    """
+    HIGH = 1
+    MEDIUM = 5
+    LOW = 9
+    FIRST = 1
+    SECOND = 2
+    THIRD = 3
+    FOURTH = 4
+    FIFTH = 5
+    SIXTH = 6
+    SEVENTH = 7
+    EIGHTH = 8
+    NINTH = 9
+
+    def __str__(self):
+        return f'{self.name}: {self.value}'
+
+
 class ApplicationSimulationObjectMetadata(object):
     """ Metadata for an :class:`ApplicationSimulationObject`
 
@@ -510,6 +551,7 @@ class ApplicationSimulationObjectMetadata(object):
         self.event_handlers_dict = {}
         self.event_handler_priorities = {}
         self.message_types_sent = set()
+        self.class_priority = SimObjClassPriority.LOW
 
 
 class ApplicationSimulationObjMeta(type):
@@ -517,7 +559,8 @@ class ApplicationSimulationObjMeta(type):
     EVENT_HANDLERS = 'event_handlers'
     # messages sent list keyword
     MESSAGES_SENT = 'messages_sent'
-    # todo: fix: add optional receiving_class_priority attribute, which can be any ordered object
+    # keyword for a class' 'subtime' priority, used to order concurrent events among classes
+    CLASS_PRIORITY = 'class_priority'
 
     def __new__(cls, clsname, superclasses, namespace):
         """
@@ -536,6 +579,7 @@ class ApplicationSimulationObjMeta(type):
 
         EVENT_HANDLERS = cls.EVENT_HANDLERS
         MESSAGES_SENT = cls.MESSAGES_SENT
+        CLASS_PRIORITY = cls.CLASS_PRIORITY
 
         new_application_simulation_obj_subclass = super().__new__(cls, clsname, superclasses, namespace)
         new_application_simulation_obj_subclass.metadata = ApplicationSimulationObjectMetadata()
@@ -562,18 +606,33 @@ class ApplicationSimulationObjMeta(type):
         if MESSAGES_SENT in namespace:
             messages_sent = namespace[MESSAGES_SENT]
 
+        class_priority = None
+        if CLASS_PRIORITY in namespace:
+            class_priority = namespace[CLASS_PRIORITY]
+            if not isinstance(class_priority, int):
+                raise SimulatorError(f"ApplicationSimulationObject '{clsname}' {CLASS_PRIORITY} must be "
+                                     f"an int, but '{class_priority}' is a {type(class_priority).__name__}")
+
         for superclass in superclasses:
             if event_handlers is None:
                 if hasattr(superclass, 'metadata') and hasattr(superclass.metadata, 'event_handlers_dict'):
-                        # convert dict in superclass to list of tuple pairs
-                        event_handlers = [(k,v) for k,v in getattr(superclass.metadata, 'event_handlers_dict').items()]
+                    # convert dict in superclass to list of tuple pairs
+                    event_handlers = [(k,v) for k,v in getattr(superclass.metadata,
+                                                               'event_handlers_dict').items()]
 
         for superclass in superclasses:
             if messages_sent is None:
                 if hasattr(superclass, 'metadata') and hasattr(superclass.metadata, 'message_types_sent'):
-                        messages_sent = getattr(superclass.metadata, 'message_types_sent')
+                    messages_sent = getattr(superclass.metadata, 'message_types_sent')
 
-        # use 'not' to check for empty lists or unset values for messages_sent or event_handlers
+        for superclass in superclasses:
+            if class_priority is None:
+                if hasattr(superclass, 'metadata') and hasattr(superclass.metadata, CLASS_PRIORITY):
+                        class_priority = getattr(superclass.metadata, CLASS_PRIORITY)
+        if class_priority is not None:
+            setattr(new_application_simulation_obj_subclass.metadata, CLASS_PRIORITY, class_priority)
+
+        # either messages_sent or event_handlers must contain values
         if (not event_handlers and not messages_sent):
             raise SimulatorError("ApplicationSimulationObject '{}' definition must inherit or provide a "
                 "non-empty '{}' or '{}'.".format(clsname, EVENT_HANDLERS, MESSAGES_SENT))

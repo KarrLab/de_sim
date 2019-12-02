@@ -5,22 +5,26 @@
 :License: MIT
 """
 
-import unittest
 import random
 import re
+import unittest
 import warnings
 
 from de_sim.errors import SimulatorError
-from de_sim.simulation_object import (EventQueue, SimulationObject, ApplicationSimulationObject,
-    ApplicationSimulationObjMeta, ApplicationSimulationObjectMetadata)
 from de_sim.simulation_engine import SimulationEngine
-from de_sim.testing.some_message_types import InitMsg, Eg1, MsgWithAttrs, UnregisteredMsg
+from de_sim.simulation_object import (EventQueue, SimulationObject, ApplicationSimulationObject,
+                                      ApplicationSimulationObjMeta, ApplicationSimulationObjectMetadata,
+                                      SimObjClassPriority)
 from de_sim.testing.example_simulation_objects import (ALL_MESSAGE_TYPES, TEST_SIM_OBJ_STATE,
-    ExampleSimulationObject, ImproperlyRegisteredSimulationObject)
-from wc_utils.util.misc import most_qual_cls_name
+                                                       ExampleSimulationObject,
+                                                       ImproperlyRegisteredSimulationObject)
+from de_sim.testing.some_message_types import InitMsg, Eg1, MsgWithAttrs, UnregisteredMsg
 from wc_utils.util.list import is_sorted
+from wc_utils.util.misc import most_qual_cls_name
+
 EVENT_HANDLERS = ApplicationSimulationObjMeta.EVENT_HANDLERS
 MESSAGES_SENT = ApplicationSimulationObjMeta.MESSAGES_SENT
+CLASS_PRIORITY = ApplicationSimulationObjMeta.CLASS_PRIORITY
 
 
 class TestEventQueue(unittest.TestCase):
@@ -164,6 +168,11 @@ class ASOwithoutMessagesSent(ExampleSimulationObject):
     event_handlers = [(InitMsg, 'handler')]
 
 
+class ASOwithDefaultClassPriority(ApplicationSimulationObject):
+    def handler(self, event): pass
+    event_handlers = [(InitMsg, 'handler')]
+
+
 class TestApplicationSimulationObjMeta(unittest.TestCase):
 
     def test_correct_code(self):
@@ -208,6 +217,17 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
         # test inherited messages_sent
         metadata = ASOwithoutMessagesSent.metadata
         self.assertEqual(metadata.message_types_sent, set(ALL_MESSAGE_TYPES))
+
+        # test class_priority
+        self.assertEqual(ExampleSimObj.class_priority, SimObjClassPriority.HIGH)
+
+        # test default class_priority
+        self.assertEqual(ASOwithDefaultClassPriority.metadata.class_priority, SimObjClassPriority.LOW)
+        sim_obj_a = ASOwithDefaultClassPriority('a')
+        self.assertEqual(sim_obj_a.class_event_priority, SimObjClassPriority.LOW)
+
+        # test inherited class_priority
+        self.assertEqual(ASOwithoutEventHandlers.class_priority, SimObjClassPriority.HIGH)
 
     def test_errors(self):
         warnings.simplefilter("ignore")
@@ -269,6 +289,12 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
                 def handler(self, event): pass
                 event_handlers = [(InitMsg, 'handler'), (InitMsg, 'handler')]
 
+        # class priority not an int
+        with self.assertRaises(SimulatorError):
+            class ASOwithWrongClassPriorityType(ExampleSimulationObject):
+                messages_sent = [MsgWithAttrs]
+                class_priority = 'x'
+
     def test_warnings(self):
 
         # missing event_handlers
@@ -292,6 +318,13 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
             self.assertTrue(InitMsg in PartlyRegisteredSimulationObject2.metadata.event_handlers_dict)
             self.assertEqual(PartlyRegisteredSimulationObject2.metadata.event_handlers_dict[InitMsg],
                 PartlyRegisteredSimulationObject2.handler)
+
+
+class TestSimObjClassPriority(unittest.TestCase):
+
+    def test(self):
+        o = SimObjClassPriority.HIGH
+        self.assertIn('HIGH', str(o))
 
 
 class TestSimulationObject(unittest.TestCase):
@@ -355,7 +388,7 @@ class TestSimulationObject(unittest.TestCase):
                     self.o2.simulator.event_queue.next_events()
                 self.assertEqual(self.o2.simulator.event_queue.next_events(), [])
 
-    def test_event_time_ties(self):
+    def test_simultaneous_event_times(self):
         self.o1.send_event(0, self.o2, Eg1())
         self.o1.send_event(2, self.o2, InitMsg())
 
@@ -367,12 +400,12 @@ class TestSimulationObject(unittest.TestCase):
             else:
                 self.o1.send_event(1, self.o2, InitMsg())
 
-        self.assertEqual(self.o2.simulator.event_queue.next_event_time(), 0)
-        event_list = self.o2.simulator.event_queue.next_events()
+        self.assertEqual(self.simulator.event_queue.next_event_time(), 0)
+        event_list = self.simulator.event_queue.next_events()
         self.assertEqual(event_list[0].event_time, 0)
 
-        self.assertEqual(self.o2.simulator.event_queue.next_event_time(), 1)
-        event_list = self.o2.simulator.event_queue.next_events()
+        self.assertEqual(self.simulator.event_queue.next_event_time(), 1)
+        event_list = self.simulator.event_queue.next_events()
         # all InitMsg messages come before any Eg1 message,
         # and at least 1 InitMsg message exists
         expected_type = InitMsg
@@ -382,7 +415,20 @@ class TestSimulationObject(unittest.TestCase):
                 expected_type = Eg1
             self.assertEqual(event.message.__class__, expected_type)
 
-        self.assertEqual(self.o2.simulator.event_queue.next_event_time(), 2)
+        self.assertEqual(self.simulator.event_queue.next_event_time(), 2)
+
+        # use event_time_tiebreaker to order simultaneous events earlier at o3
+        def tiebreaker_first_event(simulator):
+            event_list = simulator.event_queue.next_events()
+            return event_list[0].order_time()[-1]
+
+        o3_event_time_tiebreaker = 'a'
+        options = dict(event_time_tiebreaker=o3_event_time_tiebreaker)
+        o3 = ExampleSimulationObject('o3', **options)
+        self.o1.send_event(1, o3, Eg1())
+        self.o1.send_event(1, self.o2, Eg1())
+        self.assertEqual(tiebreaker_first_event(self.simulator), o3_event_time_tiebreaker)
+        self.assertEqual(tiebreaker_first_event(self.simulator), self.o2.name)
 
     def test_render_event_queue(self):
         rv = self.o1.render_event_queue()

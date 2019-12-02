@@ -6,6 +6,8 @@
 :License: MIT
 """
 
+from collections import Iterable
+
 from wc_utils.util.misc import round_direct
 from wc_utils.util.list import elements_to_str
 from de_sim.simulation_message import SimulationMessage
@@ -15,12 +17,13 @@ class Event(object):
     """ An object that holds a discrete event simulation (DES) event
 
     Each DES event is scheduled by creating an `Event` instance and storing it in the
-    simulagor's event queue. To reduce interface errors the `message`
+    simulator's event queue. To reduce interface errors the `message`
     attribute must be structured as specified in the `message_types` module.
 
     As per David Jefferson's thinking, the event queue is ordered by data provided by the
-    # todo: fix
-    simulation application, in particular (event time, receiving object name).
+    simulation application, in particular (event time, sub-time), where 'sub-time' determines the
+    execution priority among simultaneous messages with the same event time at different simulation
+    objects.
     This is implemented by the comparison operators for Event below. This ordering achieves
     deterministic and reproducible simulations. (See Jefferson's LLNL course.)
 
@@ -48,6 +51,15 @@ class Event(object):
         self.receiving_object = receiving_object
         self.message = message
 
+    def order_time(self):
+        """ Provide the tuple that determines this event's time order
+
+        Returns:
+            :obj:`tuple`: the tuple that determines this event's time order
+        """
+        return (self.event_time, self.receiving_object.class_event_priority,
+                self.receiving_object.event_time_tiebreaker)
+
     def __lt__(self, other):
         """ Does this `Event` occur earlier than `other`?
 
@@ -57,9 +69,7 @@ class Event(object):
         Returns:
             :obj:`bool`: `True` if this `Event` occurs earlier than `other`
         """
-        # todo: fix: compare events on (time, time_tiebreaker)
-        return ((self.event_time, self.receiving_object.name) <
-            (other.event_time, other.receiving_object.name))
+        return self.order_time() < other.order_time()
 
     def __le__(self, other):
         """ Does this `Event` occur earlier or at the same time as `other`?
@@ -81,9 +91,7 @@ class Event(object):
         Returns:
             :obj:`bool`: `True` if this `Event` occurs later than `other`
         """
-        # todo: fix
-        return ((self.event_time, self.receiving_object.name) >
-            (other.event_time, other.receiving_object.name))
+        return self.order_time() > other.order_time()
 
     def __ge__(self, other):
         """ Does this `Event` occur later or at the same time as `other`?
@@ -157,11 +165,14 @@ class Event(object):
             :obj:`str`: String representation of the values of an `Event`'s fields, or a :obj:`list`
                 representation if `as_list` is set
         """
-        # TODO(Arthur): allow formatting of the returned string, e.g. formatting the precision of time values
+        raw_times = [[self.creation_time], [self.event_time, str(self.receiving_object.class_event_priority),
+                                            self.receiving_object.event_time_tiebreaker]]
+        times = raw_times
         if round_w_direction:
-            times = [round_direct(self.creation_time), round_direct(self.event_time)]
-        else:
-            times = [self.creation_time, self.event_time]
+            for t_list in raw_times:
+                t_list[0] = round_direct(t_list[0])
+            times = raw_times
+        times = [tuple(t) for t in times]
         vals = times + [self.sending_object.name, self.receiving_object.name, self.message.__class__.__name__]
         if self.message.values():
             vals.extend(self.message.values(annotated=annotated, as_list=True))
@@ -178,3 +189,29 @@ class Event(object):
                 delimited by tabs
         """
         return self.render()
+
+
+def iterable_not_str(obj):
+    """ Is an object an iterable, but not a string?
+
+    Args:
+        obj (:obj:`object`): an object
+
+    Returns:
+        :obj:`bool`: `True` if `obj` is an iterable, but not a string
+    """
+    return isinstance(obj, Iterable) and not isinstance(obj, str)
+
+
+def nested_elements_to_str(o):
+    """ Obtain `str()` values of all elements of o, recursively, while retaining the same structure
+
+    Args:
+        o (:obj:`obj`): an object
+
+    Returns:
+        :obj:`obj`: stringified instance of `o`
+    """
+    if iterable_not_str(o):
+        return [nested_elements_to_str(e) for e in o]
+    return str(o)
