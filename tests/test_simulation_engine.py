@@ -154,10 +154,9 @@ class TestSimulationEngine(unittest.TestCase):
         for operation in ['simulate', 'run']:
             self.make_one_object_simulation()
             self.assertEqual(eval('self.simulator.'+operation+'(5.0)'), 3)
-            for kwargs in [{}, dict(epsilon=0.1)]:
-                expr = 'self.simulator.{}(5.0, **{})'.format(operation, kwargs)
-                self.make_one_object_simulation()
-                self.assertEqual(eval(expr), 3)
+            expr = 'self.simulator.{}(5.0)'.format(operation)
+            self.make_one_object_simulation()
+            self.assertEqual(eval(expr), 3)
 
     def test_one_object_simulation_neg_endtime(self):
         obj = ExampleSimulationObject(obj_name(1))
@@ -213,13 +212,6 @@ class TestSimulationEngine(unittest.TestCase):
         with self.assertRaises(SimulatorError) as context:
             self.simulator.initialize()
         self.assertEqual('Simulation has already been initialized', str(context.exception))
-
-        self.simulator.reset()
-        self.simulator.add_object(obj)
-        self.simulator.initialize()
-        with self.assertRaises(SimulatorError) as context:
-            self.simulator.simulate(5.0, epsilon=0)
-        self.assertRegex(str(context.exception), "epsilon (.*) plus end time (.*) must exceed end time")
 
     def test_simulation_end(self):
         self.simulator.add_object(BasicExampleSimulationObject('name'))

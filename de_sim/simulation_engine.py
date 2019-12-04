@@ -196,14 +196,11 @@ class SimulationEngine(object):
         """
         return self.simulate(end_time, **kwargs)
 
-    def simulate(self, end_time, epsilon=None, stop_condition=None, progress=False):
+    def simulate(self, end_time, stop_condition=None, progress=False):
         """ Run the simulation
 
         Args:
             end_time (:obj:`float`): the time of the end of the simulation
-            epsilon (:obj:`float`): small time interval used to control the order of near simultaneous
-                events at different simulation objects; if provided, compare
-                `epsilon` with `end_time` to ensure the ratio is not too large.
             stop_condition (:obj:`function`, optional): if provided, a function that takes one argument
                 `time`; a simulation terminates if the function returns `True`
             progress (:obj:`bool`, optional): if `True`, print a bar that dynamically reports the
@@ -215,8 +212,7 @@ class SimulationEngine(object):
                 simulation object are handled together.
 
         Raises:
-            :obj:`SimulatorError`: if the ratio of `end_time` to `epsilon` is so large that `epsilon`
-                is lost in roundoff error, or if the simulation has not been initialized
+            :obj:`SimulatorError`: if the simulation has not been initialized
         """
         if not self.__initialized:
             raise SimulatorError("Simulation has not been initialized")
@@ -229,12 +225,6 @@ class SimulationEngine(object):
 
         # set up progress bar
         self.progress = SimulationProgressBar(progress)
-
-        # ratio of max simulation time to epsilon must not be so large that epsilon is lost
-        # in roundoff error
-        if not epsilon is None and not(epsilon + end_time > end_time):
-            raise SimulatorError("epsilon ({:E}) plus end time ({:E}) must exceed end time".format(
-                epsilon, end_time))
 
         if stop_condition is not None:
             self.set_stop_condition(stop_condition)
