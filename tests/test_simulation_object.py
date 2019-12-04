@@ -342,6 +342,7 @@ class TestSimObjClassPriority(unittest.TestCase):
         with self.assertRaises(SimulatorError):
             SimObjClassPriority.assign_decreasing_priority(range(SimObjClassPriority.LOW + 1))
 
+
 class TestApplicationSimulationObject(unittest.TestCase):
 
     def test_set_class_priority(self):
@@ -452,7 +453,7 @@ class TestSimulationObject(unittest.TestCase):
         # use event_time_tiebreaker to order simultaneous events earlier at o3
         def tiebreaker_first_event(simulator):
             event_list = simulator.event_queue.next_events()
-            return event_list[0].order_time()[-1]
+            return event_list[0]._get_order_time()[-1]
 
         o3_event_time_tiebreaker = 'a'
         options = dict(event_time_tiebreaker=o3_event_time_tiebreaker)

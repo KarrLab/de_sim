@@ -34,11 +34,11 @@ class TestEvent(unittest.TestCase):
         self.assertTrue(lesser >= lesser)
         self.assertTrue(greater >= lesser)
 
-    def test_order_time(self):
+    def test_get_order_time(self):
         event_time = 1
         e = Event(0, event_time, self.sim_obj_a, self.sim_obj_a, InitMsg())
         class_priority_attr = ApplicationSimulationObjMeta.CLASS_PRIORITY
-        self.assertEqual(e.order_time(),
+        self.assertEqual(e._get_order_time(),
                          (event_time, getattr(ExampleSimulationObject, class_priority_attr),
                           self.sim_obj_a.event_time_tiebreaker))
 

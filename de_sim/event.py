@@ -33,6 +33,8 @@ class Event(object):
         sending_object (:obj:`SimulationObject`): reference to the object that sends the event
         receiving_object (:obj:`SimulationObject`): reference to the object that receives
             (aka executes) the event
+        _order_time (:obj:`tuple`): the event time, sub-time that's used to sort events; cached
+            to improve performance
         message (:obj:`SimulationMessage`): a `SimulationMessage` carried by the event; its type
             provides the simulation application's type for an `Event`; it may also carry a payload
             for the `Event` in its attributes.
@@ -41,7 +43,7 @@ class Event(object):
 
     # use __slots__ to save space
     # TODO(Arthur): figure out how to stop Sphinx from documenting these __slots__ as attributes
-    __slots__ = "creation_time event_time sending_object receiving_object message".split()
+    __slots__ = "creation_time event_time sending_object receiving_object _order_time message".split()
     BASE_HEADERS = ['t(send)', 't(event)', 'Sender', 'Receiver', 'Event type']
 
     def __init__(self, creation_time, event_time, sending_object, receiving_object, message):
@@ -49,9 +51,10 @@ class Event(object):
         self.event_time = event_time
         self.sending_object = sending_object
         self.receiving_object = receiving_object
+        self._order_time = self._get_order_time()
         self.message = message
 
-    def order_time(self):
+    def _get_order_time(self):
         """ Provide the tuple that determines this event's time order
 
         Returns:
@@ -69,7 +72,7 @@ class Event(object):
         Returns:
             :obj:`bool`: `True` if this `Event` occurs earlier than `other`
         """
-        return self.order_time() < other.order_time()
+        return self._order_time < other._order_time
 
     def __le__(self, other):
         """ Does this `Event` occur earlier or at the same time as `other`?
@@ -91,7 +94,7 @@ class Event(object):
         Returns:
             :obj:`bool`: `True` if this `Event` occurs later than `other`
         """
-        return self.order_time() > other.order_time()
+        return self._order_time > other._order_time
 
     def __ge__(self, other):
         """ Does this `Event` occur later or at the same time as `other`?

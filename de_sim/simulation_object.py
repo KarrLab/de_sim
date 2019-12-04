@@ -25,6 +25,8 @@ from de_sim.utilities import ConcreteABCMeta, FastLogger
 from wc_utils.util.list import elements_to_str
 from wc_utils.util.misc import most_qual_cls_name, round_direct
 
+config = core.get_config()
+
 
 # TODO(Arthur): move to engine
 class EventQueue(object):
@@ -272,6 +274,8 @@ class SimulationObject(object):
         simulator (:obj:`int`): the `SimulationEngine` that uses this `SimulationObject`
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
     """
+    LOG_EVENTS = config['de_sim']['log_events']
+
     def __init__(self, name, **kwargs):
         """ Initialize a SimulationObject.
 
@@ -469,10 +473,11 @@ class SimulationObject(object):
         """
         self.num_events += 1
 
-        # write events to a plot log
-        # plot logging is controlled by configuration files pointed to by config_constants and by env vars
-        for event in event_list:
-            self.fast_plot_file_logger.fast_log(str(event), sim_time=self.time)
+        if self.LOG_EVENTS:
+            # write events to a plot log
+            # plot logging is controlled by configuration files pointed to by config_constants and by env vars
+            for event in event_list:
+                self.fast_plot_file_logger.fast_log(str(event), sim_time=self.time)
 
         # iterate through event_list, branching to handler
         for event in event_list:
