@@ -326,6 +326,38 @@ class TestSimObjClassPriority(unittest.TestCase):
         o = SimObjClassPriority.HIGH
         self.assertIn('HIGH', str(o))
 
+    def test_assign_decreasing_priority(self):
+
+        class ASOwithNoClassPriority_1(ExampleSimulationObject):
+            messages_sent = [MsgWithAttrs]
+
+        class ASOwithNoClassPriority_2(ExampleSimulationObject):
+            messages_sent = [MsgWithAttrs]
+
+        SimObjClassPriority.assign_decreasing_priority([ASOwithNoClassPriority_1,
+                                                        ASOwithNoClassPriority_2])
+        self.assertEqual(ASOwithNoClassPriority_1.metadata.class_priority, 1)
+        self.assertEqual(ASOwithNoClassPriority_2.metadata.class_priority, 2)
+
+        with self.assertRaises(SimulatorError):
+            SimObjClassPriority.assign_decreasing_priority(range(SimObjClassPriority.LOW + 1))
+
+class TestApplicationSimulationObject(unittest.TestCase):
+
+    def test_set_class_priority(self):
+
+        class ASOwithMediumClassPriority(ApplicationSimulationObject):
+            def handler(self, event): pass
+            event_handlers = [(InitMsg, 'handler')]
+
+            # set MEDIUM priority
+            class_priority = SimObjClassPriority.MEDIUM
+
+        test_aso_1 = ASOwithMediumClassPriority('name')
+        self.assertEqual(test_aso_1.metadata.class_priority, SimObjClassPriority.MEDIUM)
+        test_aso_1.set_class_priority(SimObjClassPriority.HIGH)
+        self.assertEqual(test_aso_1.metadata.class_priority, SimObjClassPriority.HIGH)
+
 
 class TestSimulationObject(unittest.TestCase):
 

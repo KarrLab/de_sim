@@ -517,7 +517,7 @@ class ApplicationSimulationObjectInterface(object, metaclass=ABCMeta):  # pragma
 
 
 class SimObjClassPriority(IntEnum):
-    """ Execution priority for simulation object classes, used as `class_priority` values
+    """ Simultaneous execution priority for simulation object classes, used in `class_priority`
     """
     HIGH = 1
     MEDIUM = 5
@@ -531,6 +531,22 @@ class SimObjClassPriority(IntEnum):
     SEVENTH = 7
     EIGHTH = 8
     NINTH = 9
+
+    @classmethod
+    def assign_decreasing_priority(cls, aso_classes):
+        """ Assign decreasing simultaneous execution priorities for a list of simulation object classes
+
+        Args:
+            aso_classes (:obj:`iterator` of :obj:`ApplicationSimulationObject`): an iterator over
+                simulation object classes
+
+        Raises:
+            :obj:`SimulatorError`: if too many :obj:`ApplicationSimulationObject`\ s are given
+        """
+        if cls.LOW < len(aso_classes):
+            raise SimulatorError(f"Too many ApplicationSimulationObjects: {len(aso_classes)}")
+        for index, aso_class in enumerate(aso_classes):
+            aso_class.set_class_priority(SimObjClassPriority(index + 1))
 
     def __str__(self):
         return f'{self.name}: {self.value}'
@@ -704,4 +720,18 @@ class ApplicationSimulationObject(SimulationObject, ApplicationSimulationObjectI
     """
 
     def send_initial_events(self, *args): pass  # pragma: no cover
+
     def get_state(self): pass  # pragma: no cover
+
+    @classmethod
+    def set_class_priority(cls, priority):
+        """ Set the execution priority for simulation object classes, `class_priority`
+
+        Use this to set the `class_priority` of a subclass of :obj:`SimulationObject` after it
+            has been constructed.
+
+        Args:
+            priority (:obj:`SimObjClassPriority`): the desired `class_priority` for a subclass
+                of :obj:`SimulationObject`
+        """
+        setattr(cls.metadata, ApplicationSimulationObjMeta.CLASS_PRIORITY, priority)
