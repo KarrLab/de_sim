@@ -251,13 +251,13 @@ class SimulationEngine(object):
             # TODO(Arthur): perhaps 'while True':
             while self.time <= end_time:
                 # use the stop condition
+
                 if self.stop_condition is not None and self.stop_condition(self.time):
                     self.log_with_time(self.TERMINATE_WITH_STOP_CONDITION_SATISFIED)
                     self.progress.end()
                     break
 
                 # get the earliest next event in the simulation
-                self.log_with_time('Simulation Engine launching next object')
                 # get parameters of next event from self.event_queue
                 next_time = self.event_queue.next_event_time()
                 next_sim_obj = self.event_queue.next_event_obj()
@@ -284,6 +284,7 @@ class SimulationEngine(object):
 
                 # dispatch object that's ready to execute next event
                 next_sim_obj.time = next_time
+
                 self.log_with_time(" Running '{}' at {}".format(next_sim_obj.name, next_sim_obj.time))
                 next_events = self.event_queue.next_events()
                 for e in next_events:
