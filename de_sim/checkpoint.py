@@ -122,7 +122,7 @@ class Checkpoint(object):
         Returns:
             :obj:`str`: file name for checkpoint at time `time`
         """
-        return os.path.join(dirname, '{:0.6f}.pickle'.format(math.floor(time * 1e6) / 1e6))
+        return os.path.join(dirname, '{:0.6f}.pickle'.format(math.floor(time)))
 
     def __str__(self):
         """ Provide a human readable representation of this `Checkpoint`
