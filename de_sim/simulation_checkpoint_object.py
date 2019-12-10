@@ -18,8 +18,11 @@ class AbstractCheckpointSimulationObject(TemplatePeriodicSimulationObject):
     """ Abstract class that creates periodic checkpoints
 
     Attributes:
-        checkpoint_period (:obj:`float`): interval between checkpoints, in simulated seconds
+        period (:obj:`float`): interval between checkpoints, in simulated seconds
     """
+
+    def __init__(self, name, period):
+        super().__init__(name, period)
 
     def handle_event(self):
         self.create_checkpoint()

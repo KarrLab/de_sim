@@ -9,6 +9,7 @@
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import ApplicationSimulationObject
 from de_sim.errors import SimulatorError
+from wc_utils.util.misc import UniformSequence
 
 
 class NextEvent(SimulationMessage):
@@ -20,26 +21,25 @@ class TemplatePeriodicSimulationObject(ApplicationSimulationObject):
 
     Events occur at time 0, `period`, `2 x period`, ...
 
-    To avoid cumulative roundoff errors in event times from repeated addition, event times are
-    computed by multiplying period number times period.
+    To avoid roundoff errors in event times get them from a `UniformSequence`.
 
     Attributes:
         period (:obj:`float`): interval between events, in simulated seconds
-        period_count (:obj:`int`): count of the next period
+        event_time_sequence (:obj:`UniformSequence`): a uniform sequence generator
     """
 
     def __init__(self, name, period):
         if period <= 0:
             raise SimulatorError("period must be positive, but is {}".format(period))
         self.period = period
-        self.period_count = 0
+        self.event_time_sequence = UniformSequence(0, period)
         super().__init__(name)
 
     def schedule_next_event(self):
         """ Schedule the next event in `self.period` simulated seconds
         """
-        self.send_event_absolute(self.period_count * self.period, self, NextEvent())
-        self.period_count += 1
+        next_event_time = self.event_time_sequence.__next__()
+        self.send_event_absolute(next_event_time, self, NextEvent())
 
     def handle_event(self):
         """ Handle the periodic event
