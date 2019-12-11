@@ -9,7 +9,7 @@
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import ApplicationSimulationObject
 from de_sim.errors import SimulatorError
-from wc_utils.util.misc import UniformSequence
+from wc_utils.util.uniform_seq import UniformSequence
 
 
 class NextEvent(SimulationMessage):
