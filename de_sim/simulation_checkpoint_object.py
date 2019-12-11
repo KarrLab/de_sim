@@ -77,5 +77,5 @@ class CheckpointSimulationObject(AbstractCheckpointSimulationObject):
         """ Create a checkpoint in the directory `self.checkpoint_dir`
         """
         Checkpoint.set_checkpoint(self.checkpoint_dir,
-            Checkpoint(self.time, self.access_state_obj.get_checkpoint_state(self.time),
-                self.access_state_obj.get_random_state()))
+                                  Checkpoint(self.time, self.access_state_obj.get_checkpoint_state(self.time),
+                                             self.access_state_obj.get_random_state()))

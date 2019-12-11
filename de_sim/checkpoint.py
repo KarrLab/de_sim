@@ -7,14 +7,18 @@
 :License: MIT
 """
 
+from bisect import bisect
 import math
 import numpy
-from bisect import bisect
 import os
 import pickle
 import re
 
+from wc_utils.config.core import get_config
 from wc_utils.util.misc import obj_to_str
+from wc_utils.util.uniform_seq import UniformSequence
+
+uniform_seq_precision = get_config()['wc_utils']['misc']['uniform_seq_precision']
 
 
 class Checkpoint(object):
@@ -36,8 +40,8 @@ class Checkpoint(object):
         """ Save a checkpoint to the directory `dirname`.
 
         Args:
-            checkpoint (:obj:`Checkpoint`): checkpoint
             dirname (:obj:`str`): directory to read/write checkpoint data
+            checkpoint (:obj:`Checkpoint`): checkpoint
         """
         file_name = Checkpoint.get_file_name(dirname, checkpoint.time)
 
@@ -96,8 +100,9 @@ class Checkpoint(object):
         """
         # find checkpoint times
         checkpoint_times = []
+        pattern = r'^(\d+\.\d{' + f'{uniform_seq_precision},{uniform_seq_precision}' + r'})\.pickle$'
         for file_name in os.listdir(dirname):
-            match = re.match(r'^(\d+\.\d{6,6}).pickle$', file_name)
+            match = re.match(pattern, file_name)
             if os.path.isfile(os.path.join(dirname, file_name)) and match:
                 checkpoint_times.append(float(match.group(1)))
 
@@ -122,7 +127,7 @@ class Checkpoint(object):
         Returns:
             :obj:`str`: file name for checkpoint at time `time`
         """
-        return os.path.join(dirname, '{:0.6f}.pickle'.format(math.floor(time)))
+        return os.path.join(dirname, f'{UniformSequence.truncate(time)}.pickle')
 
     def __str__(self):
         """ Provide a human readable representation of this `Checkpoint`
@@ -170,53 +175,3 @@ class Checkpoint(object):
             :obj:`bool`: true if checkpoints are semantically unequal
         """
         return not self.__eq__(other)
-
-
-class CheckpointLogger(object):
-    """ Checkpoint logger
-
-    Attributes:
-        dirname (:obj:`str`): directory to write checkpoint data
-        step (:obj:`float`): simulation time between checkpoints in seconds
-        _next_checkpoint (:obj:`float`): time in seconds of next checkpoint
-    """
-
-    def __init__(self, dirname, step, initial_time):
-        """
-        Args:
-            dirname (:obj:`str`): directory to write checkpoint data
-            step (:obj:`float`): simulation time between checkpoints in seconds
-            initial_time (:obj:`float`): starting simulation time
-        """
-        next_checkpoint = math.ceil(initial_time / step) * step
-        if next_checkpoint == initial_time:
-            next_checkpoint += step
-
-        if not os.path.isdir(dirname):
-            os.makedirs(dirname)
-
-        self.dirname = dirname
-        self.step = step
-        self._next_checkpoint = next_checkpoint
-
-    def checkpoint_periodically(self, time, state, random_state):
-        """ Periodically store checkpoint
-
-        Args:
-            time (:obj:`float`): simulation time in seconds
-            state (:obj:`object`): simulated state (e.g. species counts)
-            random_state (:obj:`numpy.random.RandomState`): random number generator state
-        """
-        if time >= self._next_checkpoint:
-            self.checkpoint(time, state, random_state)
-            self._next_checkpoint += self.step
-
-    def checkpoint(self, time, state, random_state):
-        """ Store checkpoint at time `time` with state `state` and ranodom number generator state `random_state`
-
-        Args:
-            time (:obj:`float`): simulation time in seconds
-            state (:obj:`object`): simulated state (e.g. species counts)
-            random_state (:obj:`numpy.random.RandomState`): random number generator state
-        """
-        Checkpoint.set_checkpoint(self.dirname, Checkpoint(time, state, random_state.get_state()))
