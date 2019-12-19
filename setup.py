@@ -2,8 +2,8 @@ import setuptools
 try:
     import pkg_utils
 except ImportError:
-    import pip._internal
-    pip._internal.main(['install', 'pkg_utils'])
+    import pip._internal.main
+    pip._internal.main.main(['install', 'pkg_utils'])
     import pkg_utils
 import os
 
