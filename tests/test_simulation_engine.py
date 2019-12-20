@@ -6,6 +6,7 @@
 """
 
 from capturer import CaptureOutput
+from datetime import datetime
 from logging2 import LogRegister
 from logging2.levels import LogLevel
 import cProfile
@@ -419,26 +420,16 @@ class TestSimulationEngine(unittest.TestCase):
             num_sim_objs *= 4
 
         self.restore_logging_levels(self.log_names, existing_levels)
-        print('Performance summary')
+        performance_log = os.path.join(os.path.dirname(__file__), 'results', 'perf_results',
+                                       'de_sim_performance_log.txt')
+        with open(performance_log, 'a') as perf_log:
+            today = datetime.today().strftime('%Y-%m-%d')
+            print(f'Performance summary on {today}', end='', file=perf_log)
+            print("\n".join(unprofiled_perf), file=perf_log)
+            print(file=perf_log)
+
+        print(f'Performance summary, written to {performance_log}')
         print("\n".join(unprofiled_perf))
-        '''
-        Results on 2019-09-29:
-            #sim obs       # events       run time (s)   events/s
-            4              400               0.030       13124.738
-            16             1600              0.140       11438.032
-            64             6400              0.602       10632.815
-            256            25600             2.519       10163.297
-            1024           102400           16.648       6150.755
-            4096           409600           45.671       8968.404
-        Results on 2019-12-20:
-            #sim obs       # events       run time (s)   events/s
-            4              400               0.022       18398
-            16             1600              0.121       13256
-            64             6400              0.528       12115
-            256            25600             2.546       10053
-            1024           102400            9.307       11002
-            4096           409600           37.279       10987
-        '''
 
 
 class Delicate(SimulationMessage):
