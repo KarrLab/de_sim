@@ -84,7 +84,7 @@ class PholdSimulationObject(ApplicationSimulationObject):
         return str(self.args)
 
     def log_debug_msg(self, msg):
-        log = debug_logs.get_log('wc.debug.console')
+        log = debug_logs.get_log('de_sim.debug.console')
         log.debug(msg, sim_time=self.time, local_call_depth=1)
 
     event_handlers = [(sim_msg_type, 'handle_simulation_event') for sim_msg_type in MESSAGE_TYPES]

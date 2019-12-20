@@ -138,7 +138,7 @@ class TestSimulationEngine(unittest.TestCase):
         # create simulator
         self.simulator = SimulationEngine()
         self.out_dir = tempfile.mkdtemp()
-        self.log_names = ['wc.debug.file', 'wc.plot.file']
+        self.log_names = ['de_sim.debug.file', 'de_sim.plot.file']
 
     def tearDown(self):
         shutil.rmtree(self.out_dir)
@@ -401,7 +401,7 @@ class TestSimulationEngine(unittest.TestCase):
             num_events = self.simulator_for_perf_tests.simulate(end_sim_time)
             run_time = time.process_time() - start_time
             self.assertEqual(num_sim_objs*end_sim_time, num_events)
-            unprofiled_perf.append("{}\t{}\t{:8.3f}\t{:8.3f}".format(num_sim_objs, num_events,
+            unprofiled_perf.append("{}\t{}\t{:8.3f}\t{:8.0f}".format(num_sim_objs, num_events,
                 run_time, num_events/run_time).expandtabs(15))
 
             # profile
@@ -422,7 +422,7 @@ class TestSimulationEngine(unittest.TestCase):
         print('Performance summary')
         print("\n".join(unprofiled_perf))
         '''
-        Results on 2019-09-29 were:
+        Results on 2019-09-29:
             #sim obs       # events       run time (s)   events/s
             4              400               0.030       13124.738
             16             1600              0.140       11438.032
@@ -430,6 +430,14 @@ class TestSimulationEngine(unittest.TestCase):
             256            25600             2.519       10163.297
             1024           102400           16.648       6150.755
             4096           409600           45.671       8968.404
+        Results on 2019-12-20:
+            #sim obs       # events       run time (s)   events/s
+            4              400               0.022       18398
+            16             1600              0.121       13256
+            64             6400              0.528       12115
+            256            25600             2.546       10053
+            1024           102400            9.307       11002
+            4096           409600           37.279       10987
         '''
 
 

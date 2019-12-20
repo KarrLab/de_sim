@@ -37,7 +37,7 @@ def get_debug_logs_config(extra=None):
     paths = wc_utils.debug_logs.config.paths.deepcopy()
     paths.default = pkg_resources.resource_filename('examples', 'config/debug.default.cfg')
     paths.user = (
-        'wc_sim.examples.debug.cfg',
-        os.path.expanduser('~/.wc/wc_sim.examples.debug.cfg'),
+        'de_sim.examples.debug.cfg',
+        os.path.expanduser('~/.wc/de_sim.examples.debug.cfg'),
     )
     return wc_utils.config.core.ConfigManager(paths).get_config(extra=extra)

@@ -59,8 +59,8 @@ class SimulationEngine(object):
         else:
             self.shared_state = shared_state
         self.debug_logs = core.get_debug_logs()
-        self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('wc.debug.file'), 'debug')
-        self.fast_plotting_logger = FastLogger(self.debug_logs.get_log('wc.plot.file'), 'debug')
+        self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('de_sim.debug.file'), 'debug')
+        self.fast_plotting_logger = FastLogger(self.debug_logs.get_log('de_sim.plot.file'), 'debug')
         self.set_stop_condition(stop_condition)
         self.time = 0.0
         self.simulation_objects = {}

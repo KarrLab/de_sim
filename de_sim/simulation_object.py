@@ -50,7 +50,7 @@ class EventQueue(object):
     def __init__(self):
         self.event_heap = []
         self.debug_logs = core.get_debug_logs()
-        self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('wc.debug.file'), 'debug')
+        self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('de_sim.debug.file'), 'debug')
 
     def reset(self):
         self.event_heap = []
@@ -297,8 +297,8 @@ class SimulationObject(object):
         else:
             self.event_time_tiebreaker = name
         self.debug_logs = core.get_debug_logs()
-        self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('wc.debug.file'), 'debug')
-        self.fast_plot_file_logger = FastLogger(self.debug_logs.get_log('wc.plot.file'), 'debug')
+        self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('de_sim.debug.file'), 'debug')
+        self.fast_plot_file_logger = FastLogger(self.debug_logs.get_log('de_sim.plot.file'), 'debug')
 
     def add(self, simulator):
         """ Add this object to a simulation.

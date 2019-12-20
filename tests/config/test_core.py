@@ -29,4 +29,4 @@ class TestCore(unittest.TestCase):
 
         debug_log_manager = core.get_debug_logs()
         self.assertTrue(isinstance(debug_log_manager, DebugLogsManager))
-        self.assertTrue(isinstance(debug_log_manager.get_log('wc.debug.file'), logging2.loggers.Logger))
+        self.assertTrue(isinstance(debug_log_manager.get_log('de_sim.debug.file'), logging2.loggers.Logger))
