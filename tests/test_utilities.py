@@ -5,6 +5,7 @@
 :Copyright: 2018, Karr Lab
 :License: MIT
 """
+
 from abc import ABCMeta, abstractmethod
 from capturer import CaptureOutput
 from logging2 import Logger, LogLevel, StdOutHandler
@@ -13,6 +14,7 @@ import unittest
 
 from de_sim.utilities import ConcreteABCMeta, SimulationProgressBar, FastLogger
 from de_sim.config import core
+from wc_utils.debug_logs.core import DebugLogsManager
 
 
 class AbstractBase(object, metaclass=ABCMeta):
@@ -110,3 +112,22 @@ class TestFastLogger(unittest.TestCase):
             message = 'hi mom'
             fast_logger.fast_log(message)
             self.assertTrue(capturer.get_text().endswith(message))
+
+    def test_config(self):
+        debug_config = core.get_debug_logs_config(cfg_path=('tests', 'fixtures/config/debug.default.cfg'))
+        debug_log_manager = DebugLogsManager().setup_logs(debug_config)
+
+        file_logger = debug_log_manager.logs['de_sim.debug.testing.file']
+        self.assertFalse(FastLogger(file_logger, 'debug').active)
+        self.assertTrue(FastLogger(file_logger, 'info').active)
+
+        console_logger = debug_log_manager.logs['de_sim.debug.testing.console']
+        self.assertFalse(FastLogger(console_logger, 'debug').active)
+        self.assertFalse(FastLogger(console_logger, 'info').active)
+        self.assertTrue(FastLogger(console_logger, 'warning').active)
+
+        debug_config = core.get_debug_logs_config()
+        debug_log_manager = DebugLogsManager().setup_logs(debug_config)
+
+        file_logger = debug_log_manager.logs['de_sim.debug.file']
+        self.assertFalse(FastLogger(file_logger, 'debug').active)

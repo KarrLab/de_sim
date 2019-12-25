@@ -382,6 +382,7 @@ class TestSimulationEngine(unittest.TestCase):
             fast_logger = FastLogger(debug_logs.get_log(log_name), 'debug')
             self.assertEqual(fast_logger.get_level(), level_by_logger[log_name])
 
+    # @unittest.skip("takes 3 to 5 min.")
     def test_performance(self):
         existing_levels = self.suspend_logging(self.log_names)
         self.simulator_for_perf_tests = SimulationEngine()

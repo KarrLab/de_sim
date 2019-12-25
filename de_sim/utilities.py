@@ -6,9 +6,9 @@
 :License: MIT
 """
 from abc import ABCMeta, abstractmethod
-from progressbar.bar import ProgressBar
-from progressbar import widgets
 from logging2 import LogLevel
+from progressbar import widgets
+from progressbar.bar import ProgressBar
 
 
 class ConcreteABCMeta(ABCMeta):
@@ -111,10 +111,10 @@ class FastLogger(object):
         Returns:
             :obj:`bool`: return `True` if the `logger` is active, `False` otherwise
         """
-        active = False
         if level_used not in FastLogger.LOG_LEVELS:
             raise ValueError("bad level '{}'".format(level_used))
         log_level = LogLevel[level_used]
+        active = False
         for handler in logger.handlers:
             if handler.min_level <= log_level:
                 active = True

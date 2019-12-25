@@ -11,7 +11,7 @@ from capturer import CaptureOutput
 from argparse import Namespace
 
 from examples.random_state_variable import RunRandomStateVariableSimulation
-from de_sim.config import core
+from examples.config import core
 
 
 class TestRandomStateVariableSimulation(unittest.TestCase):
@@ -19,13 +19,13 @@ class TestRandomStateVariableSimulation(unittest.TestCase):
     def setUp(self):
         # turn off console logging
         self.config = core.get_debug_logs_config()
-        self.console_level = self.config['debug_logs']['handlers']['debug.console']['level']
-        self.config['debug_logs']['handlers']['debug.console']['level'] = 'error'
+        self.console_level = self.config['debug_logs']['handlers']['debug.example.console']['level']
+        self.config['debug_logs']['handlers']['debug.example.console']['level'] = 'error'
         warnings.simplefilter("ignore")
 
     def tearDown(self):
         # restore console logging
-        self.config['debug_logs']['handlers']['debug.console']['level'] = self.console_level
+        self.config['debug_logs']['handlers']['debug.example.console']['level'] = self.console_level
 
     def test_random_state_variable_simulation(self):
         with CaptureOutput(relay=False):

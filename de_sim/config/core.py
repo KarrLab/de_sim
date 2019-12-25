@@ -35,18 +35,19 @@ def get_config(extra=None):
     return wc_utils.config.core.ConfigManager(paths).get_config(extra=extra)
 
 
-def get_debug_logs_config(extra=None):
+def get_debug_logs_config(extra=None, cfg_path=('de_sim', 'config/debug.default.cfg')):
     """ Get debug logs configuration
 
     Args:
         extra (:obj:`dict`, optional): additional configuration to override
+        cfg_path (:obj:`str`, optional): path to the debug logs config file
 
     Returns:
         :obj:`configobj.ConfigObj`: nested dictionary with the configuration settings loaded from the
-        configuration source(s).
+            configuration source(s).
     """
     paths = wc_utils.debug_logs.config.paths.deepcopy()
-    paths.default = pkg_resources.resource_filename('de_sim', 'config/debug.default.cfg')
+    paths.default = pkg_resources.resource_filename(*cfg_path)
     paths.user = (
         'de_sim.debug.cfg',
         # todo: fix: this cfg file doesn't alter the log level:
