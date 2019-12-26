@@ -94,6 +94,10 @@ class TestFastLogger(unittest.TestCase):
         with self.assertRaises(ValueError):
             FastLogger(self.fixture_logger, 'not a level')
 
+    def test_is_active(self):
+        fast_logger = FastLogger(self.fixture_logger, self.fixture_level.name)
+        self.assertTrue(fast_logger.is_active())
+
     def test_get_level(self):
         for log_level in LogLevel:
             handler = StdOutHandler(name="handler_{}".format(log_level), level=log_level)

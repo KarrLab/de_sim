@@ -94,6 +94,8 @@ class FastLogger(object):
             level_used (:obj:`str`): a logging level, as used in :obj:`logging2.LogLevel`:
         """
         self.active = FastLogger.active_logger(logger, level_used)
+        if self.active:
+            print(f'FastLogger {logger.name} IS active at {level_used}')
         self.method = getattr(logger, level_used)
         self.logger = logger
 
@@ -120,6 +122,14 @@ class FastLogger(object):
                 active = True
         return active
 
+    def is_active(self):
+        """ Get the cached active state of this logger
+
+        Returns:
+            :obj:`bool`: whether this logger is active
+        """
+        return self.active
+
     def get_level(self):
         """ Get the level of this logger
 
@@ -140,4 +150,5 @@ class FastLogger(object):
             kwargs (:obj:`dict`): other logging arguments
         """
         if self.active:
+            print(f'logging: {self.logger.name}')
             self.method(msg, **kwargs)
