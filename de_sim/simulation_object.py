@@ -173,19 +173,18 @@ class EventQueue(object):
 
         return events
 
-    def log_event(self, event, local_call_depth=1):
+    def log_event(self, event):
         """ Log an event with its simulation time
 
         Args:
             event (:obj:`Event`): the Event to log
-            local_call_depth (:obj:`int`, optional): the local call depth; default = 1
         """
         msg = "Execute: {} {}:{} {} ({})".format(event.event_time,
                 type(event.receiving_object).__name__,
                 event.receiving_object.name,
                 event.message.__class__.__name__,
                 str(event.message))
-        self.fast_debug_file_logger.fast_log(msg, sim_time=event.event_time, local_call_depth=local_call_depth)
+        self.fast_debug_file_logger.fast_log(msg, sim_time=event.event_time)
 
     def render(self, sim_obj=None, as_list=False, separator='\t'):
         """ Return the content of an `EventQueue`
@@ -506,10 +505,10 @@ class SimulationObject(object):
         """
         return self.simulator.event_queue.render()
 
-    def log_with_time(self, msg, local_call_depth=1):
+    def log_with_time(self, msg):
         """ Write a debug log message with the simulation time.
         """
-        self.fast_debug_file_logger.fast_log(msg, sim_time=self.time, local_call_depth=local_call_depth)
+        self.fast_debug_file_logger.fast_log(msg, sim_time=self.time)
 
 
 class ApplicationSimulationObjectInterface(object, metaclass=ABCMeta):  # pragma: no cover

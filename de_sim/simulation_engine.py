@@ -288,10 +288,10 @@ class SimulationEngine(object):
 
         return num_events_handled
 
-    def log_with_time(self, msg, local_call_depth=1):
+    def log_with_time(self, msg):
         """Write a debug log message with the simulation time.
         """
-        self.fast_debug_file_logger.fast_log(msg, sim_time=self.time, local_call_depth=local_call_depth)
+        self.fast_debug_file_logger.fast_log(msg, sim_time=self.time)
 
     def provide_event_counts(self):
         """ Provide the simulation's categorized event counts
