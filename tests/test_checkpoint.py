@@ -17,6 +17,7 @@ import unittest
 import copy
 
 from de_sim.checkpoint import Checkpoint
+from de_sim.errors import SimulatorError
 from wc_utils.util.uniform_seq import UniformSequence
 import wc_utils.util.types
 
@@ -88,7 +89,7 @@ class CheckpointLogTest(unittest.TestCase):
                                                                     checkpoint_step=checkpoint_step)
 
         self.assertEqual([], Checkpoint.list_checkpoints(dirname=self.checkpoint_dir, error_if_empty=False))
-        with self.assertRaises(ValueError):
+        with self.assertRaises(SimulatorError):
             Checkpoint.list_checkpoints(dirname=self.checkpoint_dir)
         self.assertGreaterEqual(final_time, final_time_max)
 

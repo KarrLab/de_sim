@@ -212,7 +212,8 @@ class SimulationEngine(object):
                 simulation object are handled together.
 
         Raises:
-            :obj:`SimulatorError`: if the simulation has not been initialized
+            :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
+                or has no initial events
         """
         if not self.__initialized:
             raise SimulatorError("Simulation has not been initialized")

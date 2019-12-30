@@ -14,6 +14,7 @@ import os
 import pickle
 import re
 
+from de_sim.errors import SimulatorError
 from wc_utils.config.core import get_config
 from wc_utils.util.misc import obj_to_str
 from wc_utils.util.uniform_seq import UniformSequence
@@ -96,7 +97,7 @@ class Checkpoint(object):
             :obj:`list`: sorted list of times of saved checkpoints
 
         Raises:
-            :obj:`ValueError`: if `dirname` doesn't contain any checkpoints
+            :obj:`SimulatorError`: if `dirname` doesn't contain any checkpoints
         """
         # find checkpoint times
         checkpoint_times = []
@@ -108,7 +109,7 @@ class Checkpoint(object):
 
         # error if no checkpoints found
         if error_if_empty and not checkpoint_times:
-            raise ValueError("no checkpoints found in '{}'".format(dirname))
+            raise SimulatorError("no checkpoints found in '{}'".format(dirname))
 
         # sort by time
         checkpoint_times.sort()

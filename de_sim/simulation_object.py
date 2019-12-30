@@ -592,6 +592,15 @@ class ApplicationSimulationObjMeta(type):
 
         Returns:
             :obj:`SimulationObject`: a new instance of a subclass of `SimulationObject`
+
+        Raises:
+            :obj:`SimulatorError`: if class priority is not an `int`,
+                or if the :obj:`ApplicationSimulationObject` doesn't define `messages_sent` or `event_handlers`,
+                or if handlers in `event_handlers` don't refer to methods in the
+                    :obj:`ApplicationSimulationObject`,
+                or if `event_handlers` isn't an iterator over pairs,
+                or if a message type sent isn't a subclass of SimulationMessage,
+                or if `messages_sent` isn't an iterator over pairs.
         """
         # Short circuit when ApplicationSimulationObject is defined
         if clsname == 'ApplicationSimulationObject':
