@@ -17,13 +17,13 @@ jobs:
       # Python 3 installation tasks
       - run:
           name: Install pkg_utils (Python 3)
-          command: pip3 install -U git+https://github.com/KarrLab/pkg_utils.git#egg=pkg_utils
+          command: python3 -m pip install -U git+https://github.com/KarrLab/pkg_utils.git#egg=pkg_utils
       - run:
           name: Install karr_lab_build_utils (Python 3)
           command: |
-            pip3 install -U git+https://github.com/KarrLab/sphinxcontrib-googleanalytics.git#egg=sphinxcontrib_googleanalytics
-            pip3 install -U git+https://github.com/KarrLab/wc_utils.git#egg=wc_utils[all]
-            pip3 install -U git+https://github.com/KarrLab/karr_lab_build_utils.git#egg=karr_lab_build_utils[all]
+            python3 -m pip install -U git+https://github.com/KarrLab/sphinxcontrib-googleanalytics.git#egg=sphinxcontrib_googleanalytics
+            python3 -m pip install -U git+https://github.com/KarrLab/wc_utils.git#egg=wc_utils[all]
+            python3 -m pip install -U git+https://github.com/KarrLab/karr_lab_build_utils.git#egg=karr_lab_build_utils[all]
       - run:
           name: Install package configuration files including credentials
           command: karr_lab_build_utils3 download-install-package-config-files
@@ -33,13 +33,13 @@ jobs:
             if [[ -f .circleci/requirements.txt ]]; then
               while IFS="" read -r line || [ -n "$line" ]; do
                 if [[ ! -z "$line" ]] && [[ ! "$line" =~ ^# ]]; then
-                  pip3 install -U "$line"
+                  python3 -m pip install -U "$line"
                 fi
               done < .circleci/requirements.txt
             fi
       - run:
           name: Install package (Python 3)
-          command: pip3 install -U -e .[all]
+          command: python3 -m pip install -U -e .[all]
 
       # Save packages to cache
       - save_cache:
