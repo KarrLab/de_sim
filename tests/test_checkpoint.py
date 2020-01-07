@@ -104,7 +104,7 @@ class CheckpointLogTest(unittest.TestCase):
         self.assertTrue(sorted(Checkpoint.list_checkpoints(dirname=self.checkpoint_dir)))
         numpy.testing.assert_array_almost_equal(
             Checkpoint.list_checkpoints(dirname=self.checkpoint_dir),
-            numpy.linspace(0, time_max, 1 + time_max / checkpoint_step),
+            numpy.linspace(0, time_max, int(1 + time_max / checkpoint_step)),
             decimal=1)
 
         # check that checkpoints have correct data
@@ -137,7 +137,7 @@ class CheckpointLogTest(unittest.TestCase):
         self.assertTrue(sorted(Checkpoint.list_checkpoints(dirname=self.checkpoint_dir)))
         numpy.testing.assert_array_almost_equal(
             Checkpoint.list_checkpoints(dirname=self.checkpoint_dir),
-            numpy.linspace(0, final_time_max, 1 + final_time_max / checkpoint_step),
+            numpy.linspace(0, final_time_max, int(1 + final_time_max / checkpoint_step)),
             decimal=1)
 
         # check checkpoints have correct data

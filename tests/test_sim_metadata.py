@@ -96,9 +96,10 @@ class TestSimulationMetadata(unittest.TestCase):
 
     def test_build_metadata(self):
         model = self.metadata.model
-        self.assertIn(model.url, ['https://github.com/KarrLab/de_sim.git',
-                                  'git@github.com:KarrLab/de_sim.git',
-                                  'ssh://git@github.com/KarrLab/de_sim.git'])
+        urls = ['https://github.com/KarrLab/de_sim.git',
+                'git@github.com:KarrLab/de_sim.git',
+                'ssh://git@github.com/KarrLab/de_sim.git']
+        self.assertIn(model.url.lower(), [url.lower() for url in urls])
         self.assertEqual(model.branch, 'master')
 
         run = self.metadata.run
