@@ -1,9 +1,6 @@
 # description
 include README.rst
 
-# version
-include de_sim/VERSION
-
 # license
 include LICENSE
 
