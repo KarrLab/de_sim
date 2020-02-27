@@ -1,4 +1,4 @@
 configobj
 progressbar2 >= 3.39
 setuptools
-wc_utils
+wc_utils[git]
