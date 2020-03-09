@@ -10,7 +10,6 @@ from abc import ABCMeta
 from copy import deepcopy
 from enum import IntEnum
 import abc
-import collections
 import heapq
 import inspect
 import math

@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from collections import Iterable
+from collections.abc import Iterable
 
 from wc_utils.util.misc import round_direct
 from wc_utils.util.list import elements_to_str
