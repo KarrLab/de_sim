@@ -14,12 +14,12 @@ import os
 import pickle
 import re
 
+from de_sim.config import core
 from de_sim.errors import SimulatorError
 from wc_utils.config.core import get_config
 from wc_utils.util.misc import obj_to_str
-from wc_utils.util.uniform_seq import UniformSequence
 
-uniform_seq_precision = get_config()['wc_utils']['misc']['uniform_seq_precision']
+MAX_TIME_PRECISION = core.get_config()['de_sim']['max_time_precision']
 
 
 class Checkpoint(object):
@@ -61,7 +61,7 @@ class Checkpoint(object):
 
         Args:
             dirname (:obj:`str`): directory to read/write checkpoint data
-            time (:obj:`float`, optional): time in seconds of desired checkpoint; if not provided,
+            time (:obj:`float`, optional): time in simulated time units of desired checkpoint; if not provided,
                 the most recent checkpoint is returned
 
         Returns:
@@ -101,7 +101,7 @@ class Checkpoint(object):
         """
         # find checkpoint times
         checkpoint_times = []
-        pattern = r'^(\d+\.\d{' + f'{uniform_seq_precision},{uniform_seq_precision}' + r'})\.pickle$'
+        pattern = r'^(\d+\.\d{' + f'{MAX_TIME_PRECISION},{MAX_TIME_PRECISION}' + r'})\.pickle$'
         for file_name in os.listdir(dirname):
             match = re.match(pattern, file_name)
             if os.path.isfile(os.path.join(dirname, file_name)) and match:
@@ -123,12 +123,15 @@ class Checkpoint(object):
 
         Args:
             dirname (:obj:`str`): directory to read/write checkpoint data
-            time (:obj:`float`): time in seconds
+            time (:obj:`float`): time
 
         Returns:
             :obj:`str`: file name for checkpoint at time `time`
         """
-        return os.path.join(dirname, f'{UniformSequence.truncate(time)}.pickle')
+        filename_time = f'{time:.{MAX_TIME_PRECISION}f}'
+        if not math.isclose(float(filename_time), time):
+            raise SimulatorError(f"filename time {filename_time} is not close to time {time}")
+        return os.path.join(dirname, f'{filename_time}.pickle')
 
     def __str__(self):
         """ Provide a human readable representation of this `Checkpoint`

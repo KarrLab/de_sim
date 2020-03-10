@@ -21,7 +21,7 @@ class RandomStateVariableSimulationObject(ApplicationSimulationObject):
     """ The random state variable model
 
     * State: a number
-    * Event scheduling: schedule events randomly 1 or 4 seconds ahead
+    * Event scheduling: schedule events randomly
     * Event execution: randomly increment or decrement the state
     """
 

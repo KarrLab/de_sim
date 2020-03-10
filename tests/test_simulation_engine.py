@@ -115,7 +115,7 @@ class PeriodicSimulationObject(TemplatePeriodicSimulationObject):
     """ Self-clocking ApplicationSimulationObject
 
     Attributes:
-        period (:obj:`float`): interval between events, in simulated seconds
+        period (:obj:`float`): interval between events, in simulated time units
     """
 
     def __init__(self, name, period):

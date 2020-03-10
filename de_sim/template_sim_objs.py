@@ -24,7 +24,7 @@ class TemplatePeriodicSimulationObject(ApplicationSimulationObject):
     to determine event times.
 
     Attributes:
-        period (:obj:`float`): interval between events, in simulated seconds
+        period (:obj:`float`): interval between events, in simulated time units
         num_periods (:obj:`int`): number of periods executed
     """
 
@@ -36,7 +36,7 @@ class TemplatePeriodicSimulationObject(ApplicationSimulationObject):
         super().__init__(name)
 
     def schedule_next_event(self):
-        """ Schedule the next event in `self.period` simulated seconds
+        """ Schedule the next event in `self.period` simulated time units
         """
         next_event_time = self.num_periods * self.period
         self.num_periods += 1
