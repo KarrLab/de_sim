@@ -37,8 +37,8 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
         pso_1 = PeriodicSimulationObject('pso_1', period)
         expected.append(np.linspace(0, end_time, end_time + 1))
 
-        # float period
-        period = .1
+        # float period, provided as string so it can be an exact Decimal
+        period = '.1'
         pso_2 = PeriodicSimulationObject('pso_2', period)
         expected.append([t/10 for t in range(end_time * 10 + 1)])
 

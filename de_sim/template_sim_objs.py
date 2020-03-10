@@ -21,24 +21,25 @@ class TemplatePeriodicSimulationObject(ApplicationSimulationObject):
 
     Events occur at time 0, `period`, `2 x period`, ...
 
-    To avoid roundoff errors in event times get them from a `UniformSequence`.
+    To minimize roundoff errors in event times get them from a `UniformSequence`.
 
     Attributes:
-        period (:obj:`float`): interval between events, in simulated seconds
+        period (:obj:`float`, :obj:`int`, or :obj:`str`): interval between events, in simulated seconds;
+            may be a string to provide exact float to `Decimal`
         event_time_sequence (:obj:`UniformSequence`): a uniform sequence generator
     """
 
     def __init__(self, name, period):
-        if period <= 0:
+        if float(period) <= 0:
             raise SimulatorError("period must be positive, but is {}".format(period))
-        self.period = period
+        self.period = float(period)
         self.event_time_sequence = UniformSequence(0, period)
         super().__init__(name)
 
     def schedule_next_event(self):
         """ Schedule the next event in `self.period` simulated seconds
         """
-        next_event_time = self.event_time_sequence.__next__()
+        next_event_time = self.event_time_sequence.next_float()
         self.send_event_absolute(next_event_time, self, NextEvent())
 
     def handle_event(self):
