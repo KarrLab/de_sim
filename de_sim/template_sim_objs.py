@@ -25,10 +25,11 @@ class TemplatePeriodicSimulationObject(ApplicationSimulationObject):
 
     Attributes:
         period (:obj:`float`): interval between events, in simulated seconds
+        num_periods (:obj:`int`): number of periods executed
     """
 
     def __init__(self, name, period):
-        if float(period) <= 0:
+        if period <= 0:
             raise SimulatorError("period must be positive, but is {}".format(period))
         self.period = period
         self.num_periods = 0
