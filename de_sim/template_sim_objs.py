@@ -25,7 +25,7 @@ class TemplatePeriodicSimulationObject(ApplicationSimulationObject):
 
     Attributes:
         period (:obj:`float`, :obj:`int`, or :obj:`str`): interval between events, in simulated seconds;
-            may be a string to provide exact float to `Decimal`
+            may be a string to provide exact float to `Decimal` used by `UniformSequence`
         event_time_sequence (:obj:`UniformSequence`): a uniform sequence generator
     """
 
