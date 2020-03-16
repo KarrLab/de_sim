@@ -1,4 +1,4 @@
-""" Core discrete event simulation engine
+""" Discrete event simulation engine
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2016-06-01
