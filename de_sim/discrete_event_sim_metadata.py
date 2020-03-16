@@ -7,12 +7,13 @@
 :License: MIT
 """
 
+from abc import ABC, abstractmethod
 import datetime
+import getpass
 import os
+import pickle
 import socket
 import warnings
-import pickle
-from abc import ABC, abstractmethod
 
 import wc_utils.util.git
 from wc_utils.util.misc import obj_to_str
@@ -46,21 +47,22 @@ class Comparable(ABC):
         pass    # pragma: no cover
 
 
-class SimulationMetadata(object):
-    """ Represents the metadata of a simulation run
+class DiscreteEventSimMetadata(object):
+    """ Represents the metadata of a discrete event simulation run
 
     Attributes:
-        model (:obj:`wc_utils.util.git.RepositoryMetadata`): Metadata about the model's git repository
-        simulation (:obj:`object`): Information about the simulation's
-            configuration (e.g. perturbations, random seed)
-        run (:obj:`RunMetadata`): Information about the simulation's run (e.g. start time, duration)
-        author (:obj:`AuthorMetadata`): Information about the person who ran the simulation
+        application (:obj:`wc_utils.util.git.RepositoryMetadata`): metadata about the DES
+            application's git repository
+        simulation (:obj:`object`): information about the simulation's configuration
+            (e.g. start time, maximum time)
+        run (:obj:`RunMetadata`): information about the simulation's run (e.g. start time, duration)
+        author (:obj:`AuthorMetadata`): information about the person who ran the simulation
             (e.g. name, email)
     """
-    ATTRIBUTES = ['model', 'simulation', 'run', 'author']
+    ATTRIBUTES = ['application', 'simulation', 'run', 'author']
 
-    def __init__(self, model, simulation, run, author):
-        self.model = model
+    def __init__(self, application, simulation, run, author):
+        self.application = application
         self.simulation = simulation
         self.run = run
         self.author = author
@@ -70,11 +72,11 @@ class SimulationMetadata(object):
         """ Save a simulation metadata object to the directory `dirname`
 
         Args:
-            simulation_metadata (:obj:`SimulationMetadata`): a simulation metadata instance
+            simulation_metadata (:obj:`DiscreteEventSimMetadata`): a simulation metadata instance
             dirname (:obj:`str`): directory for holding the metadata
         """
 
-        file_name = SimulationMetadata.get_file_name(dirname)
+        file_name = DiscreteEventSimMetadata.get_file_name(dirname)
 
         with open(file_name, 'wb') as file:
             pickle.dump(simulation_metadata, file)
@@ -85,9 +87,12 @@ class SimulationMetadata(object):
 
         Args:
             dirname (:obj:`str`): directory for holding the metadata
+
+        Returns:
+            :obj:`DiscreteEventSimMetadata`: a simulation metadata instance
         """
 
-        file_name = SimulationMetadata.get_file_name(dirname)
+        file_name = DiscreteEventSimMetadata.get_file_name(dirname)
 
         # load and return this simulation metadata
         with open(file_name, 'rb') as file:
@@ -109,7 +114,7 @@ class SimulationMetadata(object):
         """ Compare two simulation metadata objects
 
         Args:
-            other (:obj:`SimulationMetadata`): other simulation metadata object
+            other (:obj:`DiscreteEventSimMetadata`): other simulation metadata object
 
         Returns:
             :obj:`bool`: true if simulation metadata objects are semantically equal
@@ -127,7 +132,7 @@ class SimulationMetadata(object):
         """ Compare two simulation metadata objects
 
         Args:
-            other (:obj:`SimulationMetadata`): other simulation metadata object
+            other (:obj:`DiscreteEventSimMetadata`): other simulation metadata object
 
         Returns:
             :obj:`bool`: true if simulation metadata objects are semantically unequal
@@ -135,10 +140,10 @@ class SimulationMetadata(object):
         return not self.__eq__(other)
 
     def __str__(self):
-        """ Provide a readable representation of this `SimulationMetadata`
+        """ Provide a readable representation of this `DiscreteEventSimMetadata`
 
         Returns:
-            :obj:`str`: a readable representation of this `SimulationMetadata`
+            :obj:`str`: a readable representation of this `DiscreteEventSimMetadata`
         """
         return obj_to_str(self, self.ATTRIBUTES)
 
@@ -147,7 +152,7 @@ class RunMetadata(object):
     """ Represent a simulation's run
 
     Attributes:
-        start_time (:obj:`datetime.datetime`): simulation start time
+        start_time (:obj:`datetime.datetime`): simulation clock start time
         run_time (:obj:`float`): simulation run time in seconds
         ip_address (:obj:`str`): ip address of the machine that ran the simulation
     """
@@ -157,7 +162,7 @@ class RunMetadata(object):
         """ Construct a representation of simulation run
 
         Args:
-            start_time (:obj:`datetime.datetime`): simulation start time
+            start_time (:obj:`datetime.datetime`): simulation start clock time
             run_time (:obj:`float`): simulation run time in seconds
             ip_address (:obj:`str`): ip address of the machine that ran the simulation
         """
@@ -169,7 +174,7 @@ class RunMetadata(object):
     def record_start(self):
         self.start_time = datetime.datetime.now()
 
-    def record_end(self):
+    def record_run_time(self):
         self.run_time = (datetime.datetime.now() - self.start_time).total_seconds()
 
     def record_ip_address(self):
@@ -224,18 +229,24 @@ class AuthorMetadata(object):
     """
     ATTRIBUTES = ['name', 'email', 'username', 'organization']
 
-    def __init__(self, name, email, username, organization):
+    def __init__(self, name=None, email=None, username=None, organization=None):
         """ Construct a representation of the author of a simulation run
 
         Args:
-            name (:obj:`str`): authors' name
-            email (:obj:`str`): author's email address
-            username (:obj:`str`): authors' username
-            organization (:obj:`str`): author's organization
+            name (:obj:`str`, optional): authors' name
+            email (:obj:`str`, optional): author's email address
+            username (:obj:`str`, optional): authors' username
+            organization (:obj:`str`, optional): author's organization
         """
         self.name = name
         self.email = email
-        self.username = username
+        if username is None:
+            try:
+                self.username = getpass.getuser()
+            except Exception:    # pragma: no cover
+                self.username = None
+        else:
+            self.username = username
         self.organization = organization
 
     def __eq__(self, other):

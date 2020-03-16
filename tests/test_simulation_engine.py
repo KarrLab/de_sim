@@ -21,6 +21,7 @@ import unittest
 import warnings
 
 from de_sim.config import core
+from de_sim.discrete_event_sim_metadata import DiscreteEventSimMetadata
 from de_sim.errors import SimulatorError
 from de_sim.shared_state_interface import SharedStateInterface
 from de_sim.simulation_engine import SimulationEngine
@@ -225,9 +226,9 @@ class TestSimulationEngine(unittest.TestCase):
         # 1 event/sec:
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
-        end_time = 10
-        # execute to time <= end_time, with 1st event at time = 1
-        self.assertEqual(simulator.simulate(end_time), end_time + 1)
+        time_max = 10
+        # execute to time <= time_max, with 1st event at time = 1
+        self.assertEqual(simulator.simulate(time_max), time_max + 1)
 
         # TODO(Arthur): fix: this is misleading, because __stop_cond_end is treated like a time, but
         # simulate() returns a count of events executed
@@ -237,12 +238,12 @@ class TestSimulationEngine(unittest.TestCase):
         simulator = SimulationEngine(stop_condition=stop_cond_eg)
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
-        self.assertEqual(simulator.simulate(end_time), __stop_cond_end + 1)
+        self.assertEqual(simulator.simulate(time_max), __stop_cond_end + 1)
 
         simulator = SimulationEngine()
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
-        self.assertEqual(simulator.simulate(end_time, stop_condition=stop_cond_eg), __stop_cond_end + 1)
+        self.assertEqual(simulator.simulate(time_max, stop_condition=stop_cond_eg), __stop_cond_end + 1)
         # TODO(Arthur): test that the 'Terminate with stop condition satisfied' message is logged
 
         with self.assertRaisesRegex(SimulatorError, 'stop_condition is not a function'):
@@ -256,10 +257,10 @@ class TestSimulationEngine(unittest.TestCase):
         sys.stderr.flush()
         with CaptureOutput(relay=True) as capturer:
             try:
-                end_time = 10
-                self.assertEqual(simulator.simulate(end_time, progress=True), end_time + 1)
-                self.assertTrue("/{}".format(end_time) in capturer.get_text())
-                self.assertTrue("end_time".format(end_time) in capturer.get_text())
+                time_max = 10
+                self.assertEqual(simulator.simulate(time_max, progress=True), time_max + 1)
+                self.assertTrue("/{}".format(time_max) in capturer.get_text())
+                self.assertTrue("time_max".format(time_max) in capturer.get_text())
             except ValueError as e:
                 if str(e) == 'I/O operation on closed file':
                     pass
@@ -302,7 +303,7 @@ class TestSimulationEngine(unittest.TestCase):
 
     def test_cyclical_messaging_network(self):
         # test event times at simulation objects; this test should succeed with any
-        # natural number for num_objs and any non-negative value of end_time
+        # natural number for num_objs and any non-negative value of time_max
         self.make_cyclical_messaging_network_sim(self.simulator, 10)
         self.simulator.initialize()
         self.assertTrue(0<self.simulator.simulate(20))
@@ -328,6 +329,18 @@ class TestSimulationEngine(unittest.TestCase):
         queues = self.simulator.message_queues()
         for sim_obj_name in self.simulator.simulation_objects:
             self.assertIn(sim_obj_name, queues)
+
+    def test_metadata_collection(self):
+        self.make_one_object_simulation()
+        self.simulator.run(5.0, metadata_dir=self.out_dir)
+        metadata = DiscreteEventSimMetadata.read_metadata(self.out_dir)
+        self.assertIsInstance(metadata, DiscreteEventSimMetadata)
+        self.assertGreaterEqual(metadata.run.run_time, 0)
+
+        self.simulator.reset()
+        self.make_one_object_simulation()
+        self.simulator.run(5.0)
+        self.assertIsInstance(self.simulator.metadata, DiscreteEventSimMetadata)
 
     # test simulation performance code:
     def prep_simulation(self, num_sim_objs):

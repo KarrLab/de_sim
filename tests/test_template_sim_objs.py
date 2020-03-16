@@ -30,22 +30,22 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
     def test_TemplatePeriodicSimulationObject(self):
 
         simulator = SimulationEngine()
-        end_time = 5
+        time_max = 5
         expected = []
 
         # int period
         period = 1
         pso_1 = PeriodicSimulationObject('pso_1', period)
-        expected.append(np.linspace(0, end_time, end_time + 1))
+        expected.append(np.linspace(0, time_max, time_max + 1))
 
         period = .1
         pso_2 = PeriodicSimulationObject('pso_2', period)
-        expected.append([t/10 for t in range(end_time * 10 + 1)])
+        expected.append([t/10 for t in range(time_max * 10 + 1)])
 
         psos = [pso_1, pso_2]
         simulator.add_objects(psos)
         simulator.initialize()
-        simulator.simulate(end_time)
+        simulator.simulate(time_max)
 
         for pso, expect in zip(psos, expected):
             for pso_time, expect_time in zip(pso.times, expect):

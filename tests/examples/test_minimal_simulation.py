@@ -19,8 +19,8 @@ class TestMinimalSimulation(unittest.TestCase):
     def setUp(self):
         warnings.simplefilter("ignore")
 
-    def run_minimal_simulation(self, delay, end_time):
-        args = Namespace(delay=delay, end_time=end_time)
+    def run_minimal_simulation(self, delay, time_max):
+        args = Namespace(delay=delay, time_max=time_max)
         return(RunMinimalSimulation.main(args))
 
     def test_minimal_simulation_reproducibility(self):
@@ -30,8 +30,8 @@ class TestMinimalSimulation(unittest.TestCase):
 
     def test_minimal_simulation_parse_args(self):
         delay = 3
-        end_time = 25.0
-        cl = "{} {}".format(delay, end_time)
+        time_max = 25.0
+        cl = "{} {}".format(delay, time_max)
         args = RunMinimalSimulation.parse_args(cli_args=cl.split())
         self.assertEqual(args.delay, delay)
-        self.assertEqual(args.end_time, end_time)
+        self.assertEqual(args.time_max, time_max)

@@ -51,7 +51,7 @@ class RunMinimalSimulation(object):
         """
         parser = argparse.ArgumentParser(description="A minimal simulation, containing one simulation object")
         parser.add_argument('delay', type=float, help="Delay between events")
-        parser.add_argument('end_time', type=float, help="End time for the simulation")
+        parser.add_argument('time_max', type=float, help="End time for the simulation")
         if cli_args is not None:
             args = parser.parse_args(cli_args)
         else:    # pragma: no cover     # reachable only from command line
@@ -69,7 +69,7 @@ class RunMinimalSimulation(object):
 
         # run the simulation
         simulator.initialize()
-        num_events = simulator.simulate(args.end_time)
+        num_events = simulator.simulate(args.time_max)
         return(num_events)
 
 

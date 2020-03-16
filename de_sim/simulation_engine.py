@@ -10,12 +10,14 @@ import datetime
 import sys
 from collections import Counter
 
-from de_sim.simulation_object import EventQueue, SimulationObject
+from de_sim.config import core
+from de_sim.discrete_event_sim_metadata import DiscreteEventSimMetadata, RunMetadata, AuthorMetadata
 from de_sim.errors import SimulatorError
 from de_sim.event import Event
 from de_sim.shared_state_interface import SharedStateInterface
-from de_sim.config import core
+from de_sim.simulation_object import EventQueue, SimulationObject
 from de_sim.utilities import SimulationProgressBar, FastLogger
+from wc_utils.util.git import get_repo_metadata, RepoMetadataCollectionType
 
 
 class SimulationEngine(object):
@@ -43,6 +45,7 @@ class SimulationEngine(object):
         stop_condition (:obj:`function`, optional): if provided, a function that takes one argument:
             `time`; a simulation terminates if `stop_condition` returns `True`
         event_counts (:obj:`Counter`): a counter of event types
+        metadata (:obj:`DiscreteEventSimMetadata`): metadata for a simulation run
         __initialized (:obj:`bool`): whether the simulation has been initialized
 
         Raises:
@@ -154,7 +157,7 @@ class SimulationEngine(object):
         Call `send_initial_events()` in each simulation object that has been loaded.
 
         Raises:
-            SimulatorError: if the simulation has already been initialized
+            :obj:`SimulatorError`:  if the simulation has already been initialized
         """
         if self.__initialized:
             raise SimulatorError('Simulation has already been initialized')
@@ -162,6 +165,38 @@ class SimulationEngine(object):
             sim_obj.send_initial_events()
         self.event_counts.clear()
         self.__initialized = True
+
+    '''
+    problems
+        AuthorMetadata needs data
+        sim_config needs data
+    '''
+    def init_metadata_collection(self, sim_config=None):
+        """ Initialize metatdata collection
+
+        Call just before simulation starts, so that correct clock time of start is recorded
+
+        Args:
+            sim_config (:obj:`object`, optional): information about the simulation's configuration
+                (e.g. start time, maximum time)
+        """
+        application, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
+        author = AuthorMetadata()
+        run = RunMetadata()
+        run.record_ip_address()
+        run.record_start()
+        self.metadata = DiscreteEventSimMetadata(application, sim_config, run, author)
+
+    def finish_metadata_collection(self, metadata_dir=None):
+        """ Finish metatdata collection
+
+        Args:
+            metadata_dir (:obj:`str`, optional): directory for saving metadata; if not provided,
+                then metatdata should be saved later
+        """
+        self.metadata.run.record_run_time()
+        if metadata_dir:
+            DiscreteEventSimMetadata.write_metadata(self.metadata, metadata_dir)
 
     def reset(self):
         """ Reset this `SimulationEngine`
@@ -191,20 +226,22 @@ class SimulationEngine(object):
             data.append('')
         return '\n'.join(data)
 
-    def run(self, end_time, **kwargs):
+    def run(self, time_max, **kwargs):
         """ Alias for simulate
         """
-        return self.simulate(end_time, **kwargs)
+        return self.simulate(time_max, **kwargs)
 
-    def simulate(self, end_time, stop_condition=None, progress=False):
+    def simulate(self, time_max, stop_condition=None, progress=False, metadata_dir=None):
         """ Run the simulation
 
         Args:
-            end_time (:obj:`float`): the time of the end of the simulation
+            time_max (:obj:`float`): the time of the end of the simulation
             stop_condition (:obj:`function`, optional): if provided, a function that takes one argument
                 `time`; a simulation terminates if the function returns `True`
             progress (:obj:`bool`, optional): if `True`, print a bar that dynamically reports the
                 simulation's progress
+            metadata_dir (:obj:`str`, optional): directory for saving metadata; if not provided,
+                then metatdata should be saved later
 
         Returns:
             :obj:`int`: the number of times a simulation object executes `_handle_event()`. This may
@@ -235,12 +272,13 @@ class SimulationEngine(object):
         self.fast_plotting_logger.fast_log('# {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()), sim_time=0)
 
         num_events_handled = 0
-        self.log_with_time("Simulation to {} starting".format(end_time))
+        self.log_with_time("Simulation to {} starting".format(time_max))
 
         try:
-            self.progress.start(end_time)
+            self.progress.start(time_max)
+            self.init_metadata_collection()
             # TODO(Arthur): perhaps 'while True':
-            while self.time <= end_time:
+            while self.time <= time_max:
                 # use the stop condition
 
                 if self.stop_condition is not None and self.stop_condition(self.time):
@@ -258,7 +296,7 @@ class SimulationEngine(object):
                     self.progress.end()
                     break
 
-                if end_time < next_time:
+                if time_max < next_time:
                     self.log_with_time(self.END_TIME_EXCEEDED)
                     self.progress.end()
                     break
@@ -287,6 +325,7 @@ class SimulationEngine(object):
         except SimulatorError as e:
             raise SimulatorError('Simulation ended with error:\n' + str(e))
 
+        self.finish_metadata_collection(metadata_dir=metadata_dir)
         return num_events_handled
 
     def log_with_time(self, msg):

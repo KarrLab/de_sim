@@ -26,7 +26,7 @@ class Checkpoint(object):
     """ Represents a simulation checkpoint
 
     Attributes:
-        time (:obj:`float`): the checkpoint's simulated time, in sec
+        time (:obj:`float`): the checkpoint's simulated time, in simulation time units
         state (:obj:`object`): the simulation application's state at time `time`
         random_state (:obj:`object`): the state of the simulator's random number generator at time `time`
     """

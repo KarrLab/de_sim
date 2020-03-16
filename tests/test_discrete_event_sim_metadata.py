@@ -1,4 +1,4 @@
-""" Test simulation metadata object
+""" Test discrete event simulation metadata object
 
 :Author: Jonathan Karr <karr@mssm.edu>
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
@@ -13,7 +13,8 @@ import tempfile
 import unittest
 from collections import namedtuple
 
-from de_sim.sim_metadata import SimulationMetadata, AuthorMetadata, RunMetadata, Comparable
+from de_sim.discrete_event_sim_metadata import (DiscreteEventSimMetadata, RunMetadata, AuthorMetadata,
+                                                Comparable)
 from wc_utils.util.git import get_repo_metadata, RepoMetadataCollectionType
 from wc_utils.util.misc import as_dict
 
@@ -54,13 +55,13 @@ class TestExampleComparable(unittest.TestCase):
         self.assertNotEqual(ec1, ec2)
 
 
-class TestSimulationMetadata(unittest.TestCase):
+class TestDiscreteEventSimMetadata(unittest.TestCase):
 
     def setUp(self):
         self.pickle_file_dir = tempfile.mkdtemp()
 
-        model, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
-        self.model = model
+        application, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
+        self.application = application
 
         changes = [
             ExampleComparable('name', 1),
@@ -82,30 +83,34 @@ class TestSimulationMetadata(unittest.TestCase):
         run.record_ip_address()
         self.run_equal = copy.copy(run)
         self.run_different = copy.copy(run)
-        self.run_different.record_end()
+        self.run_different.record_run_time()
 
-        self.metadata = SimulationMetadata(model, simulation, run, author)
-        self.metadata_equal = SimulationMetadata(model, simulation, run, author)
+        self.metadata = DiscreteEventSimMetadata(application, simulation, run, author)
+        self.metadata_equal = DiscreteEventSimMetadata(application, simulation, run, author)
         self.author_equal = copy.copy(author)
         self.author_different = author_different = copy.copy(author)
         author_different.name = 'Joe Smith'
-        self.metadata_different = SimulationMetadata(model, simulation, run, author_different)
+        self.metadata_different = DiscreteEventSimMetadata(application, simulation, run, author_different)
 
     def tearDown(self):
         shutil.rmtree(self.pickle_file_dir)
 
     def test_build_metadata(self):
-        model = self.metadata.model
+        application = self.metadata.application
         urls = ['https://github.com/KarrLab/de_sim.git',
                 'git@github.com:KarrLab/de_sim.git',
                 'ssh://git@github.com/KarrLab/de_sim.git']
-        self.assertIn(model.url.lower(), [url.lower() for url in urls])
-        self.assertEqual(model.branch, 'master')
+        self.assertIn(application.url.lower(), [url.lower() for url in urls])
+        self.assertEqual(application.branch, 'master')
 
         run = self.metadata.run
         run.record_start()
-        run.record_end()
+        run.record_run_time()
         self.assertGreaterEqual(run.run_time, 0)
+
+    def test_author_metadata(self):
+        author = AuthorMetadata(name='Arthur', email='test@test.com')
+        self.assertIsInstance(author.username, str)
 
     def test_equality(self):
         obj = object()
@@ -128,16 +133,16 @@ class TestSimulationMetadata(unittest.TestCase):
     def test_as_dict(self):
         d = as_dict(self.metadata)
         self.assertEqual(d['author']['name'], self.metadata.author.name)
-        self.assertEqual(d['model']['branch'], self.metadata.model.branch)
+        self.assertEqual(d['application']['branch'], self.metadata.application.branch)
         self.assertEqual(d['run']['start_time'], self.metadata.run.start_time)
         self.assertEqual(d['simulation'].changes, self.metadata.simulation.changes)
 
     def test_str(self):
         self.assertIn(self.metadata.author.name, str(self.metadata))
-        self.assertIn(self.metadata.model.branch, str(self.metadata))
+        self.assertIn(self.metadata.application.branch, str(self.metadata))
         self.assertIn(self.metadata.run.ip_address, str(self.metadata))
         self.assertIn(str(self.metadata.simulation.time_max), str(self.metadata))
 
     def test_write_and_read(self):
-        SimulationMetadata.write_metadata(self.metadata, self.pickle_file_dir)
-        self.assertEqual(self.metadata, SimulationMetadata.read_metadata(self.pickle_file_dir))
+        DiscreteEventSimMetadata.write_metadata(self.metadata, self.pickle_file_dir)
+        self.assertEqual(self.metadata, DiscreteEventSimMetadata.read_metadata(self.pickle_file_dir))

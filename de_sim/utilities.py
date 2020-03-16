@@ -44,23 +44,23 @@ class SimulationProgressBar(object):
         """
         self.use = use
 
-    def start(self, end_time):
+    def start(self, time_max):
         """ Start the simulation's progress bar
 
         Args:
-            end_time (:obj:`float`): the simulation's end time
+            time_max (:obj:`float`): the simulation's end time
         """
         if self.use:
             self.bar = ProgressBar(
                 widgets=[
                     widgets.Percentage(),
                     ' ', widgets.SimpleProgress(
-                        format='%(value)d/%(max_value)d (end_time)'),
+                        format='%(value)d/%(max_value)d (time_max)'),
                     ' ', widgets.Bar(),
                     ' ', widgets.Timer(),
                     ' ', widgets.AdaptiveETA(),
                 ],
-                max_value=end_time).start()
+                max_value=time_max).start()
 
     def progress(self, sim_time):
         """ Advance the simulation's progress bar

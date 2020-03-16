@@ -70,7 +70,7 @@ class RunRandomStateVariableSimulation(object):
         parser = argparse.ArgumentParser(
             description="A trivial simulation that increments or decrements a variable at each event")
         parser.add_argument('initial_state', type=int, help="Initial state")
-        parser.add_argument('end_time', type=float, help="End time for the simulation")
+        parser.add_argument('time_max', type=float, help="End time for the simulation")
         parser.add_argument('--no-output', dest='output', action='store_false',
                             help="Don't write progress to stdout")
         if cli_args is not None:
@@ -91,7 +91,7 @@ class RunRandomStateVariableSimulation(object):
 
         # run the simulation
         simulator.initialize()
-        num_events = simulator.simulate(args.end_time)
+        num_events = simulator.simulate(args.time_max)
         sys.stderr.write("Executed {} event(s).\n".format(num_events))
         return(num_events)
 
