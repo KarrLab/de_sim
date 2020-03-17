@@ -13,7 +13,6 @@ import tempfile
 from de_sim.errors import SimulatorError
 from de_sim.simulation_config import SimulationConfig
 
-
 class TestSimulationConfig(unittest.TestCase):
 
     def setUp(self):
@@ -21,8 +20,12 @@ class TestSimulationConfig(unittest.TestCase):
         self.time_max = 10.0
         self.time_init = 3.5
         self.random_seed = 7
-        def f(): pass
-        self.stop_condition = f
+
+        class ExampleClass(object):
+            def f(): pass
+        ec = ExampleClass()
+        self.stop_condition = ec.f
+
         self.progress = True
         self.metadata_dir = self.tmp_dir
         self.simulation_config = SimulationConfig(self.time_max, self.time_init, self.random_seed,

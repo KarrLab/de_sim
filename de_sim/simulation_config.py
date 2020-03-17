@@ -41,7 +41,7 @@ class SimulationConfig:
     _time_max: float
     _time_init: float = 0.0
     _random_seed: int = None
-    _stop_condition: object = None   # the type is 'function', but dataclass rejects it; check it below
+    _stop_condition: object = None   # _stop_condition must be callable, which is checked below
     _progress: bool = False
     _metadata_dir: str = None
 
@@ -63,7 +63,7 @@ class SimulationConfig:
             raise SimulatorError(f'time_max ({self._time_max}) must be greater than time_init ({self._time_init})')
 
         # make sure stop_condition is a function
-        if self._stop_condition is not None and not isinstance(self._stop_condition, types.FunctionType):
+        if self._stop_condition is not None and not callable(self._stop_condition):
             raise SimulatorError(f"stop_condition ('{self._stop_condition}') is not a function")
 
         # ensure that metadata_dir is a directory
