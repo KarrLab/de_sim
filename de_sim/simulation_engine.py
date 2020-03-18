@@ -6,15 +6,17 @@
 :License: MIT
 """
 
+from collections import Counter
+import dataclasses
 import datetime
 import sys
-from collections import Counter
 
 from de_sim.config import core
-from de_sim.discrete_event_sim_metadata import DiscreteEventSimMetadata, RunMetadata, AuthorMetadata
+from de_sim.simulation_metadata import SimulationMetadata, RunMetadata, AuthorMetadata
 from de_sim.errors import SimulatorError
 from de_sim.event import Event
 from de_sim.shared_state_interface import SharedStateInterface
+from de_sim.simulation_config import SimulationConfig
 from de_sim.simulation_object import EventQueue, SimulationObject
 from de_sim.utilities import SimulationProgressBar, FastLogger
 from wc_utils.util.git import get_repo_metadata, RepoMetadataCollectionType
@@ -41,22 +43,15 @@ class SimulationEngine(object):
         fast_debug_file_logger (:obj:`FastLogger`): a fast logger for debugging messages
         fast_plotting_logger (:obj:`FastLogger`): a fast logger for trajectory data for plotting
         event_queue (:obj:`EventQueue`): the queue of future events
-        progress (:obj:`SimulationProgressBar`): a real-time progress bar
-        stop_condition (:obj:`function`, optional): if provided, a function that takes one argument:
-            `time`; a simulation terminates if `stop_condition` returns `True`
         event_counts (:obj:`Counter`): a counter of event types
-        metadata (:obj:`DiscreteEventSimMetadata`): metadata for a simulation run
-        __initialized (:obj:`bool`): whether the simulation has been initialized
-
-        Raises:
-            :obj:`SimulatorError`: if the `stop_condition` is not callable
+        sim_config (:obj:`SimulationConfig`, optional): a simulation run's configuration
     """
     # Termination messages
     NO_EVENTS_REMAIN = " No events remain"
     END_TIME_EXCEEDED = " End time exceeded"
     TERMINATE_WITH_STOP_CONDITION_SATISFIED = " Terminate with stop condition satisfied"
 
-    def __init__(self, shared_state=None, stop_condition=None):
+    def __init__(self, shared_state=None):
         if shared_state is None:
             self.shared_state = []
         else:
@@ -64,28 +59,12 @@ class SimulationEngine(object):
         self.debug_logs = core.get_debug_logs()
         self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('de_sim.debug.file'), 'debug')
         self.fast_plotting_logger = FastLogger(self.debug_logs.get_log('de_sim.plot.file'), 'debug')
-        self.set_stop_condition(stop_condition)
         self.time = 0.0
         self.simulation_objects = {}
         self.log_with_time("SimulationEngine created")
         self.event_queue = EventQueue()
         self.event_counts = Counter()
         self.__initialized = False
-
-    def set_stop_condition(self, stop_condition):
-        """ Set the simulation engine's stop condition
-
-        Attributes:
-            stop_condition (:obj:`function`): a function that takes one argument
-                `time`; `stop_condition` is executed and tested before each simulation event.
-                If it returns `True` a simulation is terminated.
-
-            Raises:
-                :obj:`SimulatorError`: if the `stop_condition` is not callable
-        """
-        if stop_condition is not None and not callable(stop_condition):
-            raise SimulatorError('stop_condition is not a function')
-        self.stop_condition = stop_condition
 
     def add_object(self, simulation_object):
         """ Add a simulation object instance to this simulation
@@ -177,26 +156,22 @@ class SimulationEngine(object):
         Call just before simulation starts, so that correct clock time of start is recorded
 
         Args:
-            sim_config (:obj:`object`, optional): information about the simulation's configuration
-                (e.g. start time, maximum time)
+            sim_config (:obj:`SimulationConfig`, optional): information about the simulation's configuration
+                (start time, maximum time, etc.)
         """
         application, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
         author = AuthorMetadata()
         run = RunMetadata()
         run.record_ip_address()
         run.record_start()
-        self.metadata = DiscreteEventSimMetadata(application, sim_config, run, author)
+        self.metadata = SimulationMetadata(application, sim_config, run, author)
 
-    def finish_metadata_collection(self, metadata_dir=None):
+    def finish_metadata_collection(self):
         """ Finish metatdata collection
-
-        Args:
-            metadata_dir (:obj:`str`, optional): directory for saving metadata; if not provided,
-                then metatdata should be saved later
         """
         self.metadata.run.record_run_time()
-        if metadata_dir:
-            DiscreteEventSimMetadata.write_metadata(self.metadata, metadata_dir)
+        if self.sim_config.metadata_dir:
+            SimulationMetadata.write_metadata(self.metadata, self.sim_config.metadata_dir)
 
     def reset(self):
         """ Reset this `SimulationEngine`
@@ -226,22 +201,65 @@ class SimulationEngine(object):
             data.append('')
         return '\n'.join(data)
 
-    def run(self, time_max, **kwargs):
-        """ Alias for simulate
-        """
-        return self.simulate(time_max, **kwargs)
+    @staticmethod
+    def _get_sim_config(time_max=None, sim_config=None, **kwargs):
+        """ External simulate interface
 
-    def simulate(self, time_max, stop_condition=None, progress=False, metadata_dir=None):
-        """ Run the simulation
+        Legal parameter combinations:
+
+        1. just `time_max`
+        2. just `sim_config`
+        3. just `kwargs`, which must contain `time_max`
+
+        Other combinations are illegal.
 
         Args:
-            time_max (:obj:`float`): the time of the end of the simulation
-            stop_condition (:obj:`function`, optional): if provided, a function that takes one argument
-                `time`; a simulation terminates if the function returns `True`
-            progress (:obj:`bool`, optional): if `True`, print a bar that dynamically reports the
-                simulation's progress
-            metadata_dir (:obj:`str`, optional): directory for saving metadata; if not provided,
-                then metatdata should be saved later
+            time_max (:obj:`float`, optional): the time of the end of the simulation
+            sim_config (:obj:`SimulationConfig`, optional): the simulation run's configuration
+            kwargs (:obj:`SimulationConfig`, optional): keyword arguments, with keys chosen from
+                the field names in :obj:`SimulationConfig`
+
+        Returns:
+            :obj:`SimulationConfig`: a validated simulation configuration
+
+        Raises:
+            :obj:`SimulatorError`: if no arguments are provided, or multiple arguments are provided,
+                or `_time_max` is missing from `kwargs`
+        """
+        num_args = 0
+        if time_max is not None:
+            num_args += 1
+        if sim_config is not None:
+            num_args += 1
+        if kwargs:
+            num_args += 1
+        if num_args == 0:
+            raise SimulatorError('time_max, sim_config, or kwargs must be provided')
+        if 1 < num_args:
+            raise SimulatorError('at most 1 of time_max, sim_config, or kwargs may be provided')
+
+        # initialize sim_config if it is not provided
+        if sim_config is None:
+            if time_max is not None:
+                sim_config = SimulationConfig(time_max)
+            else:   # kwargs must be set
+                if '_time_max' not in kwargs:
+                    raise SimulatorError('_time_max must be provided in kwargs')
+                sim_config = SimulationConfig(**kwargs)
+
+        sim_config.validate()
+        return sim_config
+
+    def simulate(self, time_max=None, sim_config=None, **kwargs):
+        """ Run a simulation
+
+        See `_get_sim_config` for constraints on arguments
+
+        Args:
+            time_max (:obj:`float`, optional): the time of the end of the simulation
+            sim_config (:obj:`SimulationConfig`, optional): the simulation run's configuration
+            kwargs (:obj:`SimulationConfig`, optional): keyword arguments, with keys chosen from
+                the field names in :obj:`SimulationConfig`
 
         Returns:
             :obj:`int`: the number of times a simulation object executes `_handle_event()`. This may
@@ -250,7 +268,29 @@ class SimulationEngine(object):
 
         Raises:
             :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
-                or has no initial events
+                or has no initial events, or attempts to execute an event that violates non-decreasing time
+                order
+        """
+        self.sim_config = self._get_sim_config(time_max=time_max, sim_config=sim_config, **kwargs)
+        return self._simulate()
+
+    def run(self, time_max=None, sim_config=None, **kwargs):
+        """ Alias for simulate
+        """
+        return self.simulate(time_max=time_max, sim_config=sim_config, **kwargs)
+
+    def _simulate(self):
+        """ Run the simulation
+
+        Returns:
+            :obj:`int`: the number of times a simulation object executes `_handle_event()`. This may
+                be smaller than the number of events sent, because simultaneous events at one
+                simulation object are handled together.
+
+        Raises:
+            :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
+                or has no initial events, or attempts to execute an event that violates non-decreasing time
+                order
         """
         if not self.__initialized:
             raise SimulatorError("Simulation has not been initialized")
@@ -259,29 +299,26 @@ class SimulationEngine(object):
             raise SimulatorError("Simulation has no objects")
 
         if self.event_queue.empty():
-            raise SimulatorError("Simulation has no events")
+            raise SimulatorError("Simulation has no initial events")
 
         # set up progress bar
-        self.progress = SimulationProgressBar(progress)
-
-        if stop_condition is not None:
-            self.set_stop_condition(stop_condition)
+        self.progress = SimulationProgressBar(self.sim_config.progress)
 
         # write header to a plot log
         # plot logging is controlled by configuration files pointed to by config_constants and by env vars
         self.fast_plotting_logger.fast_log('# {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()), sim_time=0)
 
         num_events_handled = 0
-        self.log_with_time("Simulation to {} starting".format(time_max))
+        self.log_with_time(f"Simulation to {self.sim_config.time_max} starting")
 
         try:
-            self.progress.start(time_max)
+            self.progress.start(self.sim_config.time_max)
             self.init_metadata_collection()
             # TODO(Arthur): perhaps 'while True':
-            while self.time <= time_max:
-                # use the stop condition
+            while self.time <= self.sim_config.time_max:
 
-                if self.stop_condition is not None and self.stop_condition(self.time):
+                # use the stop condition
+                if self.sim_config.stop_condition is not None and self.sim_config.stop_condition(self.time):
                     self.log_with_time(self.TERMINATE_WITH_STOP_CONDITION_SATISFIED)
                     self.progress.end()
                     break
@@ -296,7 +333,7 @@ class SimulationEngine(object):
                     self.progress.end()
                     break
 
-                if time_max < next_time:
+                if self.sim_config.time_max < next_time:
                     self.log_with_time(self.END_TIME_EXCEEDED)
                     self.progress.end()
                     break
@@ -325,7 +362,7 @@ class SimulationEngine(object):
         except SimulatorError as e:
             raise SimulatorError('Simulation ended with error:\n' + str(e))
 
-        self.finish_metadata_collection(metadata_dir=metadata_dir)
+        self.finish_metadata_collection()
         return num_events_handled
 
     def log_with_time(self, msg):

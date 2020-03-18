@@ -21,9 +21,10 @@ import unittest
 import warnings
 
 from de_sim.config import core
-from de_sim.discrete_event_sim_metadata import DiscreteEventSimMetadata
+from de_sim.simulation_metadata import SimulationMetadata
 from de_sim.errors import SimulatorError
 from de_sim.shared_state_interface import SharedStateInterface
+from de_sim.simulation_config import SimulationConfig
 from de_sim.simulation_engine import SimulationEngine
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import SimulationObject, ApplicationSimulationObject
@@ -152,6 +153,27 @@ class TestSimulationEngine(unittest.TestCase):
         self.assertEqual(self.simulator.get_object(obj.name), obj)
         self.simulator.initialize()
 
+    def test_get_sim_config(self):
+        with self.assertRaisesRegex(SimulatorError, 'time_max, sim_config, or kwargs must be provided'):
+            SimulationEngine._get_sim_config()
+
+        kwargs = dict(_time_init=2.)
+        with self.assertRaisesRegex(SimulatorError, 'at most 1 of time_max, sim_config, or kwargs'):
+            SimulationEngine._get_sim_config(100, **kwargs)
+
+        simulation_config = SimulationConfig(10., 30.)
+        with self.assertRaises(SimulatorError):
+            SimulationEngine._get_sim_config(sim_config=simulation_config)
+
+        self.assertEqual(SimulationConfig(5.), SimulationEngine._get_sim_config(time_max=5.))
+
+        kwargs = dict(_time_init=2.)
+        with self.assertRaisesRegex(SimulatorError, 'time_max must be provided in kwargs'):
+            SimulationEngine._get_sim_config(**kwargs)
+
+        kwargs = dict(_time_max=5., _time_init=2.)
+        self.assertEqual(SimulationConfig(5., 2.), SimulationEngine._get_sim_config(**kwargs))
+
     def test_simulate_and_run(self):
         for operation in ['simulate', 'run']:
             self.make_one_object_simulation()
@@ -164,7 +186,8 @@ class TestSimulationEngine(unittest.TestCase):
         obj = ExampleSimulationObject(obj_name(1))
         self.simulator.add_object(obj)
         self.simulator.initialize()
-        self.assertEqual(self.simulator.simulate(-1), 0)
+        kwargs = dict(_time_max=-1, _time_init=-2)
+        self.assertEqual(self.simulator.simulate(**kwargs), 0)
 
     def test_simulation_engine_exceptions(self):
         obj = ExampleSimulationObject(obj_name(1))
@@ -189,7 +212,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.add_object(obj)
         with self.assertRaises(SimulatorError) as context:
             self.simulator.simulate(5.0)
-        self.assertIn('Simulation has no events', str(context.exception))
+        self.assertIn('Simulation has no initial events', str(context.exception))
 
         with self.assertRaises(SimulatorError) as context:
             self.simulator.add_object(obj)
@@ -230,24 +253,16 @@ class TestSimulationEngine(unittest.TestCase):
         # execute to time <= time_max, with 1st event at time = 1
         self.assertEqual(simulator.simulate(time_max), time_max + 1)
 
-        # TODO(Arthur): fix: this is misleading, because __stop_cond_end is treated like a time, but
-        # simulate() returns a count of events executed
         __stop_cond_end = 3
         def stop_cond_eg(time):
             return __stop_cond_end <= time
-        simulator = SimulationEngine(stop_condition=stop_cond_eg)
-        simulator.add_object(PeriodicSimulationObject('name', 1))
-        simulator.initialize()
-        self.assertEqual(simulator.simulate(time_max), __stop_cond_end + 1)
-
         simulator = SimulationEngine()
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
-        self.assertEqual(simulator.simulate(time_max, stop_condition=stop_cond_eg), __stop_cond_end + 1)
-        # TODO(Arthur): test that the 'Terminate with stop condition satisfied' message is logged
-
-        with self.assertRaisesRegex(SimulatorError, 'stop_condition is not a function'):
-            SimulationEngine(stop_condition='hello')
+        sim_config = SimulationConfig(time_max)
+        sim_config.stop_condition = stop_cond_eg
+        # because the simulation is executing one event / sec, the number of events should equal the stop time plus 1
+        self.assertEqual(simulator.simulate(sim_config=sim_config), __stop_cond_end + 1)
 
     def test_progress_bar(self):
         simulator = SimulationEngine()
@@ -258,9 +273,10 @@ class TestSimulationEngine(unittest.TestCase):
         with CaptureOutput(relay=True) as capturer:
             try:
                 time_max = 10
-                self.assertEqual(simulator.simulate(time_max, progress=True), time_max + 1)
-                self.assertTrue("/{}".format(time_max) in capturer.get_text())
-                self.assertTrue("time_max".format(time_max) in capturer.get_text())
+                kwargs = dict(_time_max=time_max, _progress=True)
+                self.assertEqual(simulator.simulate(**kwargs), time_max + 1)
+                self.assertTrue(f"/{time_max}" in capturer.get_text())
+                self.assertTrue("time_max" in capturer.get_text())
             except ValueError as e:
                 if str(e) == 'I/O operation on closed file':
                     pass
@@ -332,15 +348,16 @@ class TestSimulationEngine(unittest.TestCase):
 
     def test_metadata_collection(self):
         self.make_one_object_simulation()
-        self.simulator.run(5.0, metadata_dir=self.out_dir)
-        metadata = DiscreteEventSimMetadata.read_metadata(self.out_dir)
-        self.assertIsInstance(metadata, DiscreteEventSimMetadata)
+        kwargs = dict(_time_max=5.0, _metadata_dir=self.out_dir)
+        self.simulator.run(**kwargs)
+        metadata = SimulationMetadata.read_metadata(self.out_dir)
+        self.assertIsInstance(metadata, SimulationMetadata)
         self.assertGreaterEqual(metadata.run.run_time, 0)
 
         self.simulator.reset()
         self.make_one_object_simulation()
         self.simulator.run(5.0)
-        self.assertIsInstance(self.simulator.metadata, DiscreteEventSimMetadata)
+        self.assertIsInstance(self.simulator.metadata, SimulationMetadata)
 
     # test simulation performance code:
     def prep_simulation(self, num_sim_objs):

@@ -49,6 +49,12 @@ class SimulationConfig:
         # validate types
         for field in dataclasses.fields(self):
             attr = getattr(self, field.name)
+
+            # accept ints in float fields
+            if isinstance(attr, int) and field.type is float:
+                attr = float(attr)
+                setattr(self, field.name, attr)
+
             # dataclasses._MISSING_TYPE is the value used for default if no default is provided
             if 'dataclasses._MISSING_TYPE' in str(field.default):
                 if not isinstance(attr, field.type):

@@ -47,7 +47,7 @@ class Comparable(ABC):
         pass    # pragma: no cover
 
 
-class DiscreteEventSimMetadata(object):
+class SimulationMetadata(object):
     """ Represents the metadata of a discrete event simulation run
 
     Attributes:
@@ -72,11 +72,11 @@ class DiscreteEventSimMetadata(object):
         """ Save a simulation metadata object to the directory `dirname`
 
         Args:
-            simulation_metadata (:obj:`DiscreteEventSimMetadata`): a simulation metadata instance
+            simulation_metadata (:obj:`SimulationMetadata`): a simulation metadata instance
             dirname (:obj:`str`): directory for holding the metadata
         """
 
-        file_name = DiscreteEventSimMetadata.get_file_name(dirname)
+        file_name = SimulationMetadata.get_file_name(dirname)
 
         with open(file_name, 'wb') as file:
             pickle.dump(simulation_metadata, file)
@@ -89,10 +89,10 @@ class DiscreteEventSimMetadata(object):
             dirname (:obj:`str`): directory for holding the metadata
 
         Returns:
-            :obj:`DiscreteEventSimMetadata`: a simulation metadata instance
+            :obj:`SimulationMetadata`: a simulation metadata instance
         """
 
-        file_name = DiscreteEventSimMetadata.get_file_name(dirname)
+        file_name = SimulationMetadata.get_file_name(dirname)
 
         # load and return this simulation metadata
         with open(file_name, 'rb') as file:
@@ -114,7 +114,7 @@ class DiscreteEventSimMetadata(object):
         """ Compare two simulation metadata objects
 
         Args:
-            other (:obj:`DiscreteEventSimMetadata`): other simulation metadata object
+            other (:obj:`SimulationMetadata`): other simulation metadata object
 
         Returns:
             :obj:`bool`: true if simulation metadata objects are semantically equal
@@ -132,7 +132,7 @@ class DiscreteEventSimMetadata(object):
         """ Compare two simulation metadata objects
 
         Args:
-            other (:obj:`DiscreteEventSimMetadata`): other simulation metadata object
+            other (:obj:`SimulationMetadata`): other simulation metadata object
 
         Returns:
             :obj:`bool`: true if simulation metadata objects are semantically unequal
@@ -140,10 +140,10 @@ class DiscreteEventSimMetadata(object):
         return not self.__eq__(other)
 
     def __str__(self):
-        """ Provide a readable representation of this `DiscreteEventSimMetadata`
+        """ Provide a readable representation of this `SimulationMetadata`
 
         Returns:
-            :obj:`str`: a readable representation of this `DiscreteEventSimMetadata`
+            :obj:`str`: a readable representation of this `SimulationMetadata`
         """
         return obj_to_str(self, self.ATTRIBUTES)
 

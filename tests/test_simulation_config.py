@@ -67,6 +67,11 @@ class TestSimulationConfig(unittest.TestCase):
         except SimulatorError:
             self.fail("simulation_config.validate() shouldn't raise SimulatorError")
 
+        # accept ints in float fields
+        simulation_config = SimulationConfig(int(self.time_max))
+        simulation_config.validate()
+        self.assertEquals(simulation_config.time_max, self.time_max)
+
         time_max = 'no'
         simulation_config = SimulationConfig(time_max)
         with self.assertRaisesRegex(SimulatorError, 'time_max .* is not a\(n\) float'):

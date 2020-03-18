@@ -13,7 +13,7 @@ import tempfile
 import unittest
 from collections import namedtuple
 
-from de_sim.discrete_event_sim_metadata import (DiscreteEventSimMetadata, RunMetadata, AuthorMetadata,
+from de_sim.simulation_metadata import (SimulationMetadata, RunMetadata, AuthorMetadata,
                                                 Comparable)
 from wc_utils.util.git import get_repo_metadata, RepoMetadataCollectionType
 from wc_utils.util.misc import as_dict
@@ -55,7 +55,7 @@ class TestExampleComparable(unittest.TestCase):
         self.assertNotEqual(ec1, ec2)
 
 
-class TestDiscreteEventSimMetadata(unittest.TestCase):
+class TestSimulationMetadata(unittest.TestCase):
 
     def setUp(self):
         self.pickle_file_dir = tempfile.mkdtemp()
@@ -85,12 +85,12 @@ class TestDiscreteEventSimMetadata(unittest.TestCase):
         self.run_different = copy.copy(run)
         self.run_different.record_run_time()
 
-        self.metadata = DiscreteEventSimMetadata(application, simulation, run, author)
-        self.metadata_equal = DiscreteEventSimMetadata(application, simulation, run, author)
+        self.metadata = SimulationMetadata(application, simulation, run, author)
+        self.metadata_equal = SimulationMetadata(application, simulation, run, author)
         self.author_equal = copy.copy(author)
         self.author_different = author_different = copy.copy(author)
         author_different.name = 'Joe Smith'
-        self.metadata_different = DiscreteEventSimMetadata(application, simulation, run, author_different)
+        self.metadata_different = SimulationMetadata(application, simulation, run, author_different)
 
     def tearDown(self):
         shutil.rmtree(self.pickle_file_dir)
@@ -144,5 +144,5 @@ class TestDiscreteEventSimMetadata(unittest.TestCase):
         self.assertIn(str(self.metadata.simulation.time_max), str(self.metadata))
 
     def test_write_and_read(self):
-        DiscreteEventSimMetadata.write_metadata(self.metadata, self.pickle_file_dir)
-        self.assertEqual(self.metadata, DiscreteEventSimMetadata.read_metadata(self.pickle_file_dir))
+        SimulationMetadata.write_metadata(self.metadata, self.pickle_file_dir)
+        self.assertEqual(self.metadata, SimulationMetadata.read_metadata(self.pickle_file_dir))
