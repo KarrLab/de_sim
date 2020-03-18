@@ -28,7 +28,7 @@ class SimulationConfig:
 
     Attributes:
         _time_max (:obj:`float`): maximum simulation time
-        _time_init (:obj:`float`, optional): initial simulation time
+        _time_init (:obj:`float`, optional): time at which a simulation starts
         _random_seed (:obj:`int`, optional): random number generator seed
         _stop_condition (:obj:`function`, optional): if provided, a function that takes one argument,
             the simulation time; a simulation terminates if the function returns `True`

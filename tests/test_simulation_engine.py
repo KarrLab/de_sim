@@ -214,6 +214,14 @@ class TestSimulationEngine(unittest.TestCase):
             self.simulator.simulate(5.0)
         self.assertIn('Simulation has no initial events', str(context.exception))
 
+        simulator = SimulationEngine()
+        simulator.add_object(BasicExampleSimulationObject('test'))
+        simulator.initialize()
+        # start time = 2
+        simulation_config = SimulationConfig(5, 2)
+        with self.assertRaisesRegex(SimulatorError, 'first event .* is earlier than the start time'):
+            simulator.simulate(sim_config=simulation_config)
+
         with self.assertRaises(SimulatorError) as context:
             self.simulator.add_object(obj)
         self.assertIn("cannot add simulation object '{}'".format(obj.name), str(context.exception))
@@ -226,17 +234,16 @@ class TestSimulationEngine(unittest.TestCase):
 
         self.simulator.reset()
         self.simulator.initialize()
+        obj = ExampleSimulationObject(obj_name(2))
         self.simulator.add_object(obj)
+        obj.time += 1
         event_queue = self.simulator.event_queue
-        event_queue.schedule_event(-1, -1, obj, obj, InitMsg())
-        with self.assertRaises(SimulatorError) as context:
+        event_queue.schedule_event(0, 0, obj, obj, InitMsg())
+        with self.assertRaisesRegex(SimulatorError, "but event time .* < object time"):
             self.simulator.simulate(5.0)
-        self.assertIn('event time', str(context.exception))
-        self.assertIn('< object time', str(context.exception))
 
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, 'Simulation has already been initialized'):
             self.simulator.initialize()
-        self.assertEqual('Simulation has already been initialized', str(context.exception))
 
     def test_simulation_end(self):
         self.simulator.add_object(BasicExampleSimulationObject('name'))
@@ -326,6 +333,7 @@ class TestSimulationEngine(unittest.TestCase):
 
     def test_message_queues(self):
         warnings.simplefilter("ignore")
+        # test with an empty event queue
         class InactiveSimulationObject(ApplicationSimulationObject):
 
             def __init__(self):
@@ -346,6 +354,12 @@ class TestSimulationEngine(unittest.TestCase):
         for sim_obj_name in self.simulator.simulation_objects:
             self.assertIn(sim_obj_name, queues)
 
+        # test with self.time initialized
+        self.simulator.simulate(5)
+        queues = self.simulator.message_queues()
+        for sim_obj_name in self.simulator.simulation_objects:
+            self.assertIn(sim_obj_name, queues)
+
     def test_metadata_collection(self):
         self.make_one_object_simulation()
         kwargs = dict(_time_max=5.0, _metadata_dir=self.out_dir)
@@ -359,7 +373,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.run(5.0)
         self.assertIsInstance(self.simulator.metadata, SimulationMetadata)
 
-    # test simulation performance code:
+    ### test simulation performance ###
     def prep_simulation(self, num_sim_objs):
         self.simulator_for_perf_tests.reset()
         self.make_cyclical_messaging_network_sim(self.simulator_for_perf_tests, num_sim_objs)

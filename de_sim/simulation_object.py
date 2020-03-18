@@ -274,20 +274,21 @@ class SimulationObject(object):
     """
     LOG_EVENTS = config['de_sim']['log_events']
 
-    def __init__(self, name, **kwargs):
+    def __init__(self, name, start_time=0, **kwargs):
         """ Initialize a SimulationObject.
 
-        Create its event queue, initialize its name, and set its start time to 0.
+        Create its event queue, initialize its name, and set its start time.
 
         Args:
             name (:obj:`str`): the object's unique name, used as a key in the dict of objects
+            start_time (:obj:`float`, optional): the earliest time at which this object can execute an event
             kwargs (:obj:`dict`): which can contain:
             event_time_tiebreaker (:obj:`str`, optional): used to break ties among simultaneous
                 events; must be unique across all instances of an `ApplicationSimulationObject`
                 class; defaults to `name`
         """
         self.name = name
-        self.time = 0.0
+        self.time = start_time
         self.num_events = 0
         self.simulator = None
         if 'event_time_tiebreaker' in kwargs and kwargs['event_time_tiebreaker']:

@@ -59,9 +59,9 @@ class SimulationEngine(object):
         self.debug_logs = core.get_debug_logs()
         self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('de_sim.debug.file'), 'debug')
         self.fast_plotting_logger = FastLogger(self.debug_logs.get_log('de_sim.plot.file'), 'debug')
-        self.time = 0.0
+        # self.time is not known until a simulation starts
+        self.time = None
         self.simulation_objects = {}
-        self.log_with_time("SimulationEngine created")
         self.event_queue = EventQueue()
         self.event_counts = Counter()
         self.__initialized = False
@@ -145,18 +145,13 @@ class SimulationEngine(object):
         self.event_counts.clear()
         self.__initialized = True
 
-    '''
-    problems
-        AuthorMetadata needs data
-        sim_config needs data
-    '''
-    def init_metadata_collection(self, sim_config=None):
+    def init_metadata_collection(self, sim_config):
         """ Initialize metatdata collection
 
         Call just before simulation starts, so that correct clock time of start is recorded
 
         Args:
-            sim_config (:obj:`SimulationConfig`, optional): information about the simulation's configuration
+            sim_config (:obj:`SimulationConfig`): information about the simulation's configuration
                 (start time, maximum time, etc.)
         """
         application, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
@@ -176,9 +171,8 @@ class SimulationEngine(object):
     def reset(self):
         """ Reset this `SimulationEngine`
 
-        Set simulation time to 0, delete all objects, and reset any prior initialization.
+        Delete all objects and reset any prior initialization.
         """
-        self.time = 0.0
         for simulation_object in list(self.simulation_objects.values()):
             self.delete_object(simulation_object)
         self.event_queue.reset()
@@ -190,7 +184,11 @@ class SimulationEngine(object):
         Returns:
             :obj:`str`: a list of all message queues in the simulation and their messages
         """
-        data = ['Event queues at {:6.3f}'.format(self.time)]
+        now = "'uninitialized'"
+        if self.time is not None:
+            now = f"{self.time:6.3f}"
+
+        data = [f'Event queues at {now}']
         for sim_obj in sorted(self.simulation_objects.values(), key=lambda sim_obj: sim_obj.name):
             data.append(sim_obj.name + ':')
             rendered_eq = self.event_queue.render(sim_obj=sim_obj)
@@ -289,8 +287,8 @@ class SimulationEngine(object):
 
         Raises:
             :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
-                or has no initial events, or attempts to execute an event that violates non-decreasing time
-                order
+                or has no initial events, or attempts to start before the start time in `time_init`,
+                or attempts to execute an event that violates non-decreasing time order
         """
         if not self.__initialized:
             raise SimulatorError("Simulation has not been initialized")
@@ -300,6 +298,15 @@ class SimulationEngine(object):
 
         if self.event_queue.empty():
             raise SimulatorError("Simulation has no initial events")
+
+        # set simulation time to `time_init`
+        self.time = self.sim_config.time_init
+
+        # error if first event occurs before time_init
+        next_time = self.event_queue.next_event_time()
+        if next_time < self.sim_config.time_init:
+            raise SimulatorError(f"Time of first event ({next_time}) is earlier than the start time "
+                                 f"({self.sim_config.time_init})")
 
         # set up progress bar
         self.progress = SimulationProgressBar(self.sim_config.progress)
@@ -313,9 +320,9 @@ class SimulationEngine(object):
 
         try:
             self.progress.start(self.sim_config.time_max)
-            self.init_metadata_collection()
-            # TODO(Arthur): perhaps 'while True':
-            while self.time <= self.sim_config.time_max:
+            self.init_metadata_collection(self.sim_config)
+
+            while True:
 
                 # use the stop condition
                 if self.sim_config.stop_condition is not None and self.sim_config.stop_condition(self.time):
@@ -342,8 +349,7 @@ class SimulationEngine(object):
 
                 self.time = next_time
 
-                # error will only be raised if an init message sent to negative time or
-                # an object decreases its time
+                # error will only be raised if an object decreases its time
                 if next_time < next_sim_obj.time:
                     raise SimulatorError("Dispatching '{}', but event time ({}) "
                         "< object time ({})".format(next_sim_obj.name, next_time, next_sim_obj.time))
