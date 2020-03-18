@@ -34,10 +34,8 @@ class TestSimulationMessageInterface(unittest.TestCase):
         attributes = ['arg_1','arg_2']
         attrs = {'__slots__':attributes}
         SimMsgType = type('test', (SimulationMessageInterface,), attrs)
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, "Constructor .*'test' expects 2 arg.*but 0 provided"):
             SimMsgType()
-        self.assertRegex(str(context.exception),
-            "Constructor .*'test' expects 2 arg.*but 0 provided")
         vals = [1, 'a']
         t = SimMsgType(*vals)
         self.assertIn(str(vals[0]), str(t))
@@ -86,7 +84,7 @@ class TestSimulationMessageInterface(unittest.TestCase):
         # test messages with attributes that cannot be compared
         sim_msg_1_bad_a = ExampleSimulationMessage1(str, str)
         sim_msg_1_bad_b = ExampleSimulationMessage1(int, int)
-        with self.assertRaises(TypeError) as context:
+        with self.assertRaises(TypeError):
             sim_msg_1_bad_a < sim_msg_1_bad_b
 
 
@@ -111,12 +109,10 @@ class TestSimulationMessageMeta(unittest.TestCase):
         self.assertEqual(example_simulation_message2.attrs(), [])
         self.assertEqual(example_simulation_message2.header(), None)
 
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, 'must be a list of strings'):
             class BadSimulationMessage1(SimulationMessage):
                 attributes = [2.5]
-        self.assertIn('must be a list of strings', str(context.exception))
 
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, 'contains duplicates'):
             class BadSimulationMessage2(SimulationMessage):
                 attributes = ['x', 'y', 'x']
-        self.assertIn('contains duplicates', str(context.exception))

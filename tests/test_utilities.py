@@ -40,9 +40,8 @@ class CombinedMeta(ConcreteABCMeta, YourMeta): pass
 class TestConcreteClass(unittest.TestCase):
 
     def test(self):
-        with self.assertRaises(TypeError) as context:
+        with self.assertRaisesRegex(TypeError, "ConcreteClass has not implemented abstract methods"):
             class ConcreteClass(AbstractBase, metaclass=CombinedMeta): pass
-        self.assertIn("ConcreteClass has not implemented abstract methods", str(context.exception))
 
 
 class TestSimulationProgressBar(unittest.TestCase):

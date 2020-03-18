@@ -46,6 +46,7 @@ class SimulationConfig:
     _metadata_dir: str = None
 
     def validate(self):
+
         # validate types
         for field in dataclasses.fields(self):
             attr = getattr(self, field.name)

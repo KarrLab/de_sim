@@ -236,6 +236,10 @@ class SimulationEngine(object):
         if 1 < num_args:
             raise SimulatorError('at most 1 of time_max, sim_config, or kwargs may be provided')
 
+        # catch common error generated when sim_config= is not used by SimulationEngine.simulate(sim_config)
+        if isinstance(time_max, SimulationConfig):
+            raise SimulatorError(f"sim_config is not provided, sim_config= is probably needed")
+
         # initialize sim_config if it is not provided
         if sim_config is None:
             if time_max is not None:

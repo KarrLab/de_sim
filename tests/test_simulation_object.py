@@ -235,15 +235,12 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
         # missing event_handlers and messages_sent
         expected_error = "ApplicationSimulationObject.*definition must inherit or provide a non-empty '{}' or '{}'".format(
                 EVENT_HANDLERS, MESSAGES_SENT)
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, expected_error):
             class EmptyASO(ApplicationSimulationObject): pass
-        self.assertRegex(str(context.exception), expected_error)
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, expected_error):
             class BadASO1(ApplicationSimulationObject): event_handlers = []
-        self.assertRegex(str(context.exception), expected_error)
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, expected_error):
             class BadASO2(ApplicationSimulationObject): messages_sent = []
-        self.assertRegex(str(context.exception), expected_error)
 
         # no such handler
         with self.assertRaises(SimulatorError):
@@ -379,19 +376,15 @@ class TestSimulationObject(unittest.TestCase):
         self.assertEqual(None, self.eso1.simulator)
 
     def test_exceptions(self):
-        with self.assertRaises(SimulatorError) as context:
+        expected = "'{}' simulation objects not registered to send '{}' messages".format(
+            most_qual_cls_name(self.eso1), UnregisteredMsg().__class__.__name__)
+        with self.assertRaisesRegex(SimulatorError, expected):
             self.eso1.send_event_absolute(2, self.eso1, UnregisteredMsg())
-        self.assertEqual(str(context.exception),
-            "'{}' simulation objects not registered to send '{}' messages".format(
-                most_qual_cls_name(self.eso1),
-                UnregisteredMsg().__class__.__name__))
 
-        with self.assertRaises(SimulatorError) as context:
+        expected = "'{}' simulation objects not registered to receive '{}' messages".format(
+            most_qual_cls_name(self.irso1), InitMsg().__class__.__name__)
+        with self.assertRaisesRegex(SimulatorError, expected):
             self.eso1.send_event_absolute(2, self.irso1, InitMsg())
-        self.assertEqual(str(context.exception),
-            "'{}' simulation objects not registered to receive '{}' messages".format(
-                most_qual_cls_name(self.irso1),
-                InitMsg().__class__.__name__))
 
         with self.assertRaisesRegex(SimulatorError,
             "simulation messages must be instances of type 'SimulationMessage'; "):

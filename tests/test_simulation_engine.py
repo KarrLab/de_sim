@@ -162,6 +162,10 @@ class TestSimulationEngine(unittest.TestCase):
             SimulationEngine._get_sim_config(100, **kwargs)
 
         simulation_config = SimulationConfig(10., 30.)
+        with self.assertRaisesRegex(SimulatorError,
+                                    'sim_config is not provided, sim_config= is probably needed'):
+            SimulationEngine._get_sim_config(simulation_config)
+
         with self.assertRaises(SimulatorError):
             SimulationEngine._get_sim_config(sim_config=simulation_config)
 
@@ -191,28 +195,23 @@ class TestSimulationEngine(unittest.TestCase):
 
     def test_simulation_engine_exceptions(self):
         obj = ExampleSimulationObject(obj_name(1))
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, f"cannot delete simulation object '{obj.name}'"):
             self.simulator.delete_object(obj)
-        self.assertIn("cannot delete simulation object '{}'".format(obj.name), str(context.exception))
 
         no_such_obj_name = 'no such object'
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, f"cannot get simulation object '{no_such_obj_name}'"):
             self.simulator.get_object(no_such_obj_name)
-        self.assertIn("cannot get simulation object '{}'".format(no_such_obj_name), str(context.exception))
 
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, 'Simulation has not been initialized'):
             self.simulator.simulate(5.0)
-        self.assertIn('Simulation has not been initialized', str(context.exception))
 
         self.simulator.initialize()
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, 'Simulation has no objects'):
             self.simulator.simulate(5.0)
-        self.assertIn('Simulation has no objects', str(context.exception))
 
         self.simulator.add_object(obj)
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, 'Simulation has no initial events'):
             self.simulator.simulate(5.0)
-        self.assertIn('Simulation has no initial events', str(context.exception))
 
         simulator = SimulationEngine()
         simulator.add_object(BasicExampleSimulationObject('test'))
@@ -222,9 +221,8 @@ class TestSimulationEngine(unittest.TestCase):
         with self.assertRaisesRegex(SimulatorError, 'first event .* is earlier than the start time'):
             simulator.simulate(sim_config=simulation_config)
 
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaisesRegex(SimulatorError, f"cannot add simulation object '{obj.name}'"):
             self.simulator.add_object(obj)
-        self.assertIn("cannot add simulation object '{}'".format(obj.name), str(context.exception))
 
         self.simulator.delete_object(obj)
         try:

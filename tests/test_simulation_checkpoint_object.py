@@ -166,5 +166,5 @@ class TestCheckpointSimulationObjects(unittest.TestCase):
             self.assertTrue(max_value - self.a * self.update_period <= state_value <= max_value)
 
     def test_checkpoint_simulation_object_exception(self):
-        with self.assertRaises(SimulatorError) as context:
+        with self.assertRaises(SimulatorError):
             PeriodicCheckpointSimuObj('', 0, None, None)

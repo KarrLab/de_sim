@@ -30,6 +30,5 @@ class TestMockSimulationObject(unittest.TestCase):
         t = Example('name', self, a=1, expected=2)
         t.test_handler(2)
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaisesRegex(ValueError, "'test_case' should be a unittest.TestCase instance"):
             Example('name', 'string')
-        self.assertIn("'test_case' should be a unittest.TestCase instance", str(context.exception))
