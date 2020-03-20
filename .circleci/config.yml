@@ -11,7 +11,8 @@ parameters:
 workflows:
   build:
     jobs:
-      - build
+      - build:
+          context: karr_lab
 
 jobs:
   build:
@@ -110,10 +111,3 @@ jobs:
       - store_artifacts:
           path: /root/project/docs/_build/html
           destination: docs
-
-# workflows:
-#  version: 2
-#  build:
-#    jobs:
-#      - build:
-#          context: karr_lab
