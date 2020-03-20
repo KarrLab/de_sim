@@ -7,6 +7,7 @@
 
 import unittest
 import os
+import math
 import numpy as np
 
 from de_sim.simulation_engine import SimulationEngine
@@ -37,7 +38,6 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
         pso_1 = PeriodicSimulationObject('pso_1', period)
         expected.append(np.linspace(0, end_time, end_time + 1))
 
-        # float period
         period = .1
         pso_2 = PeriodicSimulationObject('pso_2', period)
         expected.append([t/10 for t in range(end_time * 10 + 1)])
@@ -48,7 +48,8 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
         simulator.simulate(end_time)
 
         for pso, expect in zip(psos, expected):
-            self.assertEqual(pso.times, list(expect))
+            for pso_time, expect_time in zip(pso.times, expect):
+                self.assertTrue(math.isclose(pso_time, expect_time))
 
     def test_exceptions(self):
         with self.assertRaisesRegexp(SimulatorError, 'period must be positive'):

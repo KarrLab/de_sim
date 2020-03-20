@@ -17,9 +17,12 @@ import unittest
 import copy
 
 from de_sim.checkpoint import Checkpoint
+from de_sim.config import core
 from de_sim.errors import SimulatorError
 from wc_utils.util.uniform_seq import UniformSequence
 import wc_utils.util.types
+
+MAX_TIME_PRECISION = core.get_config()['de_sim']['max_time_precision']
 
 
 class TestCheckpoint(unittest.TestCase):
@@ -60,6 +63,12 @@ class TestCheckpoint(unittest.TestCase):
         self.assertNotEqual(self.non_empty_checkpoint1, obj)
         for ckpt in self.diff_checkpoints:
             self.assertNotEqual(self.non_empty_checkpoint1, ckpt)
+
+    def test_get_file_name(self):
+        self.assertIn(f'{3.0:.{MAX_TIME_PRECISION}f}', Checkpoint.get_file_name('', 3))
+        for time in [1.00000001, 1E-7]:
+            with self.assertRaises(SimulatorError):
+                Checkpoint.get_file_name('', time)
 
 
 class CheckpointLogTest(unittest.TestCase):
@@ -154,14 +163,14 @@ class MockCheckpointLogger(object):
     Attributes:
         dirname (:obj:`str`): directory to write checkpoint data
         event_time_sequence (:obj:`UniformSequence`):
-        _next_checkpoint (:obj:`float`): time in seconds of next checkpoint
+        _next_checkpoint (:obj:`float`): time in simulated time units of next checkpoint
     """
 
     def __init__(self, dirname, step, initial_time):
         """
         Args:
             dirname (:obj:`str`): directory to write checkpoint data
-            step (:obj:`float`): simulation time between checkpoints in seconds
+            step (:obj:`float`): simulation time between checkpoints in simulated time units
             initial_time (:obj:`float`): starting simulation time
         """
         self.event_time_sequence = UniformSequence(initial_time, step)
