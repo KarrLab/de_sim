@@ -13,13 +13,16 @@ import tempfile
 import unittest
 from collections import namedtuple
 
-from de_sim.simulation_metadata import (SimulationMetadata, RunMetadata, AuthorMetadata,
-                                                Comparable)
+from de_sim.simulation_config import SimulationConfig
+from de_sim.simulation_metadata import SimulationMetadata, RunMetadata, AuthorMetadata, Comparable
 from wc_utils.util.git import get_repo_metadata, RepoMetadataCollectionType
 from wc_utils.util.misc import as_dict
 
 
-SimulationConfig = namedtuple('SimulationConfig', 'time_max time_step changes perturbations random_seed')
+# CompleteSimulationConfig represents a complete simulation config which will be provided by the
+# simulation application, and contains a de_sim.simulation_config.SimulationConfig in de_simulation_config
+CompleteSimulationConfig = namedtuple('CompleteSimulationConfig',
+                                      'changes perturbations random_seed other_attr de_simulation_config')
 
 
 class ExampleComparable(Comparable):
@@ -63,17 +66,9 @@ class TestSimulationMetadata(unittest.TestCase):
         application, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
         self.application = application
 
-        changes = [
-            ExampleComparable('name', 1),
-            ExampleComparable('name_new', 2),
-        ]
-
-        perturbations = [
-            ExampleComparable('perturbation_1', 3),
-            ExampleComparable('perturbation_2', 4),
-        ]
-
-        simulation = SimulationConfig(100, 1, changes, perturbations, 1)
+        de_simulation_config = SimulationConfig(time_max=100, progress=False)
+        simulation = CompleteSimulationConfig('changes', 'perturbations', 'random_seed', 'other_attr',
+                                              de_simulation_config)
 
         self.author = author = AuthorMetadata(name='Test user', email='test@test.com',
                                               username='Test username', organization='Test organization')
@@ -135,13 +130,11 @@ class TestSimulationMetadata(unittest.TestCase):
         self.assertEqual(d['author']['name'], self.metadata.author.name)
         self.assertEqual(d['application']['branch'], self.metadata.application.branch)
         self.assertEqual(d['run']['start_time'], self.metadata.run.start_time)
-        self.assertEqual(d['simulation'].changes, self.metadata.simulation.changes)
 
     def test_str(self):
         self.assertIn(self.metadata.author.name, str(self.metadata))
         self.assertIn(self.metadata.application.branch, str(self.metadata))
         self.assertIn(self.metadata.run.ip_address, str(self.metadata))
-        self.assertIn(str(self.metadata.simulation.time_max), str(self.metadata))
 
     def test_write_and_read(self):
         SimulationMetadata.write_metadata(self.metadata, self.pickle_file_dir)

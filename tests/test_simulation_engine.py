@@ -154,29 +154,26 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.initialize()
 
     def test_get_sim_config(self):
-        with self.assertRaisesRegex(SimulatorError, 'time_max, sim_config, or kwargs must be provided'):
+        self.assertEqual(SimulationConfig(5.), SimulationEngine._get_sim_config(time_max=5.))
+
+        config_dict = dict(time_max=5., time_init=2.)
+        self.assertEqual(SimulationConfig(5., 2.), SimulationEngine._get_sim_config(config_dict=config_dict))
+
+        with self.assertRaisesRegex(SimulatorError, 'time_max, sim_config, or config_dict must be provided'):
             SimulationEngine._get_sim_config()
 
-        kwargs = dict(_time_init=2.)
-        with self.assertRaisesRegex(SimulatorError, 'at most 1 of time_max, sim_config, or kwargs'):
-            SimulationEngine._get_sim_config(100, **kwargs)
+        config_dict = dict(time_init=2.)
+        with self.assertRaisesRegex(SimulatorError, 'at most 1 of time_max, sim_config, or config_dict'):
+            SimulationEngine._get_sim_config(100, config_dict=config_dict)
 
-        simulation_config = SimulationConfig(10., 30.)
+        simulation_config = SimulationConfig(10)
         with self.assertRaisesRegex(SimulatorError,
                                     'sim_config is not provided, sim_config= is probably needed'):
             SimulationEngine._get_sim_config(simulation_config)
 
-        with self.assertRaises(SimulatorError):
-            SimulationEngine._get_sim_config(sim_config=simulation_config)
-
-        self.assertEqual(SimulationConfig(5.), SimulationEngine._get_sim_config(time_max=5.))
-
-        kwargs = dict(_time_init=2.)
-        with self.assertRaisesRegex(SimulatorError, 'time_max must be provided in kwargs'):
-            SimulationEngine._get_sim_config(**kwargs)
-
-        kwargs = dict(_time_max=5., _time_init=2.)
-        self.assertEqual(SimulationConfig(5., 2.), SimulationEngine._get_sim_config(**kwargs))
+        config_dict = dict(time_init=2.)
+        with self.assertRaisesRegex(SimulatorError, 'time_max must be provided in config_dict'):
+            SimulationEngine._get_sim_config(config_dict=config_dict)
 
     def test_simulate_and_run(self):
         for operation in ['simulate', 'run']:
@@ -190,8 +187,8 @@ class TestSimulationEngine(unittest.TestCase):
         obj = ExampleSimulationObject(obj_name(1))
         self.simulator.add_object(obj)
         self.simulator.initialize()
-        kwargs = dict(_time_max=-1, _time_init=-2)
-        self.assertEqual(self.simulator.simulate(**kwargs), 0)
+        config_dict = dict(time_max=-1, time_init=-2)
+        self.assertEqual(self.simulator.simulate(config_dict=config_dict), 0)
 
     def test_simulation_engine_exceptions(self):
         obj = ExampleSimulationObject(obj_name(1))
@@ -278,8 +275,8 @@ class TestSimulationEngine(unittest.TestCase):
         with CaptureOutput(relay=True) as capturer:
             try:
                 time_max = 10
-                kwargs = dict(_time_max=time_max, _progress=True)
-                self.assertEqual(simulator.simulate(**kwargs), time_max + 1)
+                config_dict = dict(time_max=time_max, progress=True)
+                self.assertEqual(simulator.simulate(config_dict=config_dict), time_max + 1)
                 self.assertTrue(f"/{time_max}" in capturer.get_text())
                 self.assertTrue("time_max" in capturer.get_text())
             except ValueError as e:
@@ -360,8 +357,8 @@ class TestSimulationEngine(unittest.TestCase):
 
     def test_metadata_collection(self):
         self.make_one_object_simulation()
-        kwargs = dict(_time_max=5.0, _metadata_dir=self.out_dir)
-        self.simulator.run(**kwargs)
+        config_dict = dict(time_max=5.0, metadata_dir=self.out_dir)
+        self.simulator.run(config_dict=config_dict)
         metadata = SimulationMetadata.read_metadata(self.out_dir)
         self.assertIsInstance(metadata, SimulationMetadata)
         self.assertGreaterEqual(metadata.run.run_time, 0)

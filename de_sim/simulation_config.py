@@ -1,6 +1,7 @@
 """ Simulation configuration
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
+:Author: Jonathan Karr <karr@mssm.edu>
 :Date: 2020-03-16
 :Copyright: 2020, Karr Lab
 :License: MIT
@@ -15,119 +16,114 @@ import types
 from de_sim.errors import SimulatorError
 
 
+# NOW: TODO: move this to wc_utils as a generic function, parameterized by exception type
+LIKELY_INITIAL_VOWEL_SOUNDS = {'a', 'e', 'i', 'o', 'u'}
+
+def validate_dataclass_types(dataclass, error_type):
+    """ Validate the types of all attributes in a dataclass instance
+
+    Args:
+        dataclass (:obj:`object`): a `dataclasses.dataclass`
+        error_type (:obj:`Exception`): the type of `Exception` that's raised if `dataclass` contains errors
+
+    Returns:
+        :obj:`None`: if no error is found
+
+    Raises:
+        :obj:`error_type`: if an attribute of `dataclass` does not have the right type
+    """
+
+    # validate types
+    for field in dataclasses.fields(dataclass):
+        attr = getattr(dataclass, field.name)
+
+        # place the right article before a type name, approximately
+        single_article = 'a'
+        if field.name[0].lower() in LIKELY_INITIAL_VOWEL_SOUNDS:
+            single_article = 'an'
+
+        # accept int inputs to float fields
+        if isinstance(attr, int) and field.type is float:
+            attr = float(attr)
+            setattr(dataclass, field.name, attr)
+
+        # dataclasses._MISSING_TYPE is the value used for default if no default is provided
+        if 'dataclasses._MISSING_TYPE' in str(field.default):
+            if not isinstance(attr, field.type):
+                raise error_type(f"{field.name} ('{attr}') must be {single_article} {field.type.__name__}")
+        else:
+            if (field.default is None and attr is not None) or field.default is not None:
+                if not isinstance(attr, field.type):
+                    raise error_type(f"{field.name} ('{attr}') must be {single_article} {field.type.__name__}")
+
+
 @dataclass
 class SimulationConfig:
     """ Configuration information for a simulation run
 
     - Simulation start time
     - Simulation maximum time
-    - Random number generator seed
     - Stop condition
     - Progress bar switch
     - Metadata directory
 
     Attributes:
-        _time_max (:obj:`float`): maximum simulation time
-        _time_init (:obj:`float`, optional): time at which a simulation starts
-        _random_seed (:obj:`int`, optional): random number generator seed
-        _stop_condition (:obj:`function`, optional): if provided, a function that takes one argument,
+        time_max (:obj:`float`): maximum simulation time
+        time_init (:obj:`float`, optional): time at which a simulation starts
+        stop_condition (:obj:`function`, optional): if provided, a function that takes one argument,
             the simulation time; a simulation terminates if the function returns `True`
-        _progress (:obj:`bool`, optional): if `True`, output a bar that dynamically reports the
+        progress (:obj:`bool`, optional): if `True`, output a bar that dynamically reports the
             simulation's progress
-        _metadata_dir (:obj:`str`, optional): directory for saving metadata; if not provided,
+        metadata_dir (:obj:`str`, optional): directory for saving metadata; if not provided,
             then metatdata should be saved before another simulation is run with the same `SimulationEngine`
     """
 
-    _time_max: float
-    _time_init: float = 0.0
-    _random_seed: int = None
-    _stop_condition: object = None   # _stop_condition must be callable, which is checked below
-    _progress: bool = False
-    _metadata_dir: str = None
+    time_max: float
+    time_init: float = 0.0
+    stop_condition: object = None   # stop_condition must be callable, which is checked below
+    progress: bool = False
+    metadata_dir: str = None
 
-    def validate(self):
+    def __setattr__(self, name, value):
+        """ Validate SimulationConfig after each change to an attribute """
+        object.__setattr__(self, name, value)
+        self.validate_individual_fields()
 
-        # validate types
-        for field in dataclasses.fields(self):
-            attr = getattr(self, field.name)
+    def validate_individual_fields(self):
+        """ Validate individual fields in a `SimulationConfig` instance
 
-            # accept ints in float fields
-            if isinstance(attr, int) and field.type is float:
-                attr = float(attr)
-                setattr(self, field.name, attr)
+        Returns:
+            :obj:`None`: if no error is found
 
-            # dataclasses._MISSING_TYPE is the value used for default if no default is provided
-            if 'dataclasses._MISSING_TYPE' in str(field.default):
-                if not isinstance(attr, field.type):
-                    raise SimulatorError(f"{field.name} ('{attr}') is not a(n) {field.type.__name__}")
-            else:
-                if (field.default is None and attr is not None) or field.default is not None:
-                    if not isinstance(attr, field.type):
-                        raise SimulatorError(f"{field.name} ('{attr}') is not a(n) {field.type.__name__}")
+        Raises:
+            :obj:`SimulatorError`: if an attribute of `self` fails validation
+        """
 
-        # other validation
-        if self._time_max <= self._time_init:
-            raise SimulatorError(f'time_max ({self._time_max}) must be greater than time_init ({self._time_init})')
+        validate_dataclass_types(self, SimulatorError)
 
-        # make sure stop_condition is a function
-        if self._stop_condition is not None and not callable(self._stop_condition):
-            raise SimulatorError(f"stop_condition ('{self._stop_condition}') is not a function")
+        # make sure stop_condition is callable
+        if self.stop_condition is not None and not callable(self.stop_condition):
+            raise SimulatorError(f"stop_condition ('{self.stop_condition}') must be a function")
 
         # ensure that metadata_dir is a directory
-        if self._metadata_dir is not None and not Path(self._metadata_dir).is_dir():
-            raise SimulatorError(f"metadata_dir ('{self._metadata_dir}') is not a directory")
+        if self.metadata_dir is not None and not Path(self.metadata_dir).is_dir():
+            raise SimulatorError(f"metadata_dir ('{self.metadata_dir}') must be a directory")
 
-    # getters and setters for all attributes
-    @property
-    def time_max(self):
-        return self._time_max
+    def validate(self):
+        """ Validate a `SimulationConfig` instance
 
-    @time_max.setter
-    def time_max(self, value):
-        self._time_max = value
-        self.validate()
+        Validation tests that involve multiple fields must be made in this method. Call it after the
+        `SimulationConfig` instance is in a consistent state.
 
-    @property
-    def time_init(self):
-        return self._time_init
+        Returns:
+            :obj:`None`: if no error is found
 
-    @time_init.setter
-    def time_init(self, value):
-        self._time_init = value
-        self.validate()
+        Raises:
+            :obj:`SimulatorError`: if `self` fails validation
+        """
 
-    @property
-    def random_seed(self):
-        return self._random_seed
+        self.validate_individual_fields()
 
-    @random_seed.setter
-    def random_seed(self, value):
-        self._random_seed = value
-        self.validate()
-
-    @property
-    def stop_condition(self):
-        return self._stop_condition
-
-    @stop_condition.setter
-    def stop_condition(self, value):
-        self._stop_condition = value
-        self.validate()
-
-    @property
-    def progress(self):
-        return self._progress
-
-    @progress.setter
-    def progress(self, value):
-        self._progress = value
-        self.validate()
-
-    @property
-    def metadata_dir(self):
-        return self._metadata_dir
-
-    @metadata_dir.setter
-    def metadata_dir(self, value):
-        self._metadata_dir = value
-        self.validate()
+        # other validation
+        if self.time_max <= self.time_init:
+            raise SimulatorError(f'time_max ({self.time_max}) must be greater than time_init ({self.time_init})')

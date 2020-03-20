@@ -200,41 +200,41 @@ class SimulationEngine(object):
         return '\n'.join(data)
 
     @staticmethod
-    def _get_sim_config(time_max=None, sim_config=None, **kwargs):
+    def _get_sim_config(time_max=None, sim_config=None, config_dict=None):
         """ External simulate interface
 
         Legal parameter combinations:
 
-        1. just `time_max`
-        2. just `sim_config`
-        3. just `kwargs`, which must contain `time_max`
+        1. Just `time_max`
+        2. Just `sim_config`
+        3. Just `config_dict`, which must contain an entry for `time_max`
 
         Other combinations are illegal.
 
         Args:
             time_max (:obj:`float`, optional): the time of the end of the simulation
             sim_config (:obj:`SimulationConfig`, optional): the simulation run's configuration
-            kwargs (:obj:`SimulationConfig`, optional): keyword arguments, with keys chosen from
-                the field names in :obj:`SimulationConfig`
+            config_dict (:obj:`dict`, optional): a dictionary with keys chosen from the field names
+            in :obj:`SimulationConfig`; note that `config_dict` is not a `kwargs` argument
 
         Returns:
             :obj:`SimulationConfig`: a validated simulation configuration
 
         Raises:
             :obj:`SimulatorError`: if no arguments are provided, or multiple arguments are provided,
-                or `_time_max` is missing from `kwargs`
+                or `time_max` is missing from `config_dict`
         """
         num_args = 0
         if time_max is not None:
             num_args += 1
         if sim_config is not None:
             num_args += 1
-        if kwargs:
+        if config_dict:
             num_args += 1
         if num_args == 0:
-            raise SimulatorError('time_max, sim_config, or kwargs must be provided')
+            raise SimulatorError('time_max, sim_config, or config_dict must be provided')
         if 1 < num_args:
-            raise SimulatorError('at most 1 of time_max, sim_config, or kwargs may be provided')
+            raise SimulatorError('at most 1 of time_max, sim_config, or config_dict may be provided')
 
         # catch common error generated when sim_config= is not used by SimulationEngine.simulate(sim_config)
         if isinstance(time_max, SimulationConfig):
@@ -244,15 +244,15 @@ class SimulationEngine(object):
         if sim_config is None:
             if time_max is not None:
                 sim_config = SimulationConfig(time_max)
-            else:   # kwargs must be set
-                if '_time_max' not in kwargs:
-                    raise SimulatorError('_time_max must be provided in kwargs')
-                sim_config = SimulationConfig(**kwargs)
+            else:   # config_dict must be set
+                if 'time_max' not in config_dict:
+                    raise SimulatorError('time_max must be provided in config_dict')
+                sim_config = SimulationConfig(**config_dict)
 
         sim_config.validate()
         return sim_config
 
-    def simulate(self, time_max=None, sim_config=None, **kwargs):
+    def simulate(self, time_max=None, sim_config=None, config_dict=None):
         """ Run a simulation
 
         See `_get_sim_config` for constraints on arguments
@@ -260,7 +260,7 @@ class SimulationEngine(object):
         Args:
             time_max (:obj:`float`, optional): the time of the end of the simulation
             sim_config (:obj:`SimulationConfig`, optional): the simulation run's configuration
-            kwargs (:obj:`SimulationConfig`, optional): keyword arguments, with keys chosen from
+            config_dict (:obj:`dict`, optional): a dictionary with keys chosen from
                 the field names in :obj:`SimulationConfig`
 
         Returns:
@@ -273,13 +273,14 @@ class SimulationEngine(object):
                 or has no initial events, or attempts to execute an event that violates non-decreasing time
                 order
         """
-        self.sim_config = self._get_sim_config(time_max=time_max, sim_config=sim_config, **kwargs)
+        self.sim_config = self._get_sim_config(time_max=time_max, sim_config=sim_config,
+                                               config_dict=config_dict)
         return self._simulate()
 
-    def run(self, time_max=None, sim_config=None, **kwargs):
+    def run(self, time_max=None, sim_config=None, config_dict=None):
         """ Alias for simulate
         """
-        return self.simulate(time_max=time_max, sim_config=sim_config, **kwargs)
+        return self.simulate(time_max=time_max, sim_config=sim_config, config_dict=config_dict)
 
     def _simulate(self):
         """ Run the simulation
