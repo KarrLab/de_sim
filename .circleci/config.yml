@@ -1,4 +1,18 @@
-version: 2
+version: 2.1
+
+parameters:
+  upstream_repo_name:
+    type: string
+    default: ""
+  upstream_build_num:
+    type: integer
+    default: 0
+
+workflows:
+  build:
+    jobs:
+      - build
+
 jobs:
   build:
     working_directory: /root/project
@@ -71,6 +85,9 @@ jobs:
       - run:
           name: Generate reports, archive results, and send notifications
           when: always
+          environment:
+            UPSTREAM_REPONAME: << pipeline.parameters.upstream_repo_name >>
+            UPSTREAM_BUILD_NUM: << pipeline.parameters.upstream_build_num >>
           command: |
             if [[ -f TEST_EXIT_CODE ]]; then
               INSTALLATION_EXIT_CODE=0
