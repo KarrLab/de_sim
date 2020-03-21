@@ -12,7 +12,20 @@ import shutil
 import tempfile
 
 from de_sim.errors import SimulatorError
-from de_sim.simulation_config import validate_dataclass_types, SimulationConfig
+from de_sim.simulation_config import SimulationConfig, ValidatedDataClass
+
+
+class TestValidatedDataClass(unittest.TestCase):
+
+        def test(self):
+            # test 'an int'
+            @dataclass
+            class TestClass(ValidatedDataClass):
+                i: int
+
+            with self.assertRaisesRegex(TypeError, "an int"):
+                TestClass(1.3)
+
 
 class TestSimulationConfig(unittest.TestCase):
 
@@ -70,14 +83,6 @@ class TestSimulationConfig(unittest.TestCase):
 
         with self.assertRaisesRegex(SimulatorError, "metadata_dir .* must be a directory"):
             SimulationConfig(self.time_max, metadata_dir='not a dir')
-
-        # test 'an int'
-        @dataclass
-        class TestClass:
-            i: int
-        tc = TestClass(1.3)
-        with self.assertRaisesRegex(Exception, "an int"):
-            validate_dataclass_types(tc, Exception)
 
     def test_validate(self):
         try:

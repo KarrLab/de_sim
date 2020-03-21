@@ -16,49 +16,66 @@ import types
 from de_sim.errors import SimulatorError
 
 
-# NOW: TODO: move this to wc_utils as a generic function, parameterized by exception type
-LIKELY_INITIAL_VOWEL_SOUNDS = {'a', 'e', 'i', 'o', 'u'}
-
-def validate_dataclass_types(dataclass, error_type):
-    """ Validate the types of all attributes in a dataclass instance
-
-    Args:
-        dataclass (:obj:`object`): a `dataclasses.dataclass`
-        error_type (:obj:`Exception`): the type of `Exception` that's raised if `dataclass` contains errors
-
-    Returns:
-        :obj:`None`: if no error is found
-
-    Raises:
-        :obj:`error_type`: if an attribute of `dataclass` does not have the right type
+# NOW: TODO: move this to wc_utils as a generic class, and use here & in wc_sim
+class ValidatedDataClass(object):
+    """ A mixin that validates attributes in dataclasses
     """
 
-    # validate types
-    for field in dataclasses.fields(dataclass):
-        attr = getattr(dataclass, field.name)
+    LIKELY_INITIAL_VOWEL_SOUNDS = {'a', 'e', 'i', 'o', 'u'}
 
-        # place the right article before a type name, approximately
-        single_article = 'a'
-        if field.name[0].lower() in LIKELY_INITIAL_VOWEL_SOUNDS:
-            single_article = 'an'
+    def validate_dataclass_types(self):
+        """ Validate the types of all attributes in a dataclass instance
 
-        # accept int inputs to float fields
-        if isinstance(attr, int) and field.type is float:
-            attr = float(attr)
-            setattr(dataclass, field.name, attr)
+        Returns:
+            :obj:`None`: if no error is found
 
-        # dataclasses._MISSING_TYPE is the value used for default if no default is provided
-        if 'dataclasses._MISSING_TYPE' in str(field.default):
-            if not isinstance(attr, field.type):
-                raise error_type(f"{field.name} ('{attr}') must be {single_article} {field.type.__name__}")
-        else:
-            if (field.default is None and attr is not None) or field.default is not None:
+        Raises:
+            :obj:`error_type`: if an attribute does not have the right type
+        """
+
+        # validate types
+        for field in dataclasses.fields(self):
+            attr = getattr(self, field.name)
+
+            # place the right article before a type name, approximately
+            single_article = 'a'
+            if field.name[0].lower() in self.LIKELY_INITIAL_VOWEL_SOUNDS:
+                single_article = 'an'
+
+            # accept int inputs to float fields
+            if isinstance(attr, int) and field.type is float:
+                attr = float(attr)
+                setattr(self, field.name, attr)
+
+            # dataclasses._MISSING_TYPE is the value used for default if no default is provided
+            if 'dataclasses._MISSING_TYPE' in str(field.default):
                 if not isinstance(attr, field.type):
-                    raise error_type(f"{field.name} ('{attr}') must be {single_article} {field.type.__name__}")
+                    raise TypeError(f"{field.name} ('{attr}') must be {single_article} {field.type.__name__}")
+            else:
+                if (field.default is None and attr is not None) or field.default is not None:
+                    if not isinstance(attr, field.type):
+                        raise TypeError(f"{field.name} ('{attr}') must be {single_article} {field.type.__name__}")
+
+    def __setattr__(self, name, value):
+        """ Validate after each change to an attribute """
+        object.__setattr__(self, name, value)
+        self.validate_individual_fields()
+
+    def validate_individual_fields(self):
+        """ Validate individual fields
+
+        Returns:
+            :obj:`None`: if no error is found
+
+        Raises:
+            :obj:`Exception`: if an attribute of `self` fails validation
+        """
+
+        self.validate_dataclass_types()
 
 
 @dataclass
-class SimulationConfig:
+class SimulationConfig(ValidatedDataClass):
     """ Configuration information for a simulation run
 
     - Simulation start time
@@ -84,11 +101,6 @@ class SimulationConfig:
     progress: bool = False
     metadata_dir: str = None
 
-    def __setattr__(self, name, value):
-        """ Validate SimulationConfig after each change to an attribute """
-        object.__setattr__(self, name, value)
-        self.validate_individual_fields()
-
     def validate_individual_fields(self):
         """ Validate individual fields in a `SimulationConfig` instance
 
@@ -99,7 +111,10 @@ class SimulationConfig:
             :obj:`SimulatorError`: if an attribute of `self` fails validation
         """
 
-        validate_dataclass_types(self, SimulatorError)
+        try:
+            self.validate_dataclass_types()
+        except TypeError as e:
+            raise SimulatorError(e)
 
         # make sure stop_condition is callable
         if self.stop_condition is not None and not callable(self.stop_condition):
