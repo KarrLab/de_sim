@@ -165,8 +165,8 @@ class SimulationEngine(object):
         """ Finish metatdata collection
         """
         self.metadata.run.record_run_time()
-        if self.sim_config.metadata_dir:
-            SimulationMetadata.write_metadata(self.metadata, self.sim_config.metadata_dir)
+        if self.sim_config.data_dir:
+            SimulationMetadata.write_metadata(self.metadata, self.sim_config.data_dir)
 
     def reset(self):
         """ Reset this `SimulationEngine`
