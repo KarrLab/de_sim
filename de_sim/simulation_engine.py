@@ -7,6 +7,7 @@
 """
 
 from collections import Counter
+import copy
 import dataclasses
 import datetime
 import sys
@@ -165,10 +166,12 @@ class SimulationEngine(object):
         """ Finish metatdata collection
         """
         self.metadata.run.record_run_time()
-        self.metadata.simulation.stop_condition = None
-        print('removing stop_condition from saved metadata')
         if self.sim_config.output_dir:
-            SimulationMetadata.write_metadata(self.metadata, self.sim_config.output_dir)
+            # FIX FOR DE-SIM CHANGES
+            # todo: move this into class SimulationMetadata
+            metadata_copy = copy.deepcopy(self.metadata)
+            metadata_copy.simulation.prepare_to_pickle()
+            SimulationMetadata.write_metadata(metadata_copy, self.sim_config.output_dir)
 
     def reset(self):
         """ Reset this `SimulationEngine`
