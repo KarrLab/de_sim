@@ -9,80 +9,14 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+import copy
 import dataclasses
 import math
 import os
 import types
 
 from de_sim.errors import SimulatorError
-
-
-# TODO: FIX FOR DE-SIM CHANGES: move this & its tests to wc_utils as a generic class, and use here & in wc_sim
-class ValidatedDataClass(object):
-    """ A mixin that validates attributes in dataclasses
-    """
-
-    LIKELY_INITIAL_VOWEL_SOUNDS = {'a', 'e', 'i', 'o', 'u'}
-
-    def validate_dataclass_type(self, attr_name):
-        """ Validate the type of an attribute in a dataclass instance
-
-        Args:
-            attr_name (:obj:`str`): the name of the attribute to validate
-
-        Returns:
-            :obj:`None`: if no error is found
-
-        Raises:
-            :obj:`ValueError`: if `attr_name` is not the name of a field
-            :obj:`TypeError`: if attribute `attr_name` does not have the right type
-        """
-
-        fields_map = {field.name: field for field in dataclasses.fields(self)}
-        if attr_name not in fields_map:
-            raise ValueError(f"'{attr_name}' must be a field in {self.__class__.__name__}")
-
-        # validate type
-        field = fields_map[attr_name]
-        attr = getattr(self, field.name)
-
-        # place the right article before a type name, approximately
-        single_article = 'a'
-        if field.type.__name__[0].lower() in self.LIKELY_INITIAL_VOWEL_SOUNDS:
-            single_article = 'an'
-
-        # accept int inputs to float fields
-        if isinstance(attr, int) and field.type is float:
-            attr = float(attr)
-            setattr(self, field.name, attr)
-
-        # dataclasses._MISSING_TYPE is the value used for default if no default is provided
-        if 'dataclasses._MISSING_TYPE' in str(field.default):
-            if not isinstance(attr, field.type):
-                raise TypeError(f"{field.name} ('{attr}') must be {single_article} {field.type.__name__}")
-        else:
-            if (field.default is None and attr is not None) or field.default is not None:
-                if not isinstance(attr, field.type):
-                    raise TypeError(f"{field.name} ('{attr}') must be {single_article} {field.type.__name__}")
-
-    def validate_dataclass_types(self):
-        """ Validate the types of all attributes in a dataclass instance
-
-        Returns:
-            :obj:`None`: if no error is found
-
-        Raises:
-            :obj:`error_type`: if an attribute does not have the right type
-        """
-
-        # validate types
-        for field in dataclasses.fields(self):
-            self.validate_dataclass_type(field.name)
-
-    def __setattr__(self, name, value):
-        """ Validate an attribute when it is changed """
-        object.__setattr__(self, name, value)
-        self.validate_dataclass_type(name)
+from wc_utils.util.misc import ValidatedDataClass
 
 
 @dataclass
@@ -112,6 +46,8 @@ class SimulationConfig(ValidatedDataClass):
     stop_condition: object = None   # stop_condition must be callable, which is checked below
     progress: bool = False
     output_dir: str = None
+
+    DO_NOT_PICKLE = ['stop_condition']
 
     def __setattr__(self, name, value):
         """ Validate an attribute when it is changed """
@@ -171,3 +107,20 @@ class SimulationConfig(ValidatedDataClass):
         # other validation
         if self.time_max <= self.time_init:
             raise SimulatorError(f'time_max ({self.time_max}) must be greater than time_init ({self.time_init})')
+
+    # FIX FOR DE-SIM CHANGES
+    # TODO: make generic, auto-determining DO_NOT_PICKLE, & move to wc_utils.util.misc.ValidatedDataClass
+    def prepare_to_pickle(self):
+        """ Provide a copy that can be pickled
+
+        Returns:
+            :obj:`SimulationConfig`: a copy of `self` that can be pickled
+        """
+        to_pickle = copy.deepcopy(self)
+        for field in dataclasses.fields(self):
+            attr = getattr(self, field.name)
+            if field.name in self.DO_NOT_PICKLE:
+                setattr(to_pickle, field.name, None)
+            elif isinstance(attr, ValidatedDataClass):
+                setattr(to_pickle, field.name, attr.prepare_to_pickle())
+        return to_pickle

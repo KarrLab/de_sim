@@ -6,49 +6,15 @@
 :License: MIT
 """
 
-from dataclasses import dataclass
+import copy
 import os
+import pickle
 import unittest
 import shutil
 import tempfile
 
 from de_sim.errors import SimulatorError
-from de_sim.simulation_config import SimulationConfig, ValidatedDataClass
-
-
-class TestValidatedDataClass(unittest.TestCase):
-
-        @dataclass
-        class TestClass(ValidatedDataClass):
-            i: int
-            f: float = 0.0
-            s: str = None
-
-        def test_validate_dataclass_type(self):
-
-            tc = self.TestClass(1, 2.2)
-            self.assertEquals(tc.validate_dataclass_type('i'), None)
-            self.assertEquals(tc.validate_dataclass_type('f'), None)
-            tc_2 = self.TestClass(1, 2)
-            self.assertEquals(tc.validate_dataclass_type('f'), None)
-
-            # test 'an' int, no default
-            with self.assertRaisesRegex(TypeError, "an int"):
-                self.TestClass(1.3)
-
-            # test default
-            with self.assertRaisesRegex(TypeError, "a float"):
-                self.TestClass(2, 'h')
-
-            # test bad name
-            tc_3 = self.TestClass(2)
-            with self.assertRaises(ValueError):
-                tc_3.validate_dataclass_type('bad name')
-
-        def test_validate_dataclass_types(self):
-
-            tc = self.TestClass(1, 2.2)
-            self.assertEquals(tc.validate_dataclass_types(), None)
+from de_sim.simulation_config import SimulationConfig
 
 
 class TestSimulationConfig(unittest.TestCase):
@@ -153,3 +119,48 @@ class TestSimulationConfig(unittest.TestCase):
         self.simulation_config.time_max = self.time_init - 1
         with self.assertRaisesRegex(SimulatorError, 'time_max .* must be greater than time_init .*'):
             self.simulation_config.validate()
+
+    simulation_config_no_stop_cond = SimulationConfig(10.0, 3.5, progress=True, output_dir=tempfile.mkdtemp())
+
+    def test_deepcopy(self):
+        simulation_config_copy = copy.deepcopy(self.simulation_config_no_stop_cond)
+        self.assertEquals(self.simulation_config_no_stop_cond, simulation_config_copy)
+
+
+class ExampleClass(object):
+    def f(): pass
+ec = ExampleClass()
+
+
+class TestPickleSimulationConfig(unittest.TestCase):
+
+    def setUp(self):
+        self.tmp_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp_dir)
+
+    simulation_config_no_stop_cond = SimulationConfig(10.0, 3.5, progress=True, output_dir=tempfile.mkdtemp())
+
+    def test_pickle(self):
+        self.simulation_config_no_stop_cond.validate()
+        file = os.path.join(self.tmp_dir, 'test.pickle')
+        with open(file, 'wb') as fd:
+            pickle.dump(self.simulation_config_no_stop_cond, fd)
+        with open(file, 'rb') as fd:
+            simulation_config = pickle.load(fd)
+        self.assertEquals(self.simulation_config_no_stop_cond, simulation_config)
+        shutil.rmtree(self.simulation_config_no_stop_cond.output_dir)
+
+    simulation_config = SimulationConfig(10.0, 3.5, stop_condition=ec.f, progress=True, output_dir=tempfile.mkdtemp())
+
+    def test_prepare_to_pickle(self):
+        self.simulation_config.validate()
+        file = os.path.join(self.tmp_dir, 'test2.pickle')
+        prepared_to_pickle = self.simulation_config.prepare_to_pickle()
+        with open(file, 'wb') as fd:
+            pickle.dump(prepared_to_pickle, fd)
+        with open(file, 'rb') as fd:
+            simulation_config = pickle.load(fd)
+        self.assertEquals(prepared_to_pickle, simulation_config)
+        shutil.rmtree(self.simulation_config.output_dir)
