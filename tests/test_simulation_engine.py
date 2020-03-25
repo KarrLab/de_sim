@@ -357,7 +357,7 @@ class TestSimulationEngine(unittest.TestCase):
 
     def test_metadata_collection(self):
         self.make_one_object_simulation()
-        config_dict = dict(time_max=5.0, data_dir=self.out_dir)
+        config_dict = dict(time_max=5.0, output_dir=self.out_dir)
         self.simulator.run(config_dict=config_dict)
         metadata = SimulationMetadata.read_metadata(self.out_dir)
         self.assertIsInstance(metadata, SimulationMetadata)

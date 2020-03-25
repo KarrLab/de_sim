@@ -102,7 +102,7 @@ class SimulationConfig(ValidatedDataClass):
             the simulation time; a simulation terminates if the function returns `True`
         progress (:obj:`bool`, optional): if `True`, output a bar that dynamically reports the
             simulation's progress
-        data_dir (:obj:`str`, optional): directory for saving metadata; will be created if it does't
+        output_dir (:obj:`str`, optional): directory for saving metadata; will be created if it does't
             exist; if not provided, then metatdata should be saved before another simulation is run
             with the same `SimulationEngine`
     """
@@ -111,7 +111,7 @@ class SimulationConfig(ValidatedDataClass):
     time_init: float = 0.0
     stop_condition: object = None   # stop_condition must be callable, which is checked below
     progress: bool = False
-    data_dir: str = None
+    output_dir: str = None
 
     def __setattr__(self, name, value):
         """ Validate an attribute when it is changed """
@@ -134,24 +134,24 @@ class SimulationConfig(ValidatedDataClass):
         if self.stop_condition is not None and not callable(self.stop_condition):
             raise SimulatorError(f"stop_condition ('{self.stop_condition}') must be a function")
 
-        # validate data_dir and convert to absolute path
-        if self.data_dir is not None:
-            absolute_data_dir = os.path.abspath(os.path.expanduser(self.data_dir))
+        # validate output_dir and convert to absolute path
+        if self.output_dir is not None:
+            absolute_output_dir = os.path.abspath(os.path.expanduser(self.output_dir))
 
-            if os.path.exists(absolute_data_dir):
-                # raise error if absolute_data_dir exists and is not a dir
-                if not os.path.isdir(absolute_data_dir):
-                    raise SimulatorError(f"data_dir '{absolute_data_dir}' must be a directory")
+            if os.path.exists(absolute_output_dir):
+                # raise error if absolute_output_dir exists and is not a dir
+                if not os.path.isdir(absolute_output_dir):
+                    raise SimulatorError(f"output_dir '{absolute_output_dir}' must be a directory")
 
-                # raise error if absolute_data_dir is not empty
-                if os.listdir(absolute_data_dir):
-                    raise SimulatorError(f"data_dir '{absolute_data_dir}' is not empty")
+                # raise error if absolute_output_dir is not empty
+                if os.listdir(absolute_output_dir):
+                    raise SimulatorError(f"output_dir '{absolute_output_dir}' is not empty")
 
-            # if absolute_data_dir does not exist, make it
-            if not os.path.exists(absolute_data_dir):
-                os.makedirs(absolute_data_dir)
+            # if absolute_output_dir does not exist, make it
+            if not os.path.exists(absolute_output_dir):
+                os.makedirs(absolute_output_dir)
 
-            self.data_dir = absolute_data_dir
+            self.output_dir = absolute_output_dir
 
     def validate(self):
         """ Validate a `SimulationConfig` instance

@@ -64,9 +64,9 @@ class TestSimulationConfig(unittest.TestCase):
         self.stop_condition = ec.f
 
         self.progress = True
-        self.data_dir = self.tmp_dir
+        self.output_dir = self.tmp_dir
         self.simulation_config = SimulationConfig(self.time_max, self.time_init,
-                                                  self.stop_condition, self.progress, self.data_dir)
+                                                  self.stop_condition, self.progress, self.output_dir)
 
     def tearDown(self):
         shutil.rmtree(self.tmp_dir)
@@ -76,14 +76,14 @@ class TestSimulationConfig(unittest.TestCase):
         self.assertEquals(self.simulation_config.time_init, self.time_init)
         self.assertEquals(self.simulation_config.stop_condition, self.stop_condition)
         self.assertEquals(self.simulation_config.progress, self.progress)
-        self.assertEquals(self.simulation_config.data_dir, self.data_dir)
+        self.assertEquals(self.simulation_config.output_dir, self.output_dir)
 
         # check defaults
         simulation_config = SimulationConfig(self.time_max)
         self.assertEquals(simulation_config.time_init, 0.0)
         self.assertEquals(simulation_config.stop_condition, None)
         self.assertEquals(simulation_config.progress, False)
-        self.assertEquals(simulation_config.data_dir, None)
+        self.assertEquals(simulation_config.output_dir, None)
 
         # check keywords
         simulation_config = SimulationConfig(time_max=self.time_max)
@@ -108,33 +108,33 @@ class TestSimulationConfig(unittest.TestCase):
             cfg = SimulationConfig(self.time_max, stop_condition='hi')
             cfg.validate_individual_fields()
 
-        # test data_dir
-        # test data_dir specified relative to home directory
+        # test output_dir
+        # test output_dir specified relative to home directory
         usr_tmp = os.path.join('~', 'tmp')
         usr_tmp_abs = os.path.expanduser(usr_tmp)
-        data_dir = os.path.join(usr_tmp, 'data_dir')
-        cfg = SimulationConfig(self.time_max, data_dir=data_dir)
+        output_dir = os.path.join(usr_tmp, 'output_dir')
+        cfg = SimulationConfig(self.time_max, output_dir=output_dir)
         self.assertEquals(cfg.validate_individual_fields(), None)
-        self.assertTrue(os.path.isdir(cfg.data_dir))
+        self.assertTrue(os.path.isdir(cfg.output_dir))
 
         _, tmp_file = tempfile.mkstemp(dir=self.tmp_dir)
-        with self.assertRaisesRegex(SimulatorError, "data_dir .* must be a directory"):
-            cfg = SimulationConfig(self.time_max, data_dir=tmp_file)
+        with self.assertRaisesRegex(SimulatorError, "output_dir .* must be a directory"):
+            cfg = SimulationConfig(self.time_max, output_dir=tmp_file)
             cfg.validate_individual_fields()
 
-        with self.assertRaisesRegex(SimulatorError, "data_dir .* is not empty"):
-            cfg = SimulationConfig(self.time_max, data_dir=self.tmp_dir)
+        with self.assertRaisesRegex(SimulatorError, "output_dir .* is not empty"):
+            cfg = SimulationConfig(self.time_max, output_dir=self.tmp_dir)
             cfg.validate_individual_fields()
 
-        # data_dir gets created because it does not exist
-        data_dir = os.path.join(self.tmp_dir, 'no_such_dir', 'no_such_sub_dir')
-        cfg = SimulationConfig(self.time_max, data_dir=data_dir)
+        # output_dir gets created because it does not exist
+        output_dir = os.path.join(self.tmp_dir, 'no_such_dir', 'no_such_sub_dir')
+        cfg = SimulationConfig(self.time_max, output_dir=output_dir)
         cfg.validate_individual_fields()
-        self.assertTrue(os.path.isdir(cfg.data_dir))
+        self.assertTrue(os.path.isdir(cfg.output_dir))
 
-        # data_dir already exists
+        # output_dir already exists
         tmp_dir = tempfile.mkdtemp(dir=self.tmp_dir)
-        cfg = SimulationConfig(self.time_max, data_dir=tmp_dir)
+        cfg = SimulationConfig(self.time_max, output_dir=tmp_dir)
         self.assertEquals(cfg.validate_individual_fields(), None)
 
     def test_validate(self):
