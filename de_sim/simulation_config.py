@@ -107,20 +107,3 @@ class SimulationConfig(ValidatedDataClass):
         # other validation
         if self.time_max <= self.time_init:
             raise SimulatorError(f'time_max ({self.time_max}) must be greater than time_init ({self.time_init})')
-
-    # FIX FOR DE-SIM CHANGES
-    # TODO: make generic, auto-determining DO_NOT_PICKLE, & move to wc_utils.util.misc.ValidatedDataClass
-    def prepare_to_pickle(self):
-        """ Provide a copy that can be pickled
-
-        Returns:
-            :obj:`SimulationConfig`: a copy of `self` that can be pickled
-        """
-        to_pickle = copy.deepcopy(self)
-        for field in dataclasses.fields(self):
-            attr = getattr(self, field.name)
-            if field.name in self.DO_NOT_PICKLE:
-                setattr(to_pickle, field.name, None)
-            elif isinstance(attr, ValidatedDataClass):
-                setattr(to_pickle, field.name, attr.prepare_to_pickle())
-        return to_pickle

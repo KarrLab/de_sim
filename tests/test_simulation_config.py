@@ -140,18 +140,6 @@ class TestPickleSimulationConfig(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmp_dir)
 
-    simulation_config_no_stop_cond = SimulationConfig(10.0, 3.5, progress=True, output_dir=tempfile.mkdtemp())
-
-    def test_pickle(self):
-        self.simulation_config_no_stop_cond.validate()
-        file = os.path.join(self.tmp_dir, 'test.pickle')
-        with open(file, 'wb') as fd:
-            pickle.dump(self.simulation_config_no_stop_cond, fd)
-        with open(file, 'rb') as fd:
-            simulation_config = pickle.load(fd)
-        self.assertEquals(self.simulation_config_no_stop_cond, simulation_config)
-        shutil.rmtree(self.simulation_config_no_stop_cond.output_dir)
-
     simulation_config = SimulationConfig(10.0, 3.5, stop_condition=ec.f, progress=True, output_dir=tempfile.mkdtemp())
 
     def test_prepare_to_pickle(self):
