@@ -21,7 +21,7 @@ import unittest
 import warnings
 
 from de_sim.config import core
-from de_sim.simulation_metadata import SimulationMetadata
+from de_sim.simulation_metadata import SimulationMetadata, RunMetadata, AuthorMetadata
 from de_sim.errors import SimulatorError
 from de_sim.shared_state_interface import SharedStateInterface
 from de_sim.simulation_config import SimulationConfig
@@ -357,16 +357,30 @@ class TestSimulationEngine(unittest.TestCase):
 
     def test_metadata_collection(self):
         self.make_one_object_simulation()
-        config_dict = dict(time_max=5.0, output_dir=self.out_dir)
+        time_max = 5
+        config_dict = dict(time_max=time_max, output_dir=self.out_dir)
         self.simulator.run(config_dict=config_dict)
-        metadata = SimulationMetadata.read_metadata(self.out_dir)
-        self.assertIsInstance(metadata, SimulationMetadata)
-        self.assertGreaterEqual(metadata.run.run_time, 0)
+        sim_metadata = SimulationMetadata.read_dataclass(self.out_dir)
+        self.assertIsInstance(sim_metadata, SimulationMetadata)
+        self.assertEqual(sim_metadata.simulation_config.time_max, time_max)
+        self.assertGreaterEqual(sim_metadata.run.run_time, 0)
 
+        # provide AuthorMetadata
+        self.simulator.reset()
+        self.make_one_object_simulation()
+        output_dir=tempfile.mkdtemp(dir=self.out_dir)
+        config_dict = dict(time_max=time_max, output_dir=output_dir)
+        author_name = 'Joe'
+        author_metadata = AuthorMetadata(name=author_name)
+        self.simulator.run(config_dict=config_dict, author_metadata=author_metadata)
+        sim_metadata = SimulationMetadata.read_dataclass(output_dir)
+        self.assertEqual(sim_metadata.author.name, author_name)
+
+        # no output_dir
         self.simulator.reset()
         self.make_one_object_simulation()
         self.simulator.run(5.0)
-        self.assertIsInstance(self.simulator.metadata, SimulationMetadata)
+        self.assertIsInstance(self.simulator.sim_metadata, SimulationMetadata)
 
     ### test simulation performance ###
     def prep_simulation(self, num_sim_objs):

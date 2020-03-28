@@ -45,7 +45,10 @@ class SimulationEngine(object):
         fast_plotting_logger (:obj:`FastLogger`): a fast logger for trajectory data for plotting
         event_queue (:obj:`EventQueue`): the queue of future events
         event_counts (:obj:`Counter`): a counter of event types
-        sim_config (:obj:`SimulationConfig`, optional): a simulation run's configuration
+        sim_config (:obj:`SimulationConfig`): a simulation run's configuration
+        sim_metadata (:obj:`SimulationMetadata`): a simulation run's metadata
+        author_metadata (:obj:`AuthorMetadata`): information about the person who runs the simulation,
+            if provided by the simulation application
     """
     # Termination messages
     NO_EVENTS_REMAIN = " No events remain"
@@ -147,31 +150,31 @@ class SimulationEngine(object):
         self.__initialized = True
 
     def init_metadata_collection(self, sim_config):
-        """ Initialize metatdata collection
+        """ Initialize a simulation metatdata object
 
-        Call just before simulation starts, so that correct clock time of start is recorded
+        Call just before a simulation starts, so that correct clock time of start is recorded
 
         Args:
             sim_config (:obj:`SimulationConfig`): information about the simulation's configuration
                 (start time, maximum time, etc.)
         """
-        application, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
-        author = AuthorMetadata()
+        simulator_repo, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
+        if self.author_metadata is None:
+            author = AuthorMetadata()
+        else:
+            author = self.author_metadata
         run = RunMetadata()
         run.record_ip_address()
         run.record_start()
-        self.metadata = SimulationMetadata(application, sim_config, run, author)
+        self.sim_metadata = SimulationMetadata(simulation_config=sim_config, run=run, author=author,
+                                               simulator_repo=simulator_repo)
 
     def finish_metadata_collection(self):
         """ Finish metatdata collection
         """
-        self.metadata.run.record_run_time()
+        self.sim_metadata.run.record_run_time()
         if self.sim_config.output_dir:
-            # FIX FOR DE-SIM CHANGES
-            # todo: move this into class SimulationMetadata
-            metadata_copy = copy.deepcopy(self.metadata)
-            metadata_copy.simulation.prepare_to_pickle()
-            SimulationMetadata.write_metadata(metadata_copy, self.sim_config.output_dir)
+            SimulationMetadata.write_dataclass(self.sim_metadata.prepare_to_pickle(), self.sim_config.output_dir)
 
     def reset(self):
         """ Reset this `SimulationEngine`
@@ -208,7 +211,7 @@ class SimulationEngine(object):
     def _get_sim_config(time_max=None, sim_config=None, config_dict=None):
         """ External simulate interface
 
-        Legal parameter combinations:
+        Legal combinations of the first three parameters:
 
         1. Just `time_max`
         2. Just `sim_config`
@@ -220,7 +223,7 @@ class SimulationEngine(object):
             time_max (:obj:`float`, optional): the time of the end of the simulation
             sim_config (:obj:`SimulationConfig`, optional): the simulation run's configuration
             config_dict (:obj:`dict`, optional): a dictionary with keys chosen from the field names
-            in :obj:`SimulationConfig`; note that `config_dict` is not a `kwargs` argument
+                in :obj:`SimulationConfig`; note that `config_dict` is not a `kwargs` argument
 
         Returns:
             :obj:`SimulationConfig`: a validated simulation configuration
@@ -249,7 +252,7 @@ class SimulationEngine(object):
         if sim_config is None:
             if time_max is not None:
                 sim_config = SimulationConfig(time_max)
-            else:   # config_dict must be set
+            else:   # config_dict must be initialized
                 if 'time_max' not in config_dict:
                     raise SimulatorError('time_max must be provided in config_dict')
                 sim_config = SimulationConfig(**config_dict)
@@ -257,7 +260,7 @@ class SimulationEngine(object):
         sim_config.validate()
         return sim_config
 
-    def simulate(self, time_max=None, sim_config=None, config_dict=None):
+    def simulate(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
         """ Run a simulation
 
         See `_get_sim_config` for constraints on arguments
@@ -267,6 +270,7 @@ class SimulationEngine(object):
             sim_config (:obj:`SimulationConfig`, optional): the simulation run's configuration
             config_dict (:obj:`dict`, optional): a dictionary with keys chosen from
                 the field names in :obj:`SimulationConfig`
+            author_metadata (:obj:`AuthorMetadata`, optional): information about the person who runs the simulation
 
         Returns:
             :obj:`int`: the number of times a simulation object executes `_handle_event()`. This may
@@ -280,12 +284,14 @@ class SimulationEngine(object):
         """
         self.sim_config = self._get_sim_config(time_max=time_max, sim_config=sim_config,
                                                config_dict=config_dict)
+        self.author_metadata = author_metadata
         return self._simulate()
 
-    def run(self, time_max=None, sim_config=None, config_dict=None):
+    def run(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
         """ Alias for simulate
         """
-        return self.simulate(time_max=time_max, sim_config=sim_config, config_dict=config_dict)
+        return self.simulate(time_max=time_max, sim_config=sim_config, config_dict=config_dict,
+                             author_metadata=author_metadata)
 
     def _simulate(self):
         """ Run the simulation

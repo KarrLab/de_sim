@@ -16,11 +16,11 @@ import os
 import types
 
 from de_sim.errors import SimulatorError
-from wc_utils.util.misc import ValidatedDataClass
+from wc_utils.util.misc import EnhancedDataClass
 
 
 @dataclass
-class SimulationConfig(ValidatedDataClass):
+class SimulationConfig(EnhancedDataClass):
     """ Configuration information for a simulation run
 
     - Simulation start time
