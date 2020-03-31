@@ -174,7 +174,7 @@ class SimulationEngine(object):
         """
         self.sim_metadata.run.record_run_time()
         if self.sim_config.output_dir:
-            SimulationMetadata.write_dataclass(self.sim_metadata.prepare_to_pickle(), self.sim_config.output_dir)
+            SimulationMetadata.write_dataclass(self.sim_metadata, self.sim_config.output_dir)
 
     def reset(self):
         """ Reset this `SimulationEngine`
