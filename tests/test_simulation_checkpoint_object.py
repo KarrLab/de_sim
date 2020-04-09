@@ -19,7 +19,7 @@ from de_sim.simulation_checkpoint_object import (AbstractCheckpointSimulationObj
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import ApplicationSimulationObject
 from de_sim.errors import SimulatorError
-from de_sim.checkpoint import Checkpoint
+from de_sim.checkpoint import Checkpoint, AccessCheckpoints
 
 
 class PeriodicCheckpointSimuObj(AbstractCheckpointSimulationObject):
@@ -154,14 +154,15 @@ class TestCheckpointSimulationObjects(unittest.TestCase):
         expected_checkpoint_times = [float(t) for t in
                                      range(0, self.checkpoint_period * int(run_time/self.checkpoint_period) + 1,
                                            self.checkpoint_period)]
-        checkpoints = Checkpoint.list_checkpoints(self.checkpoint_dir)
+        access_checkpoints = AccessCheckpoints(self.checkpoint_dir)
+        checkpoints = access_checkpoints.list_checkpoints()
         self.assertEqual(expected_checkpoint_times, checkpoints)
-        checkpoint = Checkpoint.get_checkpoint(self.checkpoint_dir)
-        self.assertEqual(checkpoint, Checkpoint.get_checkpoint(self.checkpoint_dir, time=run_time))
+        checkpoint = access_checkpoints.get_checkpoint()
+        self.assertEqual(checkpoint, access_checkpoints.get_checkpoint(time=run_time))
 
         for i in range(1 + int(run_time/self.checkpoint_period)):
             time = i * self.checkpoint_period
-            state_value = Checkpoint.get_checkpoint(self.checkpoint_dir, time=time).state
+            state_value = access_checkpoints.get_checkpoint(time=time).state
             max_value = self.a * self.checkpoint_period * i + self.b
             self.assertTrue(max_value - self.a * self.update_period <= state_value <= max_value)
 

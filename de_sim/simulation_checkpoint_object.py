@@ -10,7 +10,7 @@ import abc
 
 from de_sim.simulation_message import SimulationMessage
 from de_sim.errors import SimulatorError
-from de_sim.checkpoint import Checkpoint
+from de_sim.checkpoint import Checkpoint, AccessCheckpoints
 from de_sim.template_sim_objs import TemplatePeriodicSimulationObject
 
 
@@ -76,6 +76,7 @@ class CheckpointSimulationObject(AbstractCheckpointSimulationObject):
     def create_checkpoint(self):
         """ Create a checkpoint in the directory `self.checkpoint_dir`
         """
-        Checkpoint.set_checkpoint(self.checkpoint_dir,
-                                  Checkpoint(self.time, self.access_state_obj.get_checkpoint_state(self.time),
-                                             self.access_state_obj.get_random_state()))
+        access_checkpoints = AccessCheckpoints(self.checkpoint_dir)
+        access_checkpoints.set_checkpoint(Checkpoint(self.time,
+                                                     self.access_state_obj.get_checkpoint_state(self.time),
+                                                     self.access_state_obj.get_random_state()))

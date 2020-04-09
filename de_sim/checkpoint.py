@@ -36,103 +36,6 @@ class Checkpoint(object):
         self.state = state
         self.random_state = random_state
 
-    @staticmethod
-    def set_checkpoint(dirname, checkpoint):
-        """ Save a checkpoint to the directory `dirname`.
-
-        Args:
-            dirname (:obj:`str`): directory to read/write checkpoint data
-            checkpoint (:obj:`Checkpoint`): checkpoint
-        """
-        file_name = Checkpoint.get_file_name(dirname, checkpoint.time)
-
-        with open(file_name, 'wb') as file:
-            pickle.dump(checkpoint, file)
-
-    @staticmethod
-    def get_checkpoint(dirname, time=None):
-        """ Get the latest checkpoint in directory `dirname` with time before or equal to `time`
-
-        For example, consider checkpoints at 1.0 s, 1.5 s, and 2.0 s. If `time` = 1.5 s, then
-        return the checkpoint from 1.5 s. Return the same checkpoint if `time` = 1.9 s.
-        If no checkpoint with time <= `time` exists, then return the first checkpoint. E.g., if
-        `time` = 0.9 s, the checkpoint from 1.0 s would be returned.
-        Finally, if `time` is `None`, return the last checkpoint.
-
-        Args:
-            dirname (:obj:`str`): directory to read/write checkpoint data
-            time (:obj:`float`, optional): time in simulated time units of desired checkpoint; if not provided,
-                the most recent checkpoint is returned
-
-        Returns:
-            :obj:`Checkpoint`: the most recent checkpoint before time `time`, or the most recent
-                checkpoint if `time` is not provided
-        """
-        # get list of checkpoints
-        checkpoint_times = Checkpoint.list_checkpoints(dirname)
-
-        # select closest checkpoint
-        if time is None:
-            nearest_time = checkpoint_times[-1]
-        else:
-            index = bisect(checkpoint_times, time) - 1
-            index = max(index, 0)
-            nearest_time = checkpoint_times[index]
-
-        file_name = Checkpoint.get_file_name(dirname, nearest_time)
-
-        # load and return this checkpoint
-        with open(file_name, 'rb') as file:
-            return pickle.load(file)
-
-    @staticmethod
-    def list_checkpoints(dirname, error_if_empty=True):
-        """ Get sorted list of times of saved checkpoints in checkpoint directory `dirname`.
-
-        Args:
-            dirname (:obj:`str`): directory to read/write checkpoint data
-            error_if_empty (:obj:`bool`, optional): if set, report an error if no checkpoints found
-
-        Returns:
-            :obj:`list`: sorted list of times of saved checkpoints
-
-        Raises:
-            :obj:`SimulatorError`: if `dirname` doesn't contain any checkpoints
-        """
-        # find checkpoint times
-        checkpoint_times = []
-        pattern = r'^(\d+\.\d{' + f'{MAX_TIME_PRECISION},{MAX_TIME_PRECISION}' + r'})\.pickle$'
-        for file_name in os.listdir(dirname):
-            match = re.match(pattern, file_name)
-            if os.path.isfile(os.path.join(dirname, file_name)) and match:
-                checkpoint_times.append(float(match.group(1)))
-
-        # error if no checkpoints found
-        if error_if_empty and not checkpoint_times:
-            raise SimulatorError("no checkpoints found in '{}'".format(dirname))
-
-        # sort by time
-        checkpoint_times.sort()
-
-        # return list of checkpoint times
-        return checkpoint_times
-
-    @staticmethod
-    def get_file_name(dirname, time):
-        """ Get file name for checkpoint at time `time`
-
-        Args:
-            dirname (:obj:`str`): directory to read/write checkpoint data
-            time (:obj:`float`): time
-
-        Returns:
-            :obj:`str`: file name for checkpoint at time `time`
-        """
-        filename_time = f'{time:.{MAX_TIME_PRECISION}f}'
-        if not math.isclose(float(filename_time), time):
-            raise SimulatorError(f"filename time {filename_time} is not close to time {time}")
-        return os.path.join(dirname, f'{filename_time}.pickle')
-
     def __str__(self):
         """ Provide a human readable representation of this `Checkpoint`
 
@@ -179,3 +82,117 @@ class Checkpoint(object):
             :obj:`bool`: true if checkpoints are semantically unequal
         """
         return not self.__eq__(other)
+
+
+class AccessCheckpoints(object):
+    """ Represents a directory containing simulation checkpoints
+
+    Attributes:
+        dir_path (:obj:`str`): a directory containing simulation checkpoints
+        last_dir_mod (:obj:`str`): last time at which `dir_path` was modified
+        all_checkpoints (:obj:`list` of :obj:`str`): all the checkpoints in `dir_path`
+    """
+
+    def __init__(self, dir_path):
+        self.dir_path = dir_path
+        self.last_dir_mod = os.stat(self.dir_path).st_mtime_ns
+        self.all_checkpoints = None
+
+    def set_checkpoint(self, checkpoint):
+        """ Save a checkpoint in the directory `self.dir_path`
+
+        Args:
+            checkpoint (:obj:`Checkpoint`): checkpoint
+        """
+        file_name = self.get_file_name(checkpoint.time)
+
+        with open(file_name, 'wb') as file:
+            pickle.dump(checkpoint, file)
+
+    def get_checkpoint(self, time=None):
+        """ Get the latest checkpoint in directory `self.dir_path` with time before or equal to `time`
+
+        For example, consider checkpoints at 1.0 s, 1.5 s, and 2.0 s. If `time` = 1.5 s, then
+        return the checkpoint from 1.5 s. Return the same checkpoint if `time` = 1.9 s.
+        If no checkpoint with time <= `time` exists, then return the first checkpoint. E.g., if
+        `time` = 0.9 s, the checkpoint from 1.0 s would be returned.
+        Finally, if `time` is `None`, return the last checkpoint.
+
+        Args:
+            time (:obj:`float`, optional): time in simulated time units of desired checkpoint; if not provided,
+                the most recent checkpoint is returned
+
+        Returns:
+            :obj:`Checkpoint`: the most recent checkpoint before time `time`, or the most recent
+                checkpoint if `time` is not provided
+        """
+        # get list of checkpoints
+        checkpoint_times = self.list_checkpoints()
+
+        # select closest checkpoint
+        if time is None:
+            nearest_time = checkpoint_times[-1]
+        else:
+            index = bisect(checkpoint_times, time) - 1
+            index = max(index, 0)
+            nearest_time = checkpoint_times[index]
+
+        file_name = self.get_file_name(nearest_time)
+
+        # load and return this checkpoint
+        with open(file_name, 'rb') as file:
+            return pickle.load(file)
+
+    def list_checkpoints(self, error_if_empty=True):
+        """ Get sorted list of times of saved checkpoints in checkpoint directory `self.dir_path`
+
+        To enhance performance the list of times is cached in attribute `all_checkpoints` and
+        reloaded if the directory is updated.
+
+        Args:
+            error_if_empty (:obj:`bool`, optional): if set, report an error if no checkpoints found
+
+        Returns:
+            :obj:`list`: sorted list of times of saved checkpoints
+
+        Raises:
+            :obj:`SimulatorError`: if `dirname` doesn't contain any checkpoints
+        """
+        # reload all_checkpoints if they have not been obtained
+        # or self.dir_path has been modified since all_checkpoints was last obtained
+        if self.all_checkpoints is None or self.last_dir_mod < os.stat(self.dir_path).st_mtime_ns:
+            self.last_dir_mod = os.stat(self.dir_path).st_mtime_ns
+
+            # find checkpoint times
+            checkpoint_times = []
+            pattern = r'^(\d+\.\d{' + f'{MAX_TIME_PRECISION},{MAX_TIME_PRECISION}' + r'})\.pickle$'
+            for file_name in os.listdir(self.dir_path):
+                match = re.match(pattern, file_name)
+                if os.path.isfile(os.path.join(self.dir_path, file_name)) and match:
+                    checkpoint_times.append(float(match.group(1)))
+
+            # sort by time
+            checkpoint_times.sort()
+
+            self.all_checkpoints = checkpoint_times
+
+        # error if no checkpoints found
+        if error_if_empty and not self.all_checkpoints:
+            raise SimulatorError("no checkpoints found in '{}'".format(self.dir_path))
+
+        # return list of checkpoint times
+        return self.all_checkpoints
+
+    def get_file_name(self, time):
+        """ Get file name for checkpoint at time `time`
+
+        Args:
+            time (:obj:`float`): time
+
+        Returns:
+            :obj:`str`: file name for checkpoint at time `time`
+        """
+        filename_time = f'{time:.{MAX_TIME_PRECISION}f}'
+        if not math.isclose(float(filename_time), time):
+            raise SimulatorError(f"filename time {filename_time} is not close to time {time}")
+        return os.path.join(self.dir_path, f'{filename_time}.pickle')

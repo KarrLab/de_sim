@@ -16,7 +16,7 @@ import tempfile
 import unittest
 import copy
 
-from de_sim.checkpoint import Checkpoint
+from de_sim.checkpoint import Checkpoint, AccessCheckpoints
 from de_sim.config import core
 from de_sim.errors import SimulatorError
 from wc_utils.util.uniform_seq import UniformSequence
@@ -64,14 +64,21 @@ class TestCheckpoint(unittest.TestCase):
         for ckpt in self.diff_checkpoints:
             self.assertNotEqual(self.non_empty_checkpoint1, ckpt)
 
+
+FullSimulationState = namedtuple('FullSimulationState', 'time local_state')
+
+
+class TestAccessCheckpoints(unittest.TestCase):
+
     def test_get_file_name(self):
-        self.assertIn(f'{3.0:.{MAX_TIME_PRECISION}f}', Checkpoint.get_file_name('', 3))
+        access_checkpoints = AccessCheckpoints('.')
+        self.assertIn(f'{3.0:.{MAX_TIME_PRECISION}f}', access_checkpoints.get_file_name(3))
         for time in [1.00000001, 1E-7]:
             with self.assertRaises(SimulatorError):
-                Checkpoint.get_file_name('', time)
+                access_checkpoints.get_file_name(time)
 
 
-class CheckpointLogTest(unittest.TestCase):
+class TestAccessCheckpointsLog(unittest.TestCase):
 
     def setUp(self):
         self.checkpoint_dir = tempfile.mkdtemp()
@@ -85,7 +92,7 @@ class CheckpointLogTest(unittest.TestCase):
         checkpoint_dir = os.path.join(self.checkpoint_dir, 'checkpoint')
         checkpoint_step = 2
         init_time = 0
-        MockCheckpointLogger(checkpoint_dir, checkpoint_step, init_time)
+        MockAccessCheckpointsLogger(checkpoint_dir, checkpoint_step, init_time)
         self.assertTrue(os.path.isdir(checkpoint_dir))
 
     def test_mock_simulator(self):
@@ -97,9 +104,10 @@ class CheckpointLogTest(unittest.TestCase):
         final_time, final_state, final_random_state = mock_simulate(metadata=metadata,
                                                                     checkpoint_step=checkpoint_step)
 
-        self.assertEqual([], Checkpoint.list_checkpoints(dirname=self.checkpoint_dir, error_if_empty=False))
+        access_checkpoints = AccessCheckpoints(self.checkpoint_dir)
+        self.assertEqual([], access_checkpoints.list_checkpoints(error_if_empty=False))
         with self.assertRaises(SimulatorError):
-            Checkpoint.list_checkpoints(dirname=self.checkpoint_dir)
+            access_checkpoints.list_checkpoints()
         self.assertGreaterEqual(final_time, final_time_max)
 
         # run simulation to check checkpointing
@@ -109,26 +117,25 @@ class CheckpointLogTest(unittest.TestCase):
                                    checkpoint_step=checkpoint_step)
         self.assertGreaterEqual(time, time_max)
 
-        # check checkpoints created
-        self.assertTrue(sorted(Checkpoint.list_checkpoints(dirname=self.checkpoint_dir)))
+        # check that checkpoints created and
+        # list_checkpoints() reloads from updated self.checkpoint_dir
+        self.assertTrue(sorted(access_checkpoints.list_checkpoints()))
         numpy.testing.assert_array_almost_equal(
-            Checkpoint.list_checkpoints(dirname=self.checkpoint_dir),
+            access_checkpoints.list_checkpoints(),
             numpy.linspace(0, time_max, int(1 + time_max / checkpoint_step)),
             decimal=1)
 
         # check that checkpoints have correct data
         checkpoint_time = 5
-        chkpt = Checkpoint.get_checkpoint(dirname=self.checkpoint_dir, time=checkpoint_time)
+        chkpt = access_checkpoints.get_checkpoint(time=checkpoint_time)
         self.assertIn('time:', str(chkpt))
         self.assertIn('state:', str(chkpt))
         self.assertLessEqual(chkpt.time, checkpoint_time)
 
-        chkpt = Checkpoint.get_checkpoint(dirname=self.checkpoint_dir)
+        chkpt = access_checkpoints.get_checkpoint()
         self.assertLessEqual(chkpt.time, time_max)
 
         # check that resumed simulation reproduces earlier run
-        chkpt = Checkpoint.get_checkpoint(dirname=self.checkpoint_dir)
-
         metadata = dict(time_max=final_time_max)
         time, state, random_state = mock_simulate(metadata=metadata,
                                                   init_time=chkpt.state.time,
@@ -143,21 +150,19 @@ class CheckpointLogTest(unittest.TestCase):
                                                check_iterable_ordering=True)
 
         # check checkpoints created
-        self.assertTrue(sorted(Checkpoint.list_checkpoints(dirname=self.checkpoint_dir)))
+        # access_checkpoints = AccessCheckpoints(self.checkpoint_dir)
+        self.assertTrue(sorted(access_checkpoints.list_checkpoints()))
         numpy.testing.assert_array_almost_equal(
-            Checkpoint.list_checkpoints(dirname=self.checkpoint_dir),
+            access_checkpoints.list_checkpoints(),
             numpy.linspace(0, final_time_max, int(1 + final_time_max / checkpoint_step)),
             decimal=1)
 
         # check checkpoints have correct data
-        chkpt = Checkpoint.get_checkpoint(dirname=self.checkpoint_dir)
+        chkpt = access_checkpoints.get_checkpoint()
         self.assertLessEqual(chkpt.time, final_time)
 
 
-FullSimulationState = namedtuple('FullSimulationState', 'time local_state')
-
-
-class MockCheckpointLogger(object):
+class MockAccessCheckpointsLogger(object):
     """ Create checkpoints at a uniform sequence of times
 
     Attributes:
@@ -199,7 +204,8 @@ class MockCheckpointLogger(object):
             full_state (:obj:`FullSimulationState`): simulated full state
             random_state (:obj:`numpy.random.RandomState`): random number generator state
         """
-        Checkpoint.set_checkpoint(self.dirname, Checkpoint(time, full_state, random_state.get_state()))
+        access_checkpoints = AccessCheckpoints(self.dirname)
+        access_checkpoints.set_checkpoint(Checkpoint(time, full_state, random_state.get_state()))
 
 
 def mock_simulate(metadata, init_time=0, init_state=None, init_random_state=None, checkpoint_dir=None,
@@ -231,7 +237,7 @@ def mock_simulate(metadata, init_time=0, init_state=None, init_random_state=None
     time = init_time
 
     if checkpoint_dir:
-        logger = MockCheckpointLogger(checkpoint_dir, checkpoint_step, init_checkpoint_time)
+        logger = MockAccessCheckpointsLogger(checkpoint_dir, checkpoint_step, init_checkpoint_time)
 
     while time < metadata['time_max']:
         # randomly advance time
