@@ -8,9 +8,12 @@
 
 from collections import Counter
 import copy
+import cProfile
 import dataclasses
 import datetime
+import pstats
 import sys
+import tempfile
 
 from de_sim.config import core
 from de_sim.simulation_metadata import SimulationMetadata, RunMetadata, AuthorMetadata
@@ -54,6 +57,9 @@ class SimulationEngine(object):
     NO_EVENTS_REMAIN = " No events remain"
     END_TIME_EXCEEDED = " End time exceeded"
     TERMINATE_WITH_STOP_CONDITION_SATISFIED = " Terminate with stop condition satisfied"
+
+    # number of rows to print in a performance profile
+    NUM_PROFILE_ROWS = 20
 
     def __init__(self, shared_state=None):
         if shared_state is None:
@@ -211,10 +217,10 @@ class SimulationEngine(object):
     def _get_sim_config(time_max=None, sim_config=None, config_dict=None):
         """ External simulate interface
 
-        Legal combinations of the first three parameters:
+        Legal combinations of the three parameters:
 
         1. Just `time_max`
-        2. Just `sim_config`
+        2. Just `sim_config`, which will contain an entry for `time_max`
         3. Just `config_dict`, which must contain an entry for `time_max`
 
         Other combinations are illegal.
@@ -276,6 +282,8 @@ class SimulationEngine(object):
             :obj:`int`: the number of times a simulation object executes `_handle_event()`. This may
                 be smaller than the number of events sent, because simultaneous events at one
                 simulation object are handled together.
+                If `sim_config.profile` is set, then a :obj:`pstats.Stats` instance containing the profiling
+                statistics is returned.
 
         Raises:
             :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
@@ -285,7 +293,17 @@ class SimulationEngine(object):
         self.sim_config = self._get_sim_config(time_max=time_max, sim_config=sim_config,
                                                config_dict=config_dict)
         self.author_metadata = author_metadata
-        return self._simulate()
+        if self.sim_config.profile:
+            # profile the simulation and return the profile object
+            with tempfile.NamedTemporaryFile() as file_like_obj:
+                out_file = file_like_obj.name
+                locals = {'self': self}
+                cProfile.runctx('self._simulate()', {}, locals, filename=out_file)
+                profile = pstats.Stats(out_file)
+                profile.sort_stats('cumulative').print_stats(self.NUM_PROFILE_ROWS)
+                return profile
+        else:
+            return self._simulate()
 
     def run(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
         """ Alias for simulate

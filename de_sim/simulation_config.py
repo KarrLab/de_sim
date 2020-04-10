@@ -26,26 +26,30 @@ class SimulationConfig(EnhancedDataClass):
     - Simulation start time
     - Simulation maximum time
     - Stop condition
-    - Progress bar switch
     - Data directory
+    - Progress bar switch
+    - Profiling switch
 
     Attributes:
         time_max (:obj:`float`): maximum simulation time
         time_init (:obj:`float`, optional): time at which a simulation starts
         stop_condition (:obj:`function`, optional): if provided, a function that takes one argument,
             the simulation time; a simulation terminates if the function returns `True`
-        progress (:obj:`bool`, optional): if `True`, output a bar that dynamically reports the
-            simulation's progress
         output_dir (:obj:`str`, optional): directory for saving metadata; will be created if it does't
             exist; if not provided, then metatdata should be saved before another simulation is run
             with the same `SimulationEngine`
+        progress (:obj:`bool`, optional): if `True`, output a text bar that dynamically reports the
+            simulation's progress
+        profile (:obj:`bool`, optional): if `True`, output a profile of the simulation's performance
+            created by a Python profiler
     """
 
     time_max: float
     time_init: float = 0.0
     stop_condition: object = None   # stop_condition must be callable, which is checked below
-    progress: bool = False
     output_dir: str = None
+    progress: bool = False
+    profile: bool = False
 
     DO_NOT_PICKLE = ['stop_condition']
 

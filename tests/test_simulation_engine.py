@@ -383,10 +383,10 @@ class TestSimulationEngine(unittest.TestCase):
         self.assertIsInstance(self.simulator.sim_metadata, SimulationMetadata)
 
     ### test simulation performance ###
-    def prep_simulation(self, num_sim_objs):
-        self.simulator_for_perf_tests.reset()
-        self.make_cyclical_messaging_network_sim(self.simulator_for_perf_tests, num_sim_objs)
-        self.simulator_for_perf_tests.initialize()
+    def prep_simulation(self, simulation_engine, num_sim_objs):
+        simulation_engine.reset()
+        self.make_cyclical_messaging_network_sim(simulation_engine, num_sim_objs)
+        simulation_engine.initialize()
 
     def suspend_logging(self, log_names, new_level=LogLevel.exception):
         # cannot use environment variable(s) to modify logging because logging2.Logger() as used
@@ -438,22 +438,21 @@ class TestSimulationEngine(unittest.TestCase):
     # @unittest.skip("takes 3 to 5 min.")
     def test_performance(self):
         existing_levels = self.suspend_logging(self.log_names)
-        self.simulator_for_perf_tests = SimulationEngine()
+        simulation_engine = SimulationEngine()
         end_sim_time = 100
         num_sim_objs = 4
         max_num_profile_objects = 300
         max_num_sim_objs = 5000
         print()
-        print("Performance test of cyclical messaging network: end simulation time: {}".format(
-            end_sim_time))
+        print(f"Performance test of cyclical messaging network: end simulation time: {end_sim_time}")
         unprofiled_perf = ["\n#sim obs\t# events\trun time (s)\tevents/s".expandtabs(15)]
 
         while num_sim_objs < max_num_sim_objs:
 
             # measure execution time
-            self.prep_simulation(num_sim_objs)
+            self.prep_simulation(simulation_engine, num_sim_objs)
             start_time = time.process_time()
-            num_events = self.simulator_for_perf_tests.simulate(end_sim_time)
+            num_events = simulation_engine.simulate(end_sim_time)
             run_time = time.process_time() - start_time
             self.assertEqual(num_sim_objs*end_sim_time, num_events)
             unprofiled_perf.append("{}\t{}\t{:8.3f}\t{:8.0f}".format(num_sim_objs, num_events,
@@ -461,14 +460,14 @@ class TestSimulationEngine(unittest.TestCase):
 
             # profile
             if num_sim_objs < max_num_profile_objects:
-                self.prep_simulation(num_sim_objs)
+                self.prep_simulation(simulation_engine, num_sim_objs)
                 out_file = os.path.join(self.out_dir, "profile_out_{}.out".format(num_sim_objs))
-                locals = {'self':self,
-                    'end_sim_time':end_sim_time}
-                cProfile.runctx('num_events = self.simulator_for_perf_tests.simulate(end_sim_time)',
+                locals = {'simulation_engine': simulation_engine,
+                          'end_sim_time': end_sim_time}
+                cProfile.runctx('num_events = simulation_engine.simulate(end_sim_time)',
                     {}, locals, filename=out_file)
                 profile = pstats.Stats(out_file)
-                print("Profile for {} simulation objects:".format(num_sim_objs))
+                print(f"Profile for {num_sim_objs} simulation objects:")
                 profile.strip_dirs().sort_stats('cumulative').print_stats(20)
 
             num_sim_objs *= 4
@@ -484,6 +483,22 @@ class TestSimulationEngine(unittest.TestCase):
 
         print(f'Performance summary, written to {performance_log}')
         print("\n".join(unprofiled_perf))
+
+    def test_profiling(self):
+        existing_levels = self.suspend_logging(self.log_names)
+        simulation_engine = SimulationEngine()
+        num_sim_objs = 20
+        self.prep_simulation(simulation_engine, num_sim_objs)
+        end_sim_time = 200
+        sim_config_dict = dict(time_max=end_sim_time,
+                               profile=True)
+        with CaptureOutput(relay=False) as capturer:
+            stats = simulation_engine.simulate(config_dict=sim_config_dict)
+            expected_text =['function calls', 'Ordered by: cumulative time', 'filename:lineno(function)']
+            for text in expected_text:
+                self.assertIn(text, capturer.get_text())
+        self.assertTrue(isinstance(stats, pstats.Stats))
+        self.restore_logging_levels(self.log_names, existing_levels)
 
 
 class Delicate(SimulationMessage):

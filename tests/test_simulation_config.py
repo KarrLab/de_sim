@@ -32,7 +32,7 @@ class TestSimulationConfig(unittest.TestCase):
         self.progress = True
         self.output_dir = self.tmp_dir
         self.simulation_config = SimulationConfig(self.time_max, self.time_init,
-                                                  self.stop_condition, self.progress, self.output_dir)
+                                                  self.stop_condition, self.output_dir, self.progress)
 
     def tearDown(self):
         shutil.rmtree(self.tmp_dir)
@@ -103,6 +103,25 @@ class TestSimulationConfig(unittest.TestCase):
         cfg = SimulationConfig(self.time_max, output_dir=tmp_dir)
         self.assertEquals(cfg.validate_individual_fields(), None)
 
+    def test_all_fields(self):
+        profile = True
+        kwargs = dict(time_max=self.time_max,
+                      time_init=self.time_init,
+                      stop_condition=self.stop_condition,
+                      output_dir=self.output_dir,
+                      progress=self.progress,
+                      profile=profile)
+        simulation_config = SimulationConfig(self.time_max, self.time_init, self.stop_condition,
+                                             self.output_dir, self.progress, profile)
+        simulation_config.validate()
+        for attr, value in kwargs.items():
+            self.assertEquals(getattr(simulation_config, attr), value)
+
+        simulation_config = SimulationConfig(**kwargs)
+        simulation_config.validate()
+        for attr, value in kwargs.items():
+            self.assertEquals(getattr(simulation_config, attr), value)
+
     def test_validate(self):
         try:
             self.simulation_config.validate()
@@ -120,7 +139,7 @@ class TestSimulationConfig(unittest.TestCase):
         with self.assertRaisesRegex(SimulatorError, 'time_max .* must be greater than time_init .*'):
             self.simulation_config.validate()
 
-    simulation_config_no_stop_cond = SimulationConfig(10.0, 3.5, progress=True, output_dir=tempfile.mkdtemp())
+    simulation_config_no_stop_cond = SimulationConfig(10.0, 3.5, output_dir=tempfile.mkdtemp(), progress=True)
 
     def test_deepcopy(self):
         simulation_config_copy = copy.deepcopy(self.simulation_config_no_stop_cond)
@@ -140,7 +159,7 @@ class TestPickleSimulationConfig(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmp_dir)
 
-    simulation_config = SimulationConfig(10.0, 3.5, stop_condition=ec.f, progress=True, output_dir=tempfile.mkdtemp())
+    simulation_config = SimulationConfig(10.0, 3.5, stop_condition=ec.f, output_dir=tempfile.mkdtemp(), progress=True)
 
     def test_prepare_to_pickle(self):
         self.simulation_config.validate()
