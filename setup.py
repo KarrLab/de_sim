@@ -1,13 +1,19 @@
+import re
 import setuptools
+import subprocess
+import sys
 try:
-    import pkg_utils
-except ImportError:
-    import subprocess
-    import sys
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "pkg_utils"])
-    import pkg_utils
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "show", "pkg_utils"],
+        check=True, capture_output=True)
+    match = re.search(r'\nVersion: (.*?)\n', result.stdout.decode(), re.DOTALL)
+    assert match and tuple(match.group(1).split('.')) >= ('0', '0', '5')
+except (subprocess.CalledProcessError, AssertionError):
+    subprocess.run(
+        [sys.executable, "-m", "pip", "install", "-U", "pkg_utils"],
+        check=True)
 import os
+import pkg_utils
 
 name = 'de_sim'
 dirname = os.path.dirname(__file__)
