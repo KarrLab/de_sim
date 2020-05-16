@@ -494,7 +494,7 @@ class TestSimulationEngine(unittest.TestCase):
                                profile=True)
         with CaptureOutput(relay=False) as capturer:
             stats = simulation_engine.simulate(config_dict=sim_config_dict)
-            expected_text =['function calls', 'Ordered by: cumulative time', 'filename:lineno(function)']
+            expected_text =['function calls', 'Ordered by: internal time', 'filename:lineno(function)']
             for text in expected_text:
                 self.assertIn(text, capturer.get_text())
         self.assertTrue(isinstance(stats, pstats.Stats))
