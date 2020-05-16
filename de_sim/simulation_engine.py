@@ -59,7 +59,7 @@ class SimulationEngine(object):
     TERMINATE_WITH_STOP_CONDITION_SATISFIED = " Terminate with stop condition satisfied"
 
     # number of rows to print in a performance profile
-    NUM_PROFILE_ROWS = 20
+    NUM_PROFILE_ROWS = 50
 
     def __init__(self, shared_state=None):
         if shared_state is None:
@@ -300,7 +300,7 @@ class SimulationEngine(object):
                 locals = {'self': self}
                 cProfile.runctx('self._simulate()', {}, locals, filename=out_file)
                 profile = pstats.Stats(out_file)
-                profile.sort_stats('cumulative').print_stats(self.NUM_PROFILE_ROWS)
+                profile.sort_stats('tottime').print_stats(self.NUM_PROFILE_ROWS)
                 return profile
         else:
             return self._simulate()
