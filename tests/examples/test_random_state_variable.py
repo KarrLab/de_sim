@@ -30,6 +30,6 @@ class TestRandomStateVariableSimulation(unittest.TestCase):
     def test_random_state_variable_simulation(self):
         with CaptureOutput(relay=False):
             args = Namespace(initial_state=3, time_max=10, output=False)
-            self.assertTrue(0<RunRandomStateVariableSimulation.main(args))
+            self.assertTrue(0 < RunRandomStateVariableSimulation.main(args).num_events)
             args = Namespace(initial_state=3, time_max=10, output=True)
-            self.assertTrue(0<RunRandomStateVariableSimulation.main(args))
+            self.assertTrue(0 < RunRandomStateVariableSimulation.main(args).num_events)

@@ -145,9 +145,8 @@ class TestCheckpointSimulationObjects(unittest.TestCase):
 
         # run
         run_time = 22
-        expected_num_events = endpoints(run_time, self.update_period) + \
-            endpoints(run_time, self.checkpoint_period)
-        num_events = self.simulator.run(run_time)
+        expected_num_events = endpoints(run_time, self.update_period) + endpoints(run_time, self.checkpoint_period)
+        num_events = self.simulator.run(run_time).num_events
 
         # check results
         self.assertEqual(expected_num_events, num_events)
