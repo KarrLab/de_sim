@@ -178,9 +178,7 @@ class TestSimulationEngine(unittest.TestCase):
     def test_simulate_and_run(self):
         for operation in ['simulate', 'run']:
             self.make_one_object_simulation()
-            self.assertEqual(eval('self.simulator.'+operation+'(5.0)'), 3)
-            expr = 'self.simulator.{}(5.0)'.format(operation)
-            self.make_one_object_simulation()
+            expr = f'self.simulator.{operation}(5.0).num_events'
             self.assertEqual(eval(expr), 3)
 
     def test_one_object_simulation_neg_endtime(self):
@@ -188,7 +186,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.add_object(obj)
         self.simulator.initialize()
         config_dict = dict(time_max=-1, time_init=-2)
-        self.assertEqual(self.simulator.simulate(config_dict=config_dict), 0)
+        self.assertEqual(self.simulator.simulate(config_dict=config_dict).num_events, 0)
 
     def test_simulation_engine_exceptions(self):
         obj = ExampleSimulationObject(obj_name(1))
@@ -253,7 +251,7 @@ class TestSimulationEngine(unittest.TestCase):
         simulator.initialize()
         time_max = 10
         # execute to time <= time_max, with 1st event at time = 1
-        self.assertEqual(simulator.simulate(time_max), time_max + 1)
+        self.assertEqual(simulator.simulate(time_max).num_events, time_max + 1)
 
         __stop_cond_end = 3
         def stop_cond_eg(time):
@@ -264,7 +262,7 @@ class TestSimulationEngine(unittest.TestCase):
         sim_config = SimulationConfig(time_max)
         sim_config.stop_condition = stop_cond_eg
         # because the simulation is executing one event / sec, the number of events should equal the stop time plus 1
-        self.assertEqual(simulator.simulate(sim_config=sim_config), __stop_cond_end + 1)
+        self.assertEqual(simulator.simulate(sim_config=sim_config).num_events, __stop_cond_end + 1)
 
     def test_progress_bar(self):
         simulator = SimulationEngine()
@@ -276,7 +274,7 @@ class TestSimulationEngine(unittest.TestCase):
             try:
                 time_max = 10
                 config_dict = dict(time_max=time_max, progress=True)
-                self.assertEqual(simulator.simulate(config_dict=config_dict), time_max + 1)
+                self.assertEqual(simulator.simulate(config_dict=config_dict).num_events, time_max + 1)
                 self.assertTrue(f"/{time_max}" in capturer.get_text())
                 self.assertTrue("time_max" in capturer.get_text())
             except ValueError as e:
@@ -296,7 +294,7 @@ class TestSimulationEngine(unittest.TestCase):
             obj = ExampleSimulationObject(obj_name(i))
             self.simulator.add_object(obj)
         self.simulator.initialize()
-        self.assertEqual(self.simulator.simulate(5.0), 9)
+        self.assertEqual(self.simulator.simulate(5.0).num_events, 9)
 
         event_count_lines = self.simulator.provide_event_counts().split('\n')[1:]
         for idx, line in enumerate(event_count_lines):
@@ -311,7 +309,7 @@ class TestSimulationEngine(unittest.TestCase):
         sim_objects = [InteractingSimulationObject(obj_name(i)) for i in range(1, 3)]
         self.simulator.add_objects(sim_objects)
         self.simulator.initialize()
-        self.assertEqual(self.simulator.simulate(2.5), 4)
+        self.assertEqual(self.simulator.simulate(2.5).num_events, 4)
 
     def make_cyclical_messaging_network_sim(self, simulator, num_objs):
         # make simulation with cyclical messaging network
@@ -324,7 +322,7 @@ class TestSimulationEngine(unittest.TestCase):
         # natural number for num_objs and any non-negative value of time_max
         self.make_cyclical_messaging_network_sim(self.simulator, 10)
         self.simulator.initialize()
-        self.assertTrue(0<self.simulator.simulate(20))
+        self.assertTrue(0<self.simulator.simulate(20).num_events)
 
     def test_message_queues(self):
         warnings.simplefilter("ignore")
@@ -452,7 +450,7 @@ class TestSimulationEngine(unittest.TestCase):
             # measure execution time
             self.prep_simulation(simulation_engine, num_sim_objs)
             start_time = time.process_time()
-            num_events = simulation_engine.simulate(end_sim_time)
+            num_events = simulation_engine.simulate(end_sim_time).num_events
             run_time = time.process_time() - start_time
             self.assertEqual(num_sim_objs*end_sim_time, num_events)
             unprofiled_perf.append("{}\t{}\t{:8.3f}\t{:8.0f}".format(num_sim_objs, num_events,
@@ -493,7 +491,7 @@ class TestSimulationEngine(unittest.TestCase):
         sim_config_dict = dict(time_max=end_sim_time,
                                profile=True)
         with CaptureOutput(relay=False) as capturer:
-            stats = simulation_engine.simulate(config_dict=sim_config_dict)
+            stats = simulation_engine.simulate(config_dict=sim_config_dict).profile_stats
             expected_text =['function calls', 'Ordered by: internal time', 'filename:lineno(function)']
             for text in expected_text:
                 self.assertIn(text, capturer.get_text())

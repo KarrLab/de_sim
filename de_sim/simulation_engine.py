@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-from collections import Counter
+from collections import Counter, namedtuple
 import copy
 import cProfile
 import dataclasses
@@ -48,6 +48,7 @@ class SimulationEngine(object):
         fast_plotting_logger (:obj:`FastLogger`): a fast logger for trajectory data for plotting
         event_queue (:obj:`EventQueue`): the queue of future events
         event_counts (:obj:`Counter`): a counter of event types
+        num_events_handled (:obj:`int`): the number of events in a simulation
         sim_config (:obj:`SimulationConfig`): a simulation run's configuration
         sim_metadata (:obj:`SimulationMetadata`): a simulation run's metadata
         author_metadata (:obj:`AuthorMetadata`): information about the person who runs the simulation,
@@ -266,6 +267,8 @@ class SimulationEngine(object):
         sim_config.validate()
         return sim_config
 
+    SimulationReturnValue = namedtuple('SimulationReturnValue', 'num_events profile_stats',
+                                       defaults=(None, None))
     def simulate(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
         """ Run a simulation
 
@@ -279,11 +282,11 @@ class SimulationEngine(object):
             author_metadata (:obj:`AuthorMetadata`, optional): information about the person who runs the simulation
 
         Returns:
-            :obj:`int`: the number of times a simulation object executes `_handle_event()`. This may
+            :obj:`SimulationReturnValue`: a :obj:`namedtuple` which contains a) the number of times any
+                simulation object executes `_handle_event()`, which may
                 be smaller than the number of events sent, because simultaneous events at one
-                simulation object are handled together.
-                If `sim_config.profile` is set, then a :obj:`pstats.Stats` instance containing the profiling
-                statistics is returned.
+                simulation object are handled together, and b), if `sim_config.profile` is set,
+                a :obj:`pstats.Stats` instance containing the profiling statistics
 
         Raises:
             :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
@@ -293,6 +296,7 @@ class SimulationEngine(object):
         self.sim_config = self._get_sim_config(time_max=time_max, sim_config=sim_config,
                                                config_dict=config_dict)
         self.author_metadata = author_metadata
+        profile = None
         if self.sim_config.profile:
             # profile the simulation and return the profile object
             with tempfile.NamedTemporaryFile() as file_like_obj:
@@ -301,9 +305,9 @@ class SimulationEngine(object):
                 cProfile.runctx('self._simulate()', {}, locals, filename=out_file)
                 profile = pstats.Stats(out_file)
                 profile.sort_stats('tottime').print_stats(self.NUM_PROFILE_ROWS)
-                return profile
         else:
-            return self._simulate()
+            self._simulate()
+        return self.SimulationReturnValue(self.num_events_handled, profile)
 
     def run(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
         """ Alias for simulate
@@ -349,7 +353,7 @@ class SimulationEngine(object):
         # plot logging is controlled by configuration files pointed to by config_constants and by env vars
         self.fast_plotting_logger.fast_log('# {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()), sim_time=0)
 
-        num_events_handled = 0
+        self.num_events_handled = 0
         self.log_with_time(f"Simulation to {self.sim_config.time_max} starting")
 
         try:
@@ -379,8 +383,6 @@ class SimulationEngine(object):
                     self.progress.end()
                     break
 
-                num_events_handled += 1
-
                 self.time = next_time
 
                 # error will only be raised if an object decreases its time
@@ -397,13 +399,14 @@ class SimulationEngine(object):
                     e_name = ' - '.join([next_sim_obj.__class__.__name__, next_sim_obj.name, e.message.__class__.__name__])
                     self.event_counts[e_name] += 1
                 next_sim_obj.__handle_event_list(next_events)
+                self.num_events_handled += 1
                 self.progress.progress(next_time)
 
         except SimulatorError as e:
             raise SimulatorError('Simulation ended with error:\n' + str(e))
 
         self.finish_metadata_collection()
-        return num_events_handled
+        return self.num_events_handled
 
     def log_with_time(self, msg):
         """Write a debug log message with the simulation time.
