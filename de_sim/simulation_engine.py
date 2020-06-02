@@ -7,10 +7,11 @@
 """
 
 from collections import Counter, namedtuple
+from datetime import datetime
 import copy
 import cProfile
 import dataclasses
-import datetime
+import os
 import pstats
 import sys
 import tempfile
@@ -53,6 +54,8 @@ class SimulationEngine(object):
         sim_metadata (:obj:`SimulationMetadata`): a simulation run's metadata
         author_metadata (:obj:`AuthorMetadata`): information about the person who runs the simulation,
             if provided by the simulation application
+        measurements_fh (:obj:`_io.TextIOWrapper`, optional): file handle for debugging measurements file
+        mem_tracker (:obj:`pympler.tracker.SummaryTracker`, optional): a memory use tracker for debugging
     """
     # Termination messages
     NO_EVENTS_REMAIN = " No events remain"
@@ -296,6 +299,11 @@ class SimulationEngine(object):
         self.sim_config = self._get_sim_config(time_max=time_max, sim_config=sim_config,
                                                config_dict=config_dict)
         self.author_metadata = author_metadata
+        if self.sim_config.output_dir:
+            measurements_file = core.get_config()['de_sim']['measurements_file']
+            self.measurements_fh = open(os.path.join(self.sim_config.output_dir, measurements_file), 'w')
+            print(f"de_sim measurements: {datetime.now().isoformat(' ')}", file=self.measurements_fh)
+
         profile = None
         if self.sim_config.profile:
             # profile the simulation and return the profile object
@@ -303,10 +311,15 @@ class SimulationEngine(object):
                 out_file = file_like_obj.name
                 locals = {'self': self}
                 cProfile.runctx('self._simulate()', {}, locals, filename=out_file)
-                profile = pstats.Stats(out_file)
+                if self.sim_config.output_dir:
+                    profile = pstats.Stats(out_file, stream=self.measurements_fh)
+                else:
+                    profile = pstats.Stats(out_file)
                 profile.sort_stats('tottime').print_stats(self.NUM_PROFILE_ROWS)
         else:
             self._simulate()
+        if self.sim_config.output_dir:
+            self.measurements_fh.close()
         return self.SimulationReturnValue(self.num_events_handled, profile)
 
     def run(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
@@ -337,6 +350,13 @@ class SimulationEngine(object):
         if self.event_queue.empty():
             raise SimulatorError("Simulation has no initial events")
 
+        _object_mem_tracking = False
+        if 0 < self.sim_config.object_memory_change_interval:
+            _object_mem_tracking = True
+            # don't import tracker unless it's being used
+            from pympler import tracker
+            self.mem_tracker = tracker.SummaryTracker()
+
         # set simulation time to `time_init`
         self.time = self.sim_config.time_init
 
@@ -351,7 +371,7 @@ class SimulationEngine(object):
 
         # write header to a plot log
         # plot logging is controlled by configuration files pointed to by config_constants and by env vars
-        self.fast_plotting_logger.fast_log('# {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()), sim_time=0)
+        self.fast_plotting_logger.fast_log('# {:%Y-%m-%d %H:%M:%S}'.format(datetime.now()), sim_time=0)
 
         self.num_events_handled = 0
         self.log_with_time(f"Simulation to {self.sim_config.time_max} starting")
@@ -367,6 +387,10 @@ class SimulationEngine(object):
                     self.log_with_time(self.TERMINATE_WITH_STOP_CONDITION_SATISFIED)
                     self.progress.end()
                     break
+
+                # if tracking object use, record object and memory use changes
+                if _object_mem_tracking:
+                    self.track_obj_mem()
 
                 # get the earliest next event in the simulation
                 # get parameters of next event from self.event_queue
@@ -408,8 +432,31 @@ class SimulationEngine(object):
         self.finish_metadata_collection()
         return self.num_events_handled
 
+    def track_obj_mem(self):
+        """ Write memory use tracking
+        """
+        def format_row(values, widths=(60, 10, 16)):
+            widths_format = "{{:<{}}}{{:>{}}}{{:>{}}}".format(*widths)
+            return widths_format.format(*values)
+
+        if self.num_events_handled % self.sim_config.object_memory_change_interval is 0:
+            heading = f"\nMemory use changes by SummaryTracker at event {self.num_events_handled}:"
+            if self.sim_config.output_dir:
+                print(heading, file=self.measurements_fh)
+                data_heading = ('type', '# objects', 'total size (B)')
+                print(format_row(data_heading), file=self.measurements_fh)
+
+                # mem_values = obj_type, count, mem
+                for mem_values in sorted(self.mem_tracker.diff(), key=lambda mem_values: mem_values[2],
+                                         reverse=True):
+                    row = [str(val) for val in mem_values]
+                    print(format_row(row), file=self.measurements_fh)
+            else:
+                print(heading)
+                self.mem_tracker.print_diff()
+
     def log_with_time(self, msg):
-        """Write a debug log message with the simulation time.
+        """ Write a debug log message with the simulation time.
         """
         self.fast_debug_file_logger.fast_log(msg, sim_time=self.time)
 

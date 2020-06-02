@@ -142,6 +142,8 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator = SimulationEngine()
         self.out_dir = tempfile.mkdtemp()
         self.log_names = ['de_sim.debug.file', 'de_sim.plot.file']
+        measurements_file = core.get_config()['de_sim']['measurements_file']
+        self.measurements_pathname = os.path.join(self.out_dir, measurements_file)
 
     def tearDown(self):
         shutil.rmtree(self.out_dir)
@@ -488,15 +490,42 @@ class TestSimulationEngine(unittest.TestCase):
         num_sim_objs = 20
         self.prep_simulation(simulation_engine, num_sim_objs)
         end_sim_time = 200
+        expected_text =['function calls', 'Ordered by: internal time', 'filename:lineno(function)']
+        sim_config_dict = dict(time_max=end_sim_time,
+                               output_dir=self.out_dir,
+                               profile=True)
+        stats = simulation_engine.simulate(config_dict=sim_config_dict).profile_stats
+        self.assertTrue(isinstance(stats, pstats.Stats))
+        measurements = ''.join(open(self.measurements_pathname, 'r').readlines())
+        for text in expected_text:
+            self.assertIn(text, measurements)
+
         sim_config_dict = dict(time_max=end_sim_time,
                                profile=True)
         with CaptureOutput(relay=False) as capturer:
             stats = simulation_engine.simulate(config_dict=sim_config_dict).profile_stats
-            expected_text =['function calls', 'Ordered by: internal time', 'filename:lineno(function)']
             for text in expected_text:
                 self.assertIn(text, capturer.get_text())
         self.assertTrue(isinstance(stats, pstats.Stats))
         self.restore_logging_levels(self.log_names, existing_levels)
+
+    def test_mem_use_measurement(self):
+        self.make_one_object_simulation()
+        time_max = 20
+        config_dict = dict(time_max=time_max, output_dir=self.out_dir, object_memory_change_interval=10)
+        print('\nm', f'{self.out_dir}/sim_measurements.txt')
+        self.simulator.simulate(config_dict=config_dict)
+        expected_text =['Memory use changes by SummaryTracker', '# objects', 'float']
+        measurements = ''.join(open(self.measurements_pathname, 'r').readlines())
+        for text in expected_text:
+            self.assertIn(text, measurements)
+
+        self.make_one_object_simulation()
+        with CaptureOutput(relay=False) as capturer:
+            config_dict = dict(time_max=time_max, object_memory_change_interval=10)
+            self.simulator.simulate(config_dict=config_dict)
+            for text in expected_text:
+                self.assertIn(text, capturer.get_text())
 
 
 class Delicate(SimulationMessage):

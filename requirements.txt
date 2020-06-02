@@ -2,3 +2,4 @@ configobj
 progressbar2 >= 3.39
 setuptools
 wc_utils[git]
+pympler

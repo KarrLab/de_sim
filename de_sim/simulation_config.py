@@ -29,6 +29,7 @@ class SimulationConfig(EnhancedDataClass):
     - Data directory
     - Progress bar switch
     - Profiling switch
+    - Control profiling of changes in heap objects
 
     Attributes:
         time_max (:obj:`float`): maximum simulation time
@@ -42,6 +43,8 @@ class SimulationConfig(EnhancedDataClass):
             simulation's progress
         profile (:obj:`bool`, optional): if `True`, output a profile of the simulation's performance
             created by a Python profiler
+        object_memory_change_interval (:obj:`int`, optional): number of simulation events between reporting
+            changes in heap object count and memory use; if 0 do not report; default to do not report
     """
 
     time_max: float
@@ -50,7 +53,7 @@ class SimulationConfig(EnhancedDataClass):
     output_dir: str = None
     progress: bool = False
     profile: bool = False
-
+    object_memory_change_interval: int = 0
     DO_NOT_PICKLE = ['stop_condition']
 
     def __setattr__(self, name, value):
