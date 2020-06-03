@@ -44,7 +44,8 @@ class SimulationConfig(EnhancedDataClass):
         profile (:obj:`bool`, optional): if `True`, output a profile of the simulation's performance
             created by a Python profiler
         object_memory_change_interval (:obj:`int`, optional): number of simulation events between reporting
-            changes in heap object count and memory use; if 0 do not report; default to do not report
+            changes in heap object count and memory use; if 0 do not report; defaults to do not report;
+            cannot be used with `profile` as they run much too slowly
     """
 
     time_max: float
@@ -96,6 +97,11 @@ class SimulationConfig(EnhancedDataClass):
 
             self.output_dir = absolute_output_dir
 
+        # make sure object_memory_change_interval is non-negative
+        if self.object_memory_change_interval < 0:
+            raise SimulatorError(f"object_memory_change_interval ('{self.object_memory_change_interval}') "
+                                 "must be non-negative")
+
     def validate(self):
         """ Validate a `SimulationConfig` instance
 
@@ -114,3 +120,7 @@ class SimulationConfig(EnhancedDataClass):
         # other validation
         if self.time_max <= self.time_init:
             raise SimulatorError(f'time_max ({self.time_max}) must be greater than time_init ({self.time_init})')
+
+        if self.profile and 0 < self.object_memory_change_interval:
+            raise SimulatorError('profile and object_memory_change_interval cannot both be active, '
+                                 'as the combination slows DE Sim dramatically')

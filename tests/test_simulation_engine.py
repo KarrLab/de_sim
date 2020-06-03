@@ -513,7 +513,6 @@ class TestSimulationEngine(unittest.TestCase):
         self.make_one_object_simulation()
         time_max = 20
         config_dict = dict(time_max=time_max, output_dir=self.out_dir, object_memory_change_interval=10)
-        print('\nm', f'{self.out_dir}/sim_measurements.txt')
         self.simulator.simulate(config_dict=config_dict)
         expected_text =['Memory use changes by SummaryTracker', '# objects', 'float']
         measurements = ''.join(open(self.measurements_pathname, 'r').readlines())

@@ -103,6 +103,10 @@ class TestSimulationConfig(unittest.TestCase):
         cfg = SimulationConfig(self.time_max, output_dir=tmp_dir)
         self.assertEquals(cfg.validate_individual_fields(), None)
 
+        with self.assertRaisesRegex(SimulatorError, "object_memory_change_interval .* must be non-negative"):
+            cfg = SimulationConfig(self.time_max, object_memory_change_interval=-3)
+            cfg.validate_individual_fields()
+
     def test_all_fields(self):
         profile = True
         kwargs = dict(time_max=self.time_max,
@@ -137,6 +141,12 @@ class TestSimulationConfig(unittest.TestCase):
 
         self.simulation_config.time_max = self.time_init - 1
         with self.assertRaisesRegex(SimulatorError, 'time_max .* must be greater than time_init .*'):
+            self.simulation_config.validate()
+
+        self.simulation_config.time_max = 10
+        self.simulation_config.profile = True
+        self.simulation_config.object_memory_change_interval = 100
+        with self.assertRaisesRegex(SimulatorError, 'profile and object_memory_change_interval cannot both be active'):
             self.simulation_config.validate()
 
     simulation_config_no_stop_cond = SimulationConfig(10.0, 3.5, output_dir=tempfile.mkdtemp(), progress=True)
