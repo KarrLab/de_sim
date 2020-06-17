@@ -11,15 +11,13 @@ tags:
 authors:
   - name: Arthur P. Goldberg
     orcid: 0000-0003-2772-1484
-    affiliation: "1, 2"
+    affiliation: "1"
   - name: Jonathan R. Karr
     orcid: 0000-0002-2605-5080
-    affiliation: "1, 2" # (Multiple affiliations must be quoted)
+    affiliation: "1" # (Multiple affiliations must be quoted)
 affiliations:
- - name: Icahn Institute for Genomics and Multiscale Biology
+ - name: Department of Genetics and Genomic Sciences, and Icahn Institute for Genomics and Multiscale Biology, Icahn School of Medicine at Mount Sinai, New York, NY, 10029, USA
    index: 1
- - name: Department of Genetics and Genomic Sciences, Icahn School of Medicine at Mount Sinai, New York, NY, 10029, USA
-   index: 2
 date: 20 July 2020
 bibliography: paper.bib
 ---
@@ -38,12 +36,12 @@ OO DES was invented in the 1960s by the SIMULA language [@dahl1966simula; @nygaa
 
 # Research purpose
 
-Since existing open source Python simulators, such as SimPy [@matloff2008introduction], do not support an object-oriented, message-passing interface researchers who want to build OO DES models in Python need an OO DES Python package.
-For example, we have used DE-Sim to create a research tool -- a multi-algorithmic simulator of models that comprehensively represent the biochemical dynamics inside individual biological cells [@goldberg2020wc_sim].
+Since existing open source Python simulators, such as SimPy [@matloff2008introduction], do not support an object-oriented, message-passing interface researchers who want to build OO DES models in Python need an OO DES Python package like DE-Sim.
+For example, we have used DE-Sim to create a research tool--a multi-algorithmic simulator of models that comprehensively represent the biochemical dynamics inside individual biological cells [@goldberg2020wc_sim].
 
-Another benefit of implementing models in the object-oriented, message-passing framework supported by DE-Seim is that parallel DES simulation can reduce their simulation times.
+Another benefit of implementing models in the object-oriented, message-passing framework supported by DE-Sim is that parallel DES simulation can reduce their simulation times.
 This is important because the simulation runtimes of DES model can be very long.
-The OO DES framework makes parallel simulation feasible because 1) objects can be constructed so that they do not share memory references, and 2) a parallel DES simulator interfaces with simulation objects via operations that send and receive event message [@Jefferson1985; @Barnes2013; @Carothers2000].
+The OO DES framework makes parallel simulation feasible because 1) objects can be constructed so that they do not share memory references, and 2) a parallel DES simulator interfaces with simulation objects via operations that exchange event message between objects [@Jefferson1985; @Barnes2013; @Carothers2000].
 Examples of research models that may be accelerated by parallel simulation include epidemic outbreak phenomena [@perumalla2012discrete] and comprehensive models of the biochemistry of human cells [@goldberg2016toward].
 
 # DE-Sim features
