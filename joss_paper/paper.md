@@ -36,7 +36,7 @@ OO DES was invented in the 1960s by the SIMULA language [@dahl1966simula; @nygaa
 
 # Research purpose
 
-Since existing open source Python simulators, such as SimPy [@matloff2008introduction], do not support an object-oriented, message-passing interface researchers who want to build OO DES models in Python need an OO DES Python package like DE-Sim.
+Since existing open source Python simulators do not support an object-oriented, message-passing interface researchers who want to build OO DES models in Python need an OO DES Python package like DE-Sim.
 For example, we have used DE-Sim to create a research tool--a multi-algorithmic simulator of models that comprehensively represent the biochemical dynamics inside individual biological cells [@goldberg2020wc_sim].
 
 Another benefit of implementing models in the object-oriented, message-passing framework supported by DE-Sim is that parallel DES simulation can reduce their simulation times.
