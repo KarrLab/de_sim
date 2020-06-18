@@ -25,6 +25,7 @@ bibliography: paper.bib
 # Summary
 
 Discrete-event simulation (DES) is a simulation method that analyzes systems whose events occur at discrete instants in time.
+Events and their simulation times are dynamically determined.
 Many fields employ models that use DES, including biochemical modeling, computer network performance analysis, war gaming, modeling of infectious disease transmission, and others [@banks2005discrete].
 
 The construction of a DES model can be simplified and accelerated by using a DES simulator that implements the generic features needed by all DES models, such as executing events in increasing simulation time order.
@@ -39,13 +40,21 @@ OO DES was invented in the 1960s by the SIMULA language [@dahl1966simula; @nygaa
 Since existing open source Python simulators do not support an object-oriented, message-passing interface researchers who want to build OO DES models in Python need an OO DES Python package like DE-Sim.
 For example, we have used DE-Sim to create a research tool--a multi-algorithmic simulator of models that comprehensively represent the biochemical dynamics inside individual biological cells [@goldberg2020wc_sim].
 
-Another benefit of implementing models in the object-oriented, message-passing framework supported by DE-Sim is that parallel DES simulation can reduce their simulation times.
-This is important because the simulation runtimes of DES model can be very long.
-The OO DES framework makes parallel simulation feasible because 1) objects can be constructed so that they do not share memory references, and 2) a parallel DES simulator interfaces with simulation objects via operations that exchange event message between objects [@Jefferson1985; @Barnes2013; @Carothers2000].
+Another benefit of implementing models in the object-oriented, message-passing framework supported by DE-Sim is that parallel DES simulation can reduce the runtimes of their simulations, which are often inconveniently long.
+The OO DES framework makes parallel simulation feasible because 1) objects that they do not share memory references can be distributed on multiple processors, and 2) a parallel DES simulator interfaces with simulation objects via operations that exchange event message between objects [@Jefferson1985; @Barnes2013; @Carothers2000].
 Examples of research models that may be accelerated by parallel simulation include epidemic outbreak phenomena [@perumalla2012discrete] and comprehensive models of the biochemistry of human cells [@goldberg2016toward].
 
 # DE-Sim features
 
+Simulation applications that run on DE-Sim are structured as OO programs.
+Simulation objects are specified as subclasses of DE-Sim's built-in `ApplicationSimulationObject`.
+Each simulation object instance has these state variables required by the simulator and used by the application:
+  `name`: the text name of a simulation object; each simulation object must be given a unique text name when it's created
+  `time`: the current simulation time
+
+Simulation events are scheduled and executed by simulation object instances. Two event scheduling methods are provided by the DE-Sim simulation object:
+  `send\_event(delay, recieving\_object, event\_message)`: schedule an event to occur `delay` time units in the future; `event\_message` contains the data needed to execute the event; the event will be executed by simulation object `recieving\_object` which will receive `event\_message`.
+  `send\_event\_absolute(event\_time, receiving\_object, event\_message)`: schedule an event to occur at absolute simulation time `event\_time`; the remaining arguments have the same meaning as in `send\_event\_absolute`
 
 # DE-Sim implementation
 
