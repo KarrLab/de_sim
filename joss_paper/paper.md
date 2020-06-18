@@ -49,12 +49,14 @@ Examples of research models that may be accelerated by parallel simulation inclu
 Simulation applications that run on DE-Sim are structured as OO programs.
 Simulation objects are specified as subclasses of DE-Sim's built-in `ApplicationSimulationObject`.
 Each simulation object instance has these state variables required by the simulator and used by the application:
-  `name`: the text name of a simulation object; each simulation object must be given a unique text name when it's created
-  `time`: the current simulation time
+
+`name`: the text name of a simulation object; each simulation object must be given a unique text name when it's created  
+`time`: the current simulation time
 
 Simulation events are scheduled and executed by simulation object instances. Two event scheduling methods are provided by the DE-Sim simulation object:
-  `send\_event(delay, recieving\_object, event\_message)`: schedule an event to occur `delay` time units in the future; `event\_message` contains the data needed to execute the event; the event will be executed by simulation object `recieving\_object` which will receive `event\_message`.
-  `send\_event\_absolute(event\_time, receiving\_object, event\_message)`: schedule an event to occur at absolute simulation time `event\_time`; the remaining arguments have the same meaning as in `send\_event\_absolute`
+
+`send\_event(delay, recieving\_object, event\_message)`: schedule an event to occur `delay` time units in the future; `event\_message` contains the data needed to execute the event; the event will be executed by simulation object `recieving\_object` which will receive `event\_message`.  
+`send\_event\_absolute(event\_time, receiving\_object, event\_message)`: schedule an event to occur at absolute simulation time `event\_time`; the remaining arguments have the same meaning as in `send\_event\_absolute`.
 
 # DE-Sim implementation
 
