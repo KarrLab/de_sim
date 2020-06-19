@@ -135,11 +135,10 @@ Package features include:
 # DE-Sim performance
 
 DE-Sim is a pure Python application.
-It achieves decent performance by using the `heapq` priority queue for event scheduling.
+It achieves decent performance by using the Python's `heapq` priority queue package to schedule events.
 
-Figure \autoref{fig:performance} reports the performance of DE-Sim for a range of simulation sizes.
-Measurements of three runs were averaged.
-The runs were made in a Docker container running on a 2.9 GHz Intel Core i5 in a MacBook.
+\autoref{fig:performance} reports the performance of DE-Sim for a range of simulation sizes.
+We present the statistics of three runs made in a Docker container running on a 2.9 GHz Intel Core i5 in a MacBook.
 
 ![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.\label{fig:performance}](performance.png)
 
