@@ -113,20 +113,21 @@ num_events = simulation_engine.run(25)
 ```
 This runs the simulation for 25 time units, and returns the number of events executed.
 
-DE-Sim offers many additional benefits. 
-Functional features:
+DE-Sim offers many additional benefits.
 
-* High-performance event scheduling, which uses the `heapq` priority queue
+Functional features include:
+
+* Configuration from files
 * Periodic checkpoints
-* Compile-time configuration from files
 * Control of simulation termination by boolean functions
+* Recording of simulation run metadata, such as start time, run time, and IP address
+* Extensive error detection
+* Logging
 * Performance profiling using Python's `cProfile` package
 * Memory use analysis using Python's `pympler.tracker` package
-* Optional logging
-* Automatic recording of simulation run metadata, such as start time, run time, and IP address
-* Quick construction of periodic simulation objects
+* Quick construction of periodic simulation objects from a template
 
-Package features:
+Package features include:
 
 * Extensive documentation
 * Comprehensive unittests
@@ -134,7 +135,13 @@ Package features:
 # DE-Sim performance
 
 DE-Sim is a pure Python application.
-It achieves good performance by using a fast priority queue.
+It achieves decent performance by using the `heapq` priority queue for event scheduling.
+
+Figure \autoref{fig:performance} reports the performance of DE-Sim for a range of simulation sizes.
+Measurements of three runs were averaged.
+The runs were made in a Docker container running on a 2.9 GHz Intel Core i5 in a MacBook.
+
+![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.\label{fig:performance}](performance.png)
 
 # Example simulation
 
