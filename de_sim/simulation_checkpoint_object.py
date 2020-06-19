@@ -8,7 +8,6 @@
 import sys
 import abc
 
-from de_sim.simulation_message import SimulationMessage
 from de_sim.errors import SimulatorError
 from de_sim.checkpoint import Checkpoint, AccessCheckpoints
 from de_sim.template_sim_objs import TemplatePeriodicSimulationObject
