@@ -47,7 +47,7 @@ Examples of research models that may be accelerated by parallel simulation inclu
 
 # DE-Sim features
 
-A OO DES application can be defined in three steps:
+A OO DES application that uses DE-Sim can be defined in three steps:
 
 1: Event message types are defined by subclassing `SimulationMessage`.
 
@@ -62,7 +62,7 @@ class MessageWithAttribute(SimulationMessage):
 
 A message must be documented by a docstring, and may include attributes.
 
-2: Define simulation application objects by subclassing DE-Sim's built-in `ApplicationSimulationObject`.
+2: Define simulation application objects by subclassing `ApplicationSimulationObject`.
 
 ```python
 class MinimalSimulationObject(ApplicationSimulationObject):
@@ -83,20 +83,21 @@ class MinimalSimulationObject(ApplicationSimulationObject):
     messages_sent = [MessageSentToSelf]
 ```
 
-Each simulation object must include a unique `name`.
+Each simulation object must have a unique `name`.
 This example also includes a class attribute for the delay between events.
 All application simulation objects have a read-only attribute called `time` that always provides the current simulation time.
 
-A simulation object may include a `send_initial_events` method, which, if present, will be called by the simulator at initialization to send the object's initial events.
+A simulation object may include a `send_initial_events` method, which, if present, will be called by the simulator during initialization to send the object's initial events.
 A simulation must send at least one initial event.
 
 A simulation object must include at least one method that handles simulation events.
-The simulator vectors incoming message types as directed by an `event_handlers` attribute, which associates each message type received by an object with a simulation object method.
+The simulator vectors incoming message types as directed by an `event_handlers` attribute that associates each message type received by an object with a simulation object method.
 
 `ApplicationSimulationObject` provides the method
 `send_event(delay, receiving_object, event_message)` which schedules an event to occur `delay` time units in the future.
 `event_message` is an instance of a `SimulationMessage`, and may have attributes that contain data used by the event.
 The event will be executed by an event handler in simulation object `receiving_object`, which will receive a simulation event containing `event_message`.
+All simulation events in this example are scheduled for the object that creates the event.
 
 3: Execute a simulation by creating a `SimulationEngine`, instantiating the application objects, sending their initial event messages, and running the simulation.
 
@@ -113,38 +114,31 @@ num_events = simulation_engine.run(25)
 ```
 This runs the simulation for 25 time units, and returns the number of events executed.
 
-DE-Sim offers many additional benefits.
-
-Functional features include:
+DE-Sim offers many additional features:
 
 * Configuration from files
 * Periodic checkpoints
-* Control of simulation termination by boolean functions
-* Recording of simulation run metadata, such as start time, run time, and IP address
+* Control of simulation termination by a Python function that returns a boolean
+* Recording of simulation run metadata, including start time, run time, and IP address
 * Extensive error detection
 * Logging
 * Performance profiling using Python's `cProfile` package
 * Memory use analysis using Python's `pympler.tracker` package
 * Quick construction of periodic simulation objects from a template
-
-Package features include:
-
 * Extensive documentation
 * Comprehensive unittests
 
 # DE-Sim performance
 
 DE-Sim is a pure Python application.
-It achieves decent performance by using the Python's `heapq` priority queue package to schedule events.
+It achieves decent performance by using Python's `heapq` priority queue package to schedule events.
 
 \autoref{fig:performance} reports the performance of DE-Sim for a range of simulation sizes.
-We present the statistics of three runs made in a Docker container running on a 2.9 GHz Intel Core i5 in a MacBook.
+We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 in a MacBook.
 
 ![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.\label{fig:performance}](performance.png)
 
 # Example simulation
-
-# Figure
 
 # Acknowledgements
 
