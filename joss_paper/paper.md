@@ -8,6 +8,7 @@ tags:
   - discrete-event simulation
   - object-oriented simulation
   - parallel discrete-event simulation
+  - whole-cell modeling
 authors:
   - name: Arthur P. Goldberg
     orcid: 0000-0003-2772-1484
@@ -46,9 +47,9 @@ Examples of research models that may be accelerated by parallel simulation inclu
 
 # DE-Sim features
 
-DE-Sim makes it easy to define and run OO DES applications:
+A OO DES application can be defined in three steps:
 
-1. Event message types are defined by subclassing `SimulationMessage`.
+1: Event message types are defined by subclassing `SimulationMessage`.
 
 ```python
 class MessageSentToSelf(SimulationMessage):
@@ -61,7 +62,7 @@ class MessageWithAttribute(SimulationMessage):
 
 A message must be documented by a docstring, and may include attributes.
 
-2. Define simulation application objects by subclassing DE-Sim's built-in `ApplicationSimulationObject`.
+2: Define simulation application objects by subclassing DE-Sim's built-in `ApplicationSimulationObject`.
 
 ```python
 class MinimalSimulationObject(ApplicationSimulationObject):
@@ -83,48 +84,47 @@ class MinimalSimulationObject(ApplicationSimulationObject):
 ```
 
 Each simulation object must include a unique `name`.
-This example also includes a class attribute for the delays between events.
+This example also includes a class attribute for the delay between events.
+All application simulation objects have a `time` attribute that provides current simulation time.
 
-A simulation object may include a `send_initial_events` method, which, if present, will be called to send initial events at initialization by the simulator.
-A simulation object must include at least one method that handles simulation events,
-The simulator vectors incoming messages by their type as directed by `event_handlers`, which associates each type with simulation object method.
+A simulation object may include a `send_initial_events` method, which, if present, will be called by the simulator at initialization to send the object's initial events.
+Simulations must send at least one initial event.
 
-The `send_event(delay, recieving_object, event_message)` method provided by `ApplicationSimulationObject` schedules an event to occur `delay` time units in the future.  `event_message` indicates the type of event, and may contain data needed by the event.
-The event will be executed by simulation object `recieving_object` which will receive `event_message`.
+A simulation object must include at least one method that handles simulation events.
+The simulator vectors incoming message types as directed by an `event_handlers` attribute, which associates each message type received by an object with a simulation object method.
 
-3. Execute a simulation by creating a `SimulationEngine`, instantiating the application objects, sending their initial event messages, and running the simulation.
+`ApplicationSimulationObject` provides the method
+`send_event(delay, receiving_object, event_message)` which schedules an event to occur `delay` time units in the future.
+`event_message` is an instance of a `SimulationMessage`, and may have attributes that contain data used by the event.
+The event will be executed by an event handler in simulation object `receiving_object`, which will receive a simulation event containing `event_message`.
 
-
-
+3: Execute a simulation by creating a `SimulationEngine`, instantiating the application objects, sending their initial event messages, and running the simulation.
 
 ```python
 # create a simulator
 simulator = SimulationEngine()
 
 # create a simulation object and add it to the simulation
-simulator.add_object(MinimalSimulationObject('object_name', 6))
+simulator.add_object(MinimalSimulationObject('object_1', 6))
 
 # run the simulation
 simulator.initialize()
 num_events = simulator.run(25)
 ```
-This runs a simulation with
+This runs a simulation with one object for 25 time units.
 
-Simulation applications that run on DE-Sim are structured as OO programs.
-Simulation objects are specified as subclasses of DE-Sim's built-in `ApplicationSimulationObject`.
-Each simulation object instance has these state variables required by the simulator and used by the application:
-
-`name`: the text name of a simulation object; each simulation object must be given a unique text name when it's created
-`time`: the current simulation time
+# Misc
 
 Simulation events are scheduled and executed by simulation object instances. Two event scheduling methods are provided by the DE-Sim simulation object:
 
-`send_event(delay, recieving_object, event_message)`: schedule an event to occur `delay` time units in the future; `event_message` contains the data needed to execute the event; the event will be executed by simulation object `recieving_object` which will receive `event_message`.
+`send_event(delay, receiving_object, event_message)`: schedule an event to occur `delay` time units in the future; `event_message` contains the data needed to execute the event; the event will be executed by simulation object `receiving_object` which will receive `event_message`.
 `send_event_absolute(event_time, receiving_object, event_message)`: schedule an event to occur at absolute simulation time `event_time`; the remaining arguments have the same meaning as in `send_event_absolute`.
 
 # DE-Sim implementation
 
 # Example
+
+# Figure
 
 # Acknowledgements
 
