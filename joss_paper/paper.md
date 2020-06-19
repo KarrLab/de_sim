@@ -49,7 +49,7 @@ Examples of research models that may be accelerated by parallel simulation inclu
 
 A OO DES application can be defined in three steps:
 
-1: Event message types are defined by subclassing `SimulationMessage`.
+1: Event message types are defined by subclassing `SimulationMessage`. 
 
 ```python
 class MessageSentToSelf(SimulationMessage):
