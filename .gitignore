@@ -49,3 +49,4 @@ tests/fixtures/secret/
 .Trashes
 .~lock.*
 Thumbs.db
+~$*.xls*
