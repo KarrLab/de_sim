@@ -49,7 +49,7 @@ Examples of research models that may be accelerated by parallel simulation inclu
 
 A OO DES application can be defined in three steps:
 
-1: Event message types are defined by subclassing `SimulationMessage`. 
+1: Event message types are defined by subclassing `SimulationMessage`.
 
 ```python
 class MessageSentToSelf(SimulationMessage):
@@ -57,12 +57,13 @@ class MessageSentToSelf(SimulationMessage):
 
 class MessageWithAttribute(SimulationMessage):
     'An event message type with an attribute'
-    attributes = ['value']
+    attributes = ['attr_1']
 ```
 
 A message must be documented by a docstring, and may include attributes.
 
 2: Define simulation application objects by subclassing DE-Sim's built-in `ApplicationSimulationObject`.
+
 ```python
 class MinimalSimulationObject(ApplicationSimulationObject):
 
@@ -84,10 +85,10 @@ class MinimalSimulationObject(ApplicationSimulationObject):
 
 Each simulation object must include a unique `name`.
 This example also includes a class attribute for the delay between events.
-All application simulation objects have a `time` attribute that provides current simulation time.
+All application simulation objects have a read-only attribute called `time` that always provides the current simulation time.
 
 A simulation object may include a `send_initial_events` method, which, if present, will be called by the simulator at initialization to send the object's initial events.
-Simulations must send at least one initial event.
+A simulation must send at least one initial event.
 
 A simulation object must include at least one method that handles simulation events.
 The simulator vectors incoming message types as directed by an `event_handlers` attribute, which associates each message type received by an object with a simulation object method.
@@ -100,28 +101,42 @@ The event will be executed by an event handler in simulation object `receiving_o
 3: Execute a simulation by creating a `SimulationEngine`, instantiating the application objects, sending their initial event messages, and running the simulation.
 
 ```python
-# create a simulator
-simulator = SimulationEngine()
+# create a simulation engine
+simulation_engine = SimulationEngine()
 
 # create a simulation object and add it to the simulation
-simulator.add_object(MinimalSimulationObject('object_1', 6))
+simulation_engine.add_object(MinimalSimulationObject('object_1', 6))
 
-# run the simulation
-simulator.initialize()
-num_events = simulator.run(25)
+# initialize and run the simulation
+simulation_engine.initialize()
+num_events = simulation_engine.run(25)
 ```
-This runs a simulation with one object for 25 time units.
+This runs the simulation for 25 time units, and returns the number of events executed.
 
-# Misc
+DE-Sim offers many additional benefits. 
+Functional features:
 
-Simulation events are scheduled and executed by simulation object instances. Two event scheduling methods are provided by the DE-Sim simulation object:
+* High-performance event scheduling, which uses the `heapq` priority queue
+* Periodic checkpoints
+* Compile-time configuration from files
+* Control of simulation termination by boolean functions
+* Performance profiling using Python's `cProfile` package
+* Memory use analysis using Python's `pympler.tracker` package
+* Optional logging
+* Automatic recording of simulation run metadata, such as start time, run time, and IP address
+* Quick construction of periodic simulation objects
 
-`send_event(delay, receiving_object, event_message)`: schedule an event to occur `delay` time units in the future; `event_message` contains the data needed to execute the event; the event will be executed by simulation object `receiving_object` which will receive `event_message`.
-`send_event_absolute(event_time, receiving_object, event_message)`: schedule an event to occur at absolute simulation time `event_time`; the remaining arguments have the same meaning as in `send_event_absolute`.
+Package features:
 
-# DE-Sim implementation
+* Extensive documentation
+* Comprehensive unittests
 
-# Example
+# DE-Sim performance
+
+DE-Sim is a pure Python application.
+It achieves good performance by using a fast priority queue.
+
+# Example simulation
 
 # Figure
 
