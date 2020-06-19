@@ -63,7 +63,6 @@ class MessageWithAttribute(SimulationMessage):
 A message must be documented by a docstring, and may include attributes.
 
 2: Define simulation application objects by subclassing DE-Sim's built-in `ApplicationSimulationObject`.
-
 ```python
 class MinimalSimulationObject(ApplicationSimulationObject):
 
