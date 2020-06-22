@@ -117,16 +117,16 @@ This runs the simulation for 25 time units, and returns the number of events exe
 DE-Sim offers many additional features:
 
 * Simple configuration from files
-* Periodic checkpoints
+* Optional periodic checkpoints
+* Quick construction of periodic simulation objects from a template
 * Control of simulation termination by a Python function that returns a boolean
 * Recording of simulation run metadata, including start time, run time, and IP address
 * Extensive error detection
 * Logging
 * Performance profiling using Python's `cProfile` package
 * Memory use analysis using Python's `pympler.tracker` package
-* Quick construction of periodic simulation objects from a template
 * Extensive documentation
-* Comprehensive unittests
+* Unit tests with 98% coverage
 
 # DE-Sim performance
 
@@ -145,9 +145,15 @@ PHOLD uses only one simulation application object class, `PholdSimulationObject`
 Each `PholdSimulationObject` instance occupies a vertical lane in the figure, and each event message is indicated by a directed arrow.
 The tail of the arrow is located at the (object instance, simulation time) coordinates of the simulation when the event message was created and sent, and the head of the arrow is located at the simulation coordinates of the object and time when the event message is executed.
 
+# Contributions
+
+A.G. conceptualized, designed and implemented DE-Sim and wrote this paper.
+J.K. obtained grant funding.
+Both authors approve this manuscript.
+
 # Acknowledgements
 
 This worked was supported by National Science Foundation award 1649014 and National
-Institutes of Health award R35GM119771 to J.R.K.
+Institutes of Health award R35GM119771 to J.K.
 
 # References
