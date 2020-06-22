@@ -2,12 +2,9 @@
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2016-06-10
-:Copyright: 2016-2018, Karr Lab
+:Copyright: 2016-2020, Karr Lab
 :License: MIT
 """
-
-# TODO(Arthur): replace python random with RandomStateManager
-# from wc_utils.util.rand import RandomStateManager
 
 import random
 import sys

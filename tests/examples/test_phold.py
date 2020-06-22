@@ -1,7 +1,7 @@
 """
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2018-02-17
-:Copyright: 2018, Karr Lab
+:Copyright: 2018-2020, Karr Lab
 :License: MIT
 """
 
@@ -14,7 +14,8 @@ from argparse import Namespace
 from capturer import CaptureOutput
 from copy import copy
 
-from tests.utilities_for_testing import make_args
+from de_sim.testing.utilities_for_testing import make_args
+
 
 # todo: doesn't do anything: fix: see approach in test_simulation_engine.py
 # turn off logging by changing config to raise the 'debug.console' 'level' above debug, to error

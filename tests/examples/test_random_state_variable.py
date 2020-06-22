@@ -1,7 +1,7 @@
 """
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2018-02-17
-:Copyright: 2018, Karr Lab
+:Copyright: 2018-2020, Karr Lab
 :License: MIT
 """
 

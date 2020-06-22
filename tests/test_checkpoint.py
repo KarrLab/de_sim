@@ -3,7 +3,7 @@
 :Author: Jonathan Karr <karr@mssm.edu>
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2017-08-30
-:Copyright: 2016-2018, Karr Lab
+:Copyright: 2016-2020, Karr Lab
 :License: MIT
 """
 

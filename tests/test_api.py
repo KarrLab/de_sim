@@ -2,7 +2,7 @@
 
 :Author: Jonathan Karr <karr@mssm.edu>
 :Date: 2019-01-20
-:Copyright: 2019, Karr Lab
+:Copyright: 2019-2020, Karr Lab
 :License: MIT
 """
 
