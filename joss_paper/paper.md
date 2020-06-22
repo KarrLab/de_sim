@@ -31,18 +31,18 @@ Many fields employ models that use DES, including biochemical modeling, computer
 
 The construction of a DES model can be simplified and accelerated by using a DES simulator that implements the generic features needed by all DES models, such as executing events in increasing simulation time order.
 Model construction can be further enhanced, and models can be made more comprehensible and reusable, by structuring models as object-oriented programs.
-This approach, known as *object-oriented discrete-event simulation* (OO DES), requires that modelers represent entities in the system being modeled as objects in a model, and represent interactions between entities as event messages exchanged between objects.
+This approach, known as *object-oriented discrete-event simulation* (OO DES), recommends that modelers represent entities in the system being modeled as objects in a model, and represent interactions between entities as event messages exchanged between objects.
 OO DES was invented in the 1960s by the SIMULA language [@dahl1966simula; @nygaard1978development] and continues with modern languages such as SystemC [@mueller2001simulation; @ieee2012ieee] and SIMUL8 [@concannon2003dynamic].
 
-DE-Sim is a Python package that supports OO DES simulations written in Python.
+DE-Sim is a Python package that supports OO DES simulations.
 
 # Research purpose
 
-Since existing open source Python simulators do not support an object-oriented, message-passing interface researchers who want to build OO DES models in Python need an OO DES Python package like DE-Sim.
-For example, we have used DE-Sim to create a research tool--a multi-algorithmic simulator of models that comprehensively represent the biochemical dynamics inside individual biological cells [@goldberg2020wc_sim].
+DE-Sim is needed by researchers who want to build OO DES models in Python because existing open source Python simulators do not support an object-oriented, message-passing interface.
+For example, we have used DE-Sim to create a multi-algorithmic simulator of models that comprehensively represent the biochemical dynamics in individual biological cells [@goldberg2020wc_sim].
 
 Another benefit of implementing models in the object-oriented, message-passing framework supported by DE-Sim is that parallel DES simulation can reduce the runtimes of their simulations, which are often inconveniently long.
-The OO DES framework makes parallel simulation feasible because 1) objects that they do not share memory references can be distributed on multiple processors, and 2) a parallel DES simulator interfaces with simulation objects via operations that exchange event message between objects [@Jefferson1985; @Barnes2013; @Carothers2000].
+The OO DES framework makes parallel simulation feasible because 1) objects that do not share memory references can be distributed on multiple processors, and 2) a parallel DES simulator interfaces with simulation objects the event messages that are used to schedule events by OO DES applications [@Jefferson1985; @Barnes2013; @Carothers2000].
 Examples of research models that may be accelerated by parallel simulation include epidemic outbreak phenomena [@perumalla2012discrete] and comprehensive models of the biochemistry of human cells [@goldberg2016toward].
 
 # DE-Sim features
@@ -116,7 +116,7 @@ This runs the simulation for 25 time units, and returns the number of events exe
 
 DE-Sim offers many additional features:
 
-* Configuration from files
+* Simple configuration from files
 * Periodic checkpoints
 * Control of simulation termination by a Python function that returns a boolean
 * Recording of simulation run metadata, including start time, run time, and IP address
@@ -132,14 +132,22 @@ DE-Sim offers many additional features:
 
 DE-Sim is a pure Python application.
 It achieves decent performance by using Python's `heapq` priority queue package to schedule events.
-
 \autoref{fig:performance} reports the performance of DE-Sim for a range of simulation sizes.
-We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 in a MacBook.
+We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 processor in a MacBook.
 
 ![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.\label{fig:performance}](performance.png)
 
-# Example simulation
+# Example discrete-event simulation
+
+DE-Sim includes an example simulation that implements the PHOLD [@fujimoto1990performance] parallel DES benchmark (see `phold.py` in the `examples` directory).
+Fig X presents a space-time visualization (a computational variant of a Feynman diagram, transposed with time increasing down) of one simulation run of PHOLD.
+PHOLD uses only one simulation application object class, `PholdSimulationObject`.
+Each `PholdSimulationObject` instance occupies a vertical lane in the figure, and each event message is indicated by a directed arrow.
+The tail of the arrow is located at the (object instance, simulation time) coordinates of the simulation when the event message was created and sent, and the head of the arrow is located at the simulation coordinates of the object and time when the event message is executed.
 
 # Acknowledgements
+
+This worked was supported by National Science Foundation award 1649014 and National
+Institutes of Health award R35GM119771 to J.R.K.
 
 # References
