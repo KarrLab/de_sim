@@ -10,7 +10,7 @@ import warnings
 from pprint import pprint
 from argparse import Namespace
 
-from examples.minimal_simulation import RunMinimalSimulation
+from de_sim.examples.minimal_simulation import RunMinimalSimulation
 from de_sim.config import core
 
 

@@ -14,7 +14,7 @@ import datetime
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import SimulationObject, ApplicationSimulationObject
 from de_sim.simulation_engine import SimulationEngine
-from examples.debug_logs import logs as debug_logs
+from de_sim.examples.debug_logs import logs as debug_logs
 
 
 def obj_name(obj_num):

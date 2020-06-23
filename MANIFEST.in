@@ -5,7 +5,7 @@ include README.rst
 include LICENSE
 
 # examples
-recursive-include examples *
+recursive-include de_sim/examples *
 
 # requirements
 include requirements.txt

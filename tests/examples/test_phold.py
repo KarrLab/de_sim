@@ -26,7 +26,7 @@ make_environ_args = MakeEnvironArgs()
 make_environ_args.add_to_env(['debug_logs', 'handlers', 'debug.console', 'level'], 'error')
 env = make_environ_args.get_env()
 with EnvironUtils.make_temp_environ(**env):
-    from examples.phold import RunPhold
+    from de_sim.examples.phold import RunPhold
 
 
 class TestPhold(unittest.TestCase):

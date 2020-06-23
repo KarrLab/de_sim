@@ -35,7 +35,7 @@ def get_debug_logs_config(extra=None):
         :obj:`configobj.ConfigObj`: nested dictionary with the configuration settings loaded from the configuration source(s).
     """
     paths = wc_utils.debug_logs.config.paths.deepcopy()
-    paths.default = pkg_resources.resource_filename('examples', 'config/debug.default.cfg')
+    paths.default = pkg_resources.resource_filename('de_sim.examples', 'config/debug.default.cfg')
     paths.user = (
         'de_sim.examples.debug.cfg',
         os.path.expanduser('~/.wc/de_sim.examples.debug.cfg'),

@@ -10,8 +10,8 @@ import warnings
 from capturer import CaptureOutput
 from argparse import Namespace
 
-from examples.random_state_variable import RunRandomStateVariableSimulation
-from examples.config import core
+from de_sim.examples.random_state_variable import RunRandomStateVariableSimulation
+from de_sim.examples.config import core
 
 
 class TestRandomStateVariableSimulation(unittest.TestCase):
