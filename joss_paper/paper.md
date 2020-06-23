@@ -39,11 +39,17 @@ DE-Sim is a Python package that supports OO DES simulations.
 # Research purpose
 
 DE-Sim is needed by researchers who want to build OO DES models in Python because existing open source Python simulators do not support an object-oriented, message-passing interface.
-For example, we have used DE-Sim to create a multi-algorithmic simulator of models that comprehensively represent the biochemical dynamics in individual biological cells [@goldberg2020wc_sim].
+For example, we have used DE-Sim as a platform for a simulator of whole-cell models models that comprehensively represent the biochemical dynamics in individual biological cells [@goldberg2020wc_sim].
+The whole-cell simulator (WC-Sim) models the growth of a cell and the changes in its biochemical composition caused by chemical reactions and the movement of molecules.
+To comprehensively represent the numerous processes in a cell, such as metabolism, transcription, and translation, WC-Sim must use multiple types of dynamic integration algorithms, including ordinary differential equations and the stochastic simulation algorithm.
+DE-Sim's OO DES framework enabled the construction of WC-Sim.
+WC-Sim uses different DE-Sim object types to represent different integration algorithms, and it uses
+DE-Sim's discrete-event scheduling to synchronize the interactions between these integration algorithms.
 
 Another benefit of implementing models in the object-oriented, message-passing framework supported by DE-Sim is that parallel DES simulation can reduce the runtimes of their simulations, which are often inconveniently long.
 The OO DES framework makes parallel simulation feasible because 1) objects that do not share memory references can be distributed on multiple processors, and 2) a parallel DES simulator interfaces with simulation objects the event messages that are used to schedule events by OO DES applications [@Jefferson1985; @Barnes2013; @Carothers2000].
-Examples of research models that may be accelerated by parallel simulation include epidemic outbreak phenomena [@perumalla2012discrete] and comprehensive models of the biochemistry of human cells [@goldberg2016toward].
+An example of a research model that is accelerated by parallel simulation is an epidemic outbreak phenomena [@perumalla2012discrete].
+We aspire to speed up whole-cell models of human cells with parallel simulation in future work [@goldberg2016toward].
 
 # DE-Sim features
 
@@ -144,12 +150,6 @@ Fig X presents a space-time visualization (a computational variant of a Feynman 
 PHOLD uses only one simulation application object class, `PholdSimulationObject`.
 Each `PholdSimulationObject` instance occupies a vertical lane in the figure, and each event message is indicated by a directed arrow.
 The tail of the arrow is located at the (object instance, simulation time) coordinates of the simulation when the event message was created and sent, and the head of the arrow is located at the simulation coordinates of the object and time when the event message is executed.
-
-# Contributions
-
-A.G. conceptualized, designed and implemented DE-Sim and wrote this paper.
-J.K. obtained grant funding.
-Both authors approve this manuscript.
 
 # Acknowledgements
 
