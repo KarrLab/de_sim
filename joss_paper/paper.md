@@ -29,33 +29,33 @@ Discrete-event simulation (DES) is a simulation method that analyzes systems who
 Events and their simulation times are dynamically determined.
 Many fields employ models that use DES, including biochemical modeling, computer network performance analysis, war gaming, modeling of infectious disease transmission, and others [@banks2005discrete].
 
-The construction of a DES model can be simplified and accelerated by using a DES simulator that implements the generic features needed by all DES models, such as executing events in increasing simulation time order.
+The construction of a DES model can be simplified and accelerated by using a DES simulator that implements the generic features needed by all DES models, primarily efficiently executing events in increasing simulation time order.
 Model construction can be further enhanced, and models can be made more comprehensible and reusable, by structuring models as object-oriented programs.
 This approach, known as *object-oriented discrete-event simulation* (OO DES), recommends that modelers represent entities in the system being modeled as objects in a model, and represent interactions between entities as event messages exchanged between objects.
-OO DES was invented in the 1960s by the SIMULA language [@dahl1966simula; @nygaard1978development] and continues with modern languages such as SystemC [@mueller2001simulation; @ieee2012ieee] and SIMUL8 [@concannon2003dynamic].
+OO DES was invented in the 1960s by the SIMULA language [@dahl1966simula; @nygaard1978development] and continues to be used by modern tools such as SystemC [@mueller2001simulation; @ieee2012ieee] and SIMUL8 [@concannon2003dynamic].
 
 DE-Sim is a Python package that supports OO DES simulations.
 
 # Research purpose
 
 DE-Sim is needed by researchers who want to build OO DES models in Python because existing open source Python simulators do not support an object-oriented, message-passing interface.
-For example, we have used DE-Sim as a platform for a simulator of whole-cell models models that comprehensively represent the biochemical dynamics in individual biological cells [@goldberg2020wc_sim].
+We have used DE-Sim as a platform for a simulator of whole-cell models that comprehensively represent the biochemical dynamics in individual biological cells [@goldberg2020wc_sim; @goldberg2018emerging].
 The whole-cell simulator (WC-Sim) models the growth of a cell and the changes in its biochemical composition caused by chemical reactions and the movement of molecules.
 To comprehensively represent the numerous processes in a cell, such as metabolism, transcription, and translation, WC-Sim must use multiple types of dynamic integration algorithms, including ordinary differential equations and the stochastic simulation algorithm.
 DE-Sim's OO DES framework enabled the construction of WC-Sim.
-WC-Sim uses different DE-Sim object types to represent different integration algorithms, and it uses
+WC-Sim uses different DE-Sim object types to represent different integration algorithms, and uses
 DE-Sim's discrete-event scheduling to synchronize the interactions between these integration algorithms.
 
 Another benefit of implementing models in the object-oriented, message-passing framework supported by DE-Sim is that parallel DES simulation can reduce the runtimes of their simulations, which are often inconveniently long.
-The OO DES framework makes parallel simulation feasible because 1) objects that do not share memory references can be distributed on multiple processors, and 2) a parallel DES simulator interfaces with simulation objects the event messages that are used to schedule events by OO DES applications [@Jefferson1985; @Barnes2013; @Carothers2000].
-An example of a research model that is accelerated by parallel simulation is an epidemic outbreak phenomena [@perumalla2012discrete].
+The OO DES framework makes parallel simulation feasible because 1) objects that do not share memory references can be distributed on multiple processors, and 2) a parallel DES simulator interfaces with simulation objects through the event messages that are used to schedule events by OO DES applications [@Jefferson1985; @Barnes2013; @Carothers2000].
+An example research model accelerated by parallel simulation analyzes epidemic outbreak phenomena [@perumalla2012discrete].
 We aspire to speed up whole-cell models of human cells with parallel simulation in future work [@goldberg2016toward].
 
 # DE-Sim features
 
 A OO DES application that uses DE-Sim can be defined in three steps:
 
-1: Event message types are defined by subclassing `SimulationMessage`.
+1: Create event message types by subclassing `SimulationMessage`.
 
 ```python
 class MessageSentToSelf(SimulationMessage):
@@ -102,8 +102,9 @@ The simulator vectors incoming message types as directed by an `event_handlers` 
 `ApplicationSimulationObject` provides the method
 `send_event(delay, receiving_object, event_message)` which schedules an event to occur `delay` time units in the future.
 `event_message` is an instance of a `SimulationMessage`, and may have attributes that contain data used by the event.
-The event will be executed by an event handler in simulation object `receiving_object`, which will receive a simulation event containing `event_message`.
-All simulation events in this example are scheduled for the object that creates the event.
+The event will be executed by an event handler in simulation object `receiving_object`, which will receive a simulation event containing `event_message` at the scheduled simulation time.
+In this example all simulation events are scheduled to be executed by the object that creates the event, but realistic
+simulations contain multiple simulation objects which schedule events for each other.
 
 3: Execute a simulation by creating a `SimulationEngine`, instantiating the application objects, sending their initial event messages, and running the simulation.
 
@@ -118,35 +119,35 @@ simulation_engine.add_object(MinimalSimulationObject('object_1', 6))
 simulation_engine.initialize()
 num_events = simulation_engine.run(25)
 ```
-This runs the simulation for 25 time units, and returns the number of events executed.
+This runs a simulation for 25 time units, and obtains the number of events executed.
 
 DE-Sim offers many additional features:
 
 * Simple configuration from files
 * Optional periodic checkpoints
 * Quick construction of periodic simulation objects from a template
-* Control of simulation termination by a Python function that returns a boolean
+* Control of simulation termination by a user-defined Python function that returns a boolean
 * Recording of simulation run metadata, including start time, run time, and IP address
 * Visualization of simulation run event messages trace
 * Extensive error detection
 * Logging
-* Performance profiling using Python's `cProfile` package
-* Memory use analysis using Python's `pympler.tracker` package
+* Performance profiling that uses Python's `cProfile` package
+* Memory use analysis that uses Python's `pympler.tracker` package
 * Extensive documentation
 * Unit tests with 98% coverage
 
 # DE-Sim performance
 
-DE-Sim is a pure Python application.
-It achieves decent performance by using Python's `heapq` priority queue package to schedule events.
-\autoref{fig:performance} reports the performance of DE-Sim for a range of simulation sizes.
-We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 processor in a MacBook.
+DE-Sim achieves decent performance by using Python's `heapq` priority queue package to schedule events.
+\autoref{fig:performance} reports the performance of DE-Sim over a range of simulation sizes.
 
-![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.\label{fig:performance}](performance.png)
+![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.
+We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 processor in a MacBook.
+\label{fig:performance}](performance.png)
 
 # Visualization of simulation traces
 
-DE-Sim can generate space-time visualizations of event traces to help debug and understand an OO DES application.
+DE-Sim generates space-time visualizations of event traces that help debug and understand an OO DES application.
 \autoref{fig:phold_space_time_plot} visualizes a simulation run of the PHOLD parallel DES benchmark [@fujimoto1990performance; @Barnes2013] (see `phold.py` in the `examples` directory).
 This simulation parameterizes PHOLD as follows.
 An event schedules another event to occur after an exponentially distributed delay with $\mu=1$.
@@ -155,7 +156,7 @@ The next event is scheduled for self with probability 0.5; otherwise it is sched
 ![A space-time visualization of all messages and events in an 8 time unit simulation of PHOLD.
 A timeline for each object shows its events as gray dots.
 Event messages are shown as arrows, with the arrow tail located at the (object instance, simulation time) coordinates when an event message was created and sent, and the arrow head located at the coordinates when the event message is executed.
-At time 0 each object sends an initialization message to itself .
+At time 0 each object sends an initialization message to itself.
 Curved blue arrows represent event messages sent by an object to itself, while straight purple arrows illustrate messages sent to another object.
 \label{fig:phold_space_time_plot}](phold_space_time_plot.png)
 
