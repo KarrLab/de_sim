@@ -19,7 +19,7 @@ from de_sim.examples.debug_logs import logs as debug_logs
 
 def obj_name(obj_num):
     # create object name from index
-    return 'obj_{}'.format(obj_num)
+    return 'phold_{}'.format(obj_num)
 
 
 def obj_index(obj_name):
@@ -139,7 +139,7 @@ class RunPhold(object):
 
         # run the simulation
         simulator.initialize()
-        event_num = simulator.simulate(args.time_max)
+        event_num = simulator.simulate(args.time_max).num_events
         sys.stderr.write("Executed {} events.\n".format(event_num))
         return(event_num)
 

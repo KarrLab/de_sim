@@ -50,7 +50,6 @@ def get_debug_logs_config(extra=None, cfg_path=('de_sim', 'config/debug.default.
     paths.default = pkg_resources.resource_filename(*cfg_path)
     paths.user = (
         'de_sim.debug.cfg',
-        # todo: fix: this cfg file doesn't alter the log level:
         os.path.expanduser('~/.wc/de_sim.debug.cfg'),
     )
     return wc_utils.config.core.ConfigManager(paths).get_config(extra=extra)

@@ -6,6 +6,9 @@
 """
 
 import numpy
+import os
+import shutil
+import tempfile
 import unittest
 
 from de_sim.visualize import EventCoordinates, EventMessage, SpaceTime
@@ -28,6 +31,10 @@ class TestVisualize(unittest.TestCase):
                          EventCoordinates('obj_1', 0),
                          EventCoordinates('obj_3', 2.5)),
         ]
+        self.out_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.out_dir)
 
     def test(self):
         space_time = SpaceTime(self.sample_data)
@@ -47,4 +54,20 @@ class TestVisualize(unittest.TestCase):
         self.assertEqual(space_time.get_categorized_messages(),
             (self.sample_data[0:2],
              self.sample_data[2:]))
-        space_time.plot_data('filename.png')
+        plot_file = os.path.join(self.out_dir, 'filename.png')
+        space_time.plot_data(plot_file)
+        self.assertTrue(os.path.isfile(plot_file))
+
+    def test_get_data(self):
+        PLOT_LOG = os.path.join(os.path.dirname(__file__), 'fixtures', 'example.de_sim.plot.log')
+        space_time = SpaceTime()
+        ems = space_time.get_data(PLOT_LOG)
+        self.assertEqual(len(ems), 5)
+        self.assertEqual(ems[0],
+                         EventMessage(message_type='InitMsg',
+                                      send_coordinates=EventCoordinates(sim_obj_id='obj_2', time=0.0),
+                                      receive_coordinates=EventCoordinates(sim_obj_id='obj_2', time=0.044)))
+        self.assertEqual(ems[4],
+                         EventMessage(message_type='MessageSentToOtherObject',
+                                      send_coordinates=EventCoordinates(sim_obj_id='obj_1', time=0.863),
+                                      receive_coordinates=EventCoordinates(sim_obj_id='obj_2', time=1.731)))
