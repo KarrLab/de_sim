@@ -144,20 +144,21 @@ We present the statistics of three runs made in a Docker container executing on 
 
 ![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.\label{fig:performance}](performance.png)
 
-# Visualize a PHOLD simulation
+# Visualize an example simulation
 
 DE-Sim includes an example simulation that implements the PHOLD parallel DES benchmark [@fujimoto1990performance; @Barnes2013] (see `phold.py` in the `examples` directory).
-\autoref{fig:phold_space_time_plot} visualizes one simulation run of PHOLD.
-PHOLD uses only one simulation application object class, `PholdSimulationObject`.
-In this run a PHOLD event sends a message to self with probability 0.5, and otherwise randomly sends a message to another PHOLD object.
-Message delays are exponentially distributed with $\mu=1$.
+\autoref{fig:phold_space_time_plot} visualizes a PHOLD simulation run.
+This simulation parameterizes PHOLD as follows.
+An event schedules another event to occur after an exponentially distributed delay with $\mu=1$.
+The next event is scheduled for self with probability 0.5; otherwise it is scheduled for another PHOLD object selected at random.
 Space-time visualization can help debug and understand OO DES simulations.
 
 ![This space-time visualization shows all messages and events in an 8 time unit simulation of PHOLD.
 A timeline for each object shows its events as gray dots.
-Event messages are illustrated as arrows, with the tail located at the (object instance, simulation time) coordinates of the simulation when the event message was created and sent, and the head located at the coordinates of the object and time when the event message is executed.
-Messages an object sends to itself are shown as curved blue arrows, and messages sent to another object as straight purple arrows.
-Object initialization messages are sent at time 0.\label{fig:phold_space_time_plot}](phold_space_time_plot.png)
+Event messages are illustrated as arrows, with the tail located at the (object instance, simulation time) coordinates when the event message was created and sent, and the head located at the coordinates when the event message is executed.
+Each object sends an initialization message to itself at time 0.
+Messages sent by an object to itself are shown as curved blue arrows, and messages sent to another object are shown as straight purple arrows.
+\label{fig:phold_space_time_plot}](phold_space_time_plot.png)
 
 # Acknowledgements
 
