@@ -135,15 +135,6 @@ DE-Sim offers many additional features:
 * Extensive documentation
 * Unit tests with 98% coverage
 
-# DE-Sim performance
-
-DE-Sim achieves decent performance by using Python's `heapq` priority queue package to schedule events.
-\autoref{fig:performance} reports the performance of DE-Sim over a range of simulation sizes.
-
-![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.
-We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 processor in a MacBook.
-\label{fig:performance}](performance.png)
-
 # Visualization of simulation traces
 
 DE-Sim generates space-time visualizations of event traces that help debug and understand an OO DES application.
@@ -157,7 +148,16 @@ A timeline for each object shows its events as gray dots.
 Event messages are shown as arrows, with the arrow tail located at the (object instance, simulation time) coordinates when an event message was created and sent, and the arrow head located at the coordinates when the event message is executed.
 At time 0 each PHOLD object sends an initialization message to itself.
 Curved blue arrows represent event messages sent by objects to themselves, while straight purple arrows illustrate messages sent to another object.
-\label{fig:phold_space_time_plot}](phold_space_time_plot_2.png)
+\label{fig:phold_space_time_plot}](phold_space_time_plot.png)
+
+# DE-Sim performance
+
+DE-Sim achieves decent performance by using Python's `heapq` priority queue package to schedule events.
+\autoref{fig:performance} reports the performance of DE-Sim over a range of simulation sizes.
+
+![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.
+We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 processor in a MacBook.
+\label{fig:performance}](performance.png)
 
 # Acknowledgements
 
