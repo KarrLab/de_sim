@@ -127,6 +127,7 @@ DE-Sim offers many additional features:
 * Quick construction of periodic simulation objects from a template
 * Control of simulation termination by a Python function that returns a boolean
 * Recording of simulation run metadata, including start time, run time, and IP address
+* Visualization of simulation run event messages trace
 * Extensive error detection
 * Logging
 * Performance profiling using Python's `cProfile` package
@@ -143,13 +144,20 @@ We present the statistics of three runs made in a Docker container executing on 
 
 ![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.\label{fig:performance}](performance.png)
 
-# Example discrete-event simulation
+# Visualize a PHOLD simulation
 
-DE-Sim includes an example simulation that implements the PHOLD [@fujimoto1990performance] parallel DES benchmark (see `phold.py` in the `examples` directory).
-Fig X presents a space-time visualization (a computational variant of a Feynman diagram, transposed with time increasing down) of one simulation run of PHOLD.
+DE-Sim includes an example simulation that implements the PHOLD parallel DES benchmark [@fujimoto1990performance; @Barnes2013] (see `phold.py` in the `examples` directory).
+\autoref{fig:phold_space_time_plot} visualizes one simulation run of PHOLD.
 PHOLD uses only one simulation application object class, `PholdSimulationObject`.
-Each `PholdSimulationObject` instance occupies a vertical lane in the figure, and each event message is indicated by a directed arrow.
-The tail of the arrow is located at the (object instance, simulation time) coordinates of the simulation when the event message was created and sent, and the head of the arrow is located at the simulation coordinates of the object and time when the event message is executed.
+In this run a PHOLD event sends a message to self with probability 0.5, and otherwise randomly sends a message to another PHOLD object.
+Message delays are exponentially distributed with $\mu=1$.
+Space-time visualization can help debug and understand OO DES simulations.
+
+![This space-time visualization shows all messages and events in an 8 time unit simulation of PHOLD.
+A timeline for each object shows its events as gray dots.
+Event messages are illustrated as arrows, with the tail located at the (object instance, simulation time) coordinates of the simulation when the event message was created and sent, and the head located at the coordinates of the object and time when the event message is executed.
+Messages an object sends to itself are shown as curved blue arrows, and messages sent to another object as straight purple arrows.
+Object initialization messages are sent at time 0.\label{fig:phold_space_time_plot}](phold_space_time_plot.png)
 
 # Acknowledgements
 
