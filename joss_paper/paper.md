@@ -152,7 +152,7 @@ Curved blue arrows represent event messages sent by objects to themselves, while
 
 # DE-Sim performance
 
-DE-Sim achieves decent performance by using Python's `heapq` priority queue package to schedule events.
+DE-Sim achieves good performance by using Python's `heapq` priority queue package to schedule events.
 \autoref{fig:performance} reports the performance of DE-Sim over a range of simulation sizes.
 
 ![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.
