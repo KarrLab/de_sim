@@ -2,8 +2,7 @@
 title: 'DE-Sim: An Object-Oriented Discrete-Event Simulator in Python'
 tags:
   - Python
-  - dynamics
-  - modeling
+  - dynamical modeling
   - simulation
   - discrete-event simulation
   - object-oriented simulation
@@ -25,13 +24,13 @@ bibliography: paper.bib
 
 # Summary
 
-Discrete-event simulation (DES) is a simulation method that analyzes systems whose events occur at discrete instants in time.
-Events and their simulation times are dynamically determined.
-Many fields employ models that use DES, including biochemical modeling, computer network performance analysis, war gaming, modeling of infectious disease transmission, and others [@banks2005discrete].
+Discrete-event simulation (DES) is a simulation method that modelers use to analyze systems whose events occur at discrete instants in time.
+DES models dynamically create events and determine their simulation times.
+Many fields employ models that use DES, including modeling of biochemical dynamics, computer network performance analysis, war gaming, modeling of infectious disease transmission, and others [@banks2005discrete].
 
-The construction of a DES model can be simplified and accelerated by using a DES simulator that implements the generic features needed by all DES models, primarily efficiently executing events in increasing simulation time order.
+The construction of a DES model can be simplified and accelerated by using a DES simulator that implements the generic features needed by all DES models, primarily efficient execution of events in increasing simulation time order.
 Model construction can be further enhanced, and models can be made more comprehensible and reusable, by structuring models as object-oriented programs.
-This approach, known as *object-oriented discrete-event simulation* (OO DES), recommends that modelers represent entities in the system being modeled as objects in a model, and represent interactions between entities as event messages exchanged between objects.
+This approach, known as *object-oriented discrete-event simulation* (OO DES), recommends that models represent entities in the system being modeled as objects, and represent interactions between entities as event messages exchanged between objects.
 OO DES was invented in the 1960s by the SIMULA language [@dahl1966simula; @nygaard1978development] and continues to be used by modern tools such as SystemC [@mueller2001simulation; @ieee2012ieee] and SIMUL8 [@concannon2003dynamic].
 
 DE-Sim is a Python package that supports OO DES simulations.
@@ -40,16 +39,16 @@ DE-Sim is a Python package that supports OO DES simulations.
 
 DE-Sim is needed by researchers who want to build OO DES models in Python because existing open source Python simulators do not support an object-oriented, message-passing interface.
 We have used DE-Sim as a platform for a simulator of whole-cell models that comprehensively represent the biochemical dynamics in individual biological cells [@goldberg2020wc_sim; @goldberg2018emerging].
-The whole-cell simulator (WC-Sim) models the growth of a cell and the changes in its biochemical composition caused by chemical reactions and the movement of molecules.
+The whole-cell simulator (WC-Sim) models the growth of a cell and the changes in its biochemical composition caused by chemical reactions and the intracellular movement of molecules.
 To comprehensively represent the numerous processes in a cell, such as metabolism, transcription, and translation, WC-Sim must use multiple types of dynamic integration algorithms, including ordinary differential equations and the stochastic simulation algorithm.
 DE-Sim's OO DES framework enabled the construction of WC-Sim.
 WC-Sim uses different DE-Sim object types to represent different integration algorithms, and uses
 DE-Sim's discrete-event scheduling to synchronize the interactions between these integration algorithms.
 
 Another benefit of implementing models in the object-oriented, message-passing framework supported by DE-Sim is that parallel DES simulation can reduce the runtimes of their simulations, which are often inconveniently long.
-The OO DES framework makes parallel simulation feasible because 1) objects that do not share memory references can be distributed on multiple processors, and 2) a parallel DES simulator interfaces with simulation objects through the event messages that are used to schedule events by OO DES applications [@Jefferson1985; @Barnes2013; @Carothers2000].
+The OO DES framework makes parallel simulation feasible because 1) objects that do not share memory references can be distributed on multiple processors, and 2) a parallel DES simulator interfaces with simulation objects through the event messages that they use to schedule events [@Jefferson1985; @Barnes2013; @Carothers2000].
 An example research model accelerated by parallel simulation analyzes epidemic outbreak phenomena [@perumalla2012discrete].
-We aspire to speed up whole-cell models of human cells with parallel simulation in future work [@goldberg2016toward].
+We plan to speed up whole-cell models of human cells with parallel simulation in future work [@goldberg2016toward].
 
 # DE-Sim features
 
@@ -66,12 +65,12 @@ class MessageWithAttribute(SimulationMessage):
     attributes = ['attr_1']
 ```
 
-A message must be documented by a docstring, and may include attributes.
+An event message class must be documented by a docstring, and may include attributes.
 
 2: Define simulation application objects by subclassing `ApplicationSimulationObject`.
 
 ```python
-class MinimalSimulationObject(ApplicationSimulationObject):
+class SimpleSimulationObject(ApplicationSimulationObject):
 
     def __init__(self, name, delay):
         self.delay = delay
@@ -90,19 +89,19 @@ class MinimalSimulationObject(ApplicationSimulationObject):
 ```
 
 Each simulation object must have a unique `name`.
-This example also includes a class attribute for the delay between events.
-All application simulation objects have a read-only attribute called `time` that always provides the current simulation time.
+This example adds an instance attribute that provides the delay between events.
+All `ApplicationSimulationObject`s also have a read-only attribute called `time` that always provides the current simulation time.
 
 A simulation object may include a `send_initial_events` method, which, if present, will be called by the simulator during initialization to send the object's initial events.
 A simulation must send at least one initial event.
 
 A simulation object must include at least one method that handles simulation events.
-The simulator vectors incoming message types as directed by an `event_handlers` attribute that associates each message type received by an object with a simulation object method.
+The simulator vectors incoming message types as directed by an `event_handlers` attribute that associates each message type received by a simulation object with one of its methods.
 
 `ApplicationSimulationObject` provides the method
 `send_event(delay, receiving_object, event_message)` which schedules an event to occur `delay` time units in the future.
 `event_message` is an instance of a `SimulationMessage`, and may have attributes that contain data used by the event.
-The event will be executed by an event handler in simulation object `receiving_object`, which will receive a simulation event containing `event_message` at the scheduled simulation time.
+The event will be executed by an event handler in simulation object `receiving_object`, which will receive a simulation event containing `event_message` at its scheduled simulation time.
 In this example all simulation events are scheduled to be executed by the object that creates the event, but realistic
 simulations contain multiple simulation objects which schedule events for each other.
 
@@ -113,7 +112,7 @@ simulations contain multiple simulation objects which schedule events for each o
 simulation_engine = SimulationEngine()
 
 # create a simulation object and add it to the simulation
-simulation_engine.add_object(MinimalSimulationObject('object_1', 6))
+simulation_engine.add_object(SimpleSimulationObject('object_1', 6))
 
 # initialize and run the simulation
 simulation_engine.initialize()
@@ -145,20 +144,20 @@ DE-Sim achieves decent performance by using Python's `heapq` priority queue pack
 We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 processor in a MacBook.
 \label{fig:performance}](performance.png)
 
-![A space-time visualization of all messages and events in an 8 time unit simulation of PHOLD.
-A timeline for each object shows its events as gray dots.
-Event messages are shown as arrows, with the arrow tail located at the (object instance, simulation time) coordinates when an event message was created and sent, and the arrow head located at the coordinates when the event message is executed.
-At time 0 each object sends an initialization message to itself.
-Curved blue arrows represent event messages sent by an object to itself, while straight purple arrows illustrate messages sent to another object.
-\label{fig:phold_space_time_plot}](phold_space_time_plot.png)
-
 # Visualization of simulation traces
 
 DE-Sim generates space-time visualizations of event traces that help debug and understand an OO DES application.
-\autoref{fig:phold_space_time_plot} visualizes a simulation run of the PHOLD parallel DES benchmark [@fujimoto1990performance; @Barnes2013] (see `phold.py` in the `examples` directory).
+\autoref{fig:phold_space_time_plot} visualizes a simulation run of the PHOLD parallel DES benchmark [@fujimoto1990performance; @Barnes2013] (see `phold.py` in DE-Sim's `examples` directory).
 This simulation parameterizes PHOLD as follows.
 An event schedules another event to occur after an exponentially distributed delay with $\mu=1$.
-The next event is scheduled for self with probability 0.5; otherwise it is scheduled for another PHOLD object selected at random.
+An object schedules the next event for itself with probability 0.5; otherwise the next event is scheduled for another PHOLD object selected at random.
+
+![A space-time visualization of all messages and events in an 8 time unit simulation of PHOLD.
+A timeline for each object shows its events as gray dots.
+Event messages are shown as arrows, with the arrow tail located at the (object instance, simulation time) coordinates when an event message was created and sent, and the arrow head located at the coordinates when the event message is executed.
+At time 0 each PHOLD object sends an initialization message to itself.
+Curved blue arrows represent event messages sent by objects to themselves, while straight purple arrows illustrate messages sent to another object.
+\label{fig:phold_space_time_plot}](phold_space_time_plot_2.png)
 
 # Acknowledgements
 
