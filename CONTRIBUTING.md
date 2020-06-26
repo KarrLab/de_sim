@@ -35,9 +35,22 @@ DE-Sim follows standard Python style conventions:
 
 ## Testing and continuous integration
 
-We strive to have complete test coverage of DE-Sim. As such, all contributions to DE-Sim should be tested. The tests are located in the `tests`  directory. The tests can be executed by running `python -m pytest tests`.
+We strive to have complete test coverage of DE-Sim. As such, all contributions to DE-Sim should be tested. 
 
-Upon each push to GitHub, GitHub will trigger CircleCI to execute all of the tests.
+The tests are located in the `tests`  directory. The tests can be executed by running the following command.
+```
+pip install pytest
+python -m pytest tests
+```
+
+The coverage of the tests can be evaluated by running the following commands and then opening `/path/to/de_sim/htmlcov/index.html` with your browser.
+```
+pip install pytest pytest-cov coverage
+python -m pytest tests --cov de_sim
+coverage html
+```
+
+Upon each push to GitHub, GitHub will trigger CircleCI to execute all of the tests. The latest test results are available at [CircleCI](https://circleci.com/gh/KarrLab/de_sim). The latest coverage results are available at [Coveralls](https://coveralls.io/github/KarrLab/de_sim).
 
 ## Documentation convention
 
@@ -50,3 +63,11 @@ Please use GitHub pull requests to submit changes. Each request should include a
 ## Releasing and deploying new versions
 
 Contact [info@karrlab.org](mailto:info@karrlab.org) to request release and deployment of new changes. 
+
+## Reporting issues
+
+Please use [GitHub issues]() to report any issues to the development community.
+
+## Getting help
+
+Please use [GitHub issues]() to post questions or contact the lead developers at [info@karrlab.org](mailto:info@karrlab.org).
