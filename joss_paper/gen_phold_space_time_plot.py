@@ -11,7 +11,7 @@ import os
 import re
 
 from de_sim.examples.phold import RunPhold
-from de_sim.visualize import EventCoordinates, EventMessage, SpaceTime
+from de_sim.visualize import SpaceTime
 
 
 # TODO(Arthur): all docstrings, make config changes work consistently
@@ -77,7 +77,7 @@ def prepare_plot():
                                               'debug.default.cfg')
     temp_debug_conf_filename = os.path.expanduser('~/.wc/de_sim.debug.cfg')
     debug_conf_file_modifier = ConfigFileModifier(source_config_filename=source_debug_conf_filename,
-                                              temp_config_filename=temp_debug_conf_filename)
+                                                  temp_config_filename=temp_debug_conf_filename)
     debug_conf_file_modifier.write_test_config_file([('level', 'debug')])
 
     plot_log = os.path.expanduser('~/.wc/log/de_sim.plot.log')
@@ -93,5 +93,6 @@ def prepare_plot():
 
     config_file_modifier.clean_up()
     debug_conf_file_modifier.clean_up()
+
 
 prepare_plot()

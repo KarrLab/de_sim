@@ -7,11 +7,9 @@
 
 import unittest
 import warnings
-from pprint import pprint
 from argparse import Namespace
 
 from de_sim.examples.minimal_simulation import RunMinimalSimulation
-from de_sim.config import core
 
 
 class TestMinimalSimulation(unittest.TestCase):
@@ -24,8 +22,8 @@ class TestMinimalSimulation(unittest.TestCase):
         return(RunMinimalSimulation.main(args))
 
     def test_minimal_simulation_reproducibility(self):
-        num_events1=self.run_minimal_simulation(2, 20)
-        num_events2=self.run_minimal_simulation(2, 20)
+        num_events1 = self.run_minimal_simulation(2, 20)
+        num_events2 = self.run_minimal_simulation(2, 20)
         self.assertEqual(num_events1, num_events2)
 
     def test_minimal_simulation_parse_args(self):

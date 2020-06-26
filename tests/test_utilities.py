@@ -21,11 +21,11 @@ class AbstractBase(object, metaclass=ABCMeta):
 
     @abstractmethod
     def f(self):
-        raise NotImplemented
+        raise NotImplementedError()
 
     @abstractmethod
     def g(self):
-        raise NotImplemented
+        raise NotImplementedError()
 
 
 class YourMeta(type):
@@ -34,14 +34,16 @@ class YourMeta(type):
         return newcls
 
 
-class CombinedMeta(ConcreteABCMeta, YourMeta): pass
+class CombinedMeta(ConcreteABCMeta, YourMeta):
+    pass
 
 
 class TestConcreteClass(unittest.TestCase):
 
     def test(self):
         with self.assertRaisesRegex(TypeError, "ConcreteClass has not implemented abstract methods"):
-            class ConcreteClass(AbstractBase, metaclass=CombinedMeta): pass
+            class ConcreteClass(AbstractBase, metaclass=CombinedMeta):
+                pass
 
 
 class TestSimulationProgressBar(unittest.TestCase):

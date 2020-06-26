@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-import configobj
+import configobj  # noqa: F401
 import os
 import pkg_resources
 import wc_utils.config.core

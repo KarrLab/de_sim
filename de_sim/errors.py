@@ -5,12 +5,14 @@
 :License: MIT
 """
 
+
 class Error(Exception):
     """ Base class for exceptions in de_sim
 
     Attributes:
         message (:obj:`str`): the exception's message
     """
+
     def __init__(self, message=None):
         super().__init__(message)
 
@@ -21,5 +23,6 @@ class SimulatorError(Error):
     Attributes:
         message (:obj:`str`): the exception's message
     """
+
     def __init__(self, message=None):
         super().__init__(message)

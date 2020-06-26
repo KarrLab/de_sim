@@ -16,7 +16,6 @@ import re
 
 from de_sim.config import core
 from de_sim.errors import SimulatorError
-from wc_utils.config.core import get_config
 from wc_utils.util.misc import obj_to_str
 
 MAX_TIME_PRECISION = core.get_config()['de_sim']['max_time_precision']

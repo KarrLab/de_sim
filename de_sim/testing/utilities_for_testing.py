@@ -6,6 +6,7 @@
 :License: MIT
 """
 
+
 def make_args(args_dict, required, options):
     """ Make command line argument list, for testing argument parsers
 

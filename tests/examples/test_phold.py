@@ -5,7 +5,6 @@
 :License: MIT
 """
 
-import os
 import sys
 import unittest
 import warnings
@@ -41,11 +40,11 @@ class TestPhold(unittest.TestCase):
             return(RunPhold.main(args))
 
     def test_phold_reproducibility(self):
-        num_events1=self.run_phold(123, 10)
-        num_events2=self.run_phold(123, 10)
+        num_events1 = self.run_phold(123, 10)
+        num_events2 = self.run_phold(123, 10)
         self.assertEqual(num_events1, num_events2)
 
-        num_events2=self.run_phold(173, 10)
+        num_events2 = self.run_phold(173, 10)
         self.assertNotEqual(num_events1, num_events2)
 
     def test_phold_parse_args(self):
@@ -74,12 +73,12 @@ class TestPhold(unittest.TestCase):
         args = make_args(arguments, self.required, [])
         # test parser error handling
         errors = dict(
-            num_phold_procs = [-2, 0],
-            frac_self_events = [-1, 1.1]
+            num_phold_procs=[-2, 0],
+            frac_self_events=[-1, 1.1]
         )
         with CaptureOutput(relay=False):
             print('\n--- testing RunPhold.parse_args() error handling ---', file=sys.stderr)
-            for arg,error_vals in errors.items():
+            for arg, error_vals in errors.items():
                 for error_val in error_vals:
                     arguments2 = copy(arguments)
                     arguments2[arg] = error_val

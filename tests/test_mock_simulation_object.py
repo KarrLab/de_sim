@@ -13,7 +13,8 @@ from de_sim.testing.some_message_types import Eg1
 
 class Example(MockSimulationObject):
 
-    def send_initial_events(self): pass
+    def send_initial_events(self):
+        pass
 
     def get_state(self):
         return 'object state to be provided'

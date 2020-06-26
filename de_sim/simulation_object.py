@@ -11,9 +11,7 @@ from copy import deepcopy
 from enum import IntEnum
 import abc
 import heapq
-import inspect
 import math
-import sys
 import warnings
 
 from de_sim.config import core
@@ -156,16 +154,16 @@ class EventQueue(object):
 
         # gather all events with the same event_time and receiving_object
         while (self.event_heap and now == self.next_event_time() and
-            receiving_obj == self.next_event_obj()):
+               receiving_obj == self.next_event_obj()):
             events.append(heapq.heappop(self.event_heap))
 
-        if 1<len(events):
+        if 1 < len(events):
             # sort events by message type priority, and within priority by message content
             # thus, a sim object handles simultaneous messages in priority order;
             # this costs O(n log(n)) in the number of event messages in events
             receiver_priority_dict = receiving_obj.get_receiving_priorities_dict()
             events = sorted(events,
-                key=lambda event: (receiver_priority_dict[event.message.__class__], event.message))
+                            key=lambda event: (receiver_priority_dict[event.message.__class__], event.message))
 
         for event in events:
             self.log_event(event)
@@ -179,10 +177,10 @@ class EventQueue(object):
             event (:obj:`Event`): the Event to log
         """
         msg = "Execute: {} {}:{} {} ({})".format(event.event_time,
-                type(event.receiving_object).__name__,
-                event.receiving_object.name,
-                event.message.__class__.__name__,
-                str(event.message))
+                                                 type(event.receiving_object).__name__,
+                                                 event.receiving_object.name,
+                                                 event.message.__class__.__name__,
+                                                 str(event.message))
         self.fast_debug_file_logger.fast_log(msg, sim_time=event.event_time)
 
     def render(self, sim_obj=None, as_list=False, separator='\t'):
@@ -206,7 +204,7 @@ class EventQueue(object):
         """
         event_heap = self.event_heap
         if sim_obj is not None:
-            event_heap = list(filter(lambda event: event.receiving_object==sim_obj, event_heap))
+            event_heap = list(filter(lambda event: event.receiving_object == sim_obj, event_heap))
 
         if not event_heap:
             return None
@@ -218,9 +216,9 @@ class EventQueue(object):
         message_types = set()
         for event in event_heap:
             message_types.add(event.message.__class__)
-            if 1<len(message_types):
+            if 1 < len(message_types):
                 break
-        multiple_msg_types = 1<len(message_types)
+        multiple_msg_types = 1 < len(message_types)
 
         rendered_event_queue = []
         if multiple_msg_types:
@@ -355,7 +353,7 @@ class SimulationObject(object):
         # check that the sending object type is registered to send the message type
         if not isinstance(message, SimulationMessage):
             raise SimulatorError("simulation messages must be instances of type 'SimulationMessage'; "
-                "'{}' is not".format(event_type_name))
+                                 "'{}' is not".format(event_type_name))
         if message.__class__ not in self.__class__.metadata.message_types_sent:
             raise SimulatorError("'{}' simulation objects not registered to send '{}' messages".format(
                 most_qual_cls_name(self), event_type_name))
@@ -370,9 +368,9 @@ class SimulationObject(object):
             message = deepcopy(message)
 
         self.simulator.event_queue.schedule_event(self.time, event_time, self,
-            receiving_object, message)
+                                                  receiving_object, message)
         self.log_with_time("Send: ({}, {:6.2f}) -> ({}, {:6.2f}): {}".format(self.name, self.time,
-            receiving_object.name, event_time, message.__class__.__name__))
+                                                                             receiving_object.name, event_time, message.__class__.__name__))
 
     def send_event(self, delay, receiving_object, message, copy=False):
         """ Send a simulation event message, specifing the event time as a delay.
@@ -429,7 +427,7 @@ class SimulationObject(object):
                 raise SimulatorError("handler '{}' must be callable".format(handler))
             subclass.metadata.event_handlers_dict[message_type] = handler
 
-        for index,(message_type, _) in enumerate(handlers):
+        for index, (message_type, _) in enumerate(handlers):
             subclass.metadata.event_handler_priorities[message_type] = index
 
     @staticmethod
@@ -483,8 +481,9 @@ class SimulationObject(object):
             try:
                 handler = self.__class__.metadata.event_handlers_dict[event.message.__class__]
                 handler(self, event)
-            except KeyError: # pragma: no cover     # unreachable because of check that receiving sim
-                                                    # obj type is registered to receive the message type
+            except KeyError:  # pragma: no cover
+                # unreachable because of check that receiving sim
+                # obj type is registered to receive the message type
                 raise SimulatorError("No handler registered for Simulation message type: '{}'".format(
                     event.message.__class__.__name__))
 
@@ -514,10 +513,12 @@ class SimulationObject(object):
 class ApplicationSimulationObjectInterface(object, metaclass=ABCMeta):  # pragma: no cover
 
     @abc.abstractmethod
-    def send_initial_events(self, *args): pass
+    def send_initial_events(self, *args):
+        pass
 
     @abc.abstractmethod
-    def get_state(self): pass
+    def get_state(self):
+        pass
 
 
 class SimObjClassPriority(IntEnum):
@@ -567,6 +568,7 @@ class ApplicationSimulationObjectMetadata(object):
         message_types_sent (:obj:`set`): the types of messages a subclass of `SimulationObject` has
             registered to send
     """
+
     def __init__(self):
         self.event_handlers_dict = {}
         self.event_handler_priorities = {}
@@ -614,7 +616,7 @@ class ApplicationSimulationObjMeta(type):
         new_application_simulation_obj_subclass.metadata = ApplicationSimulationObjectMetadata()
 
         # use 'abstract' to indicate that an ApplicationSimulationObject should not be instantiated
-        if 'abstract' in namespace and namespace['abstract'] == True:
+        if 'abstract' in namespace and namespace['abstract'] is True:
             return new_application_simulation_obj_subclass
 
         # approach:
@@ -646,8 +648,8 @@ class ApplicationSimulationObjMeta(type):
             if event_handlers is None:
                 if hasattr(superclass, 'metadata') and hasattr(superclass.metadata, 'event_handlers_dict'):
                     # convert dict in superclass to list of tuple pairs
-                    event_handlers = [(k,v) for k,v in getattr(superclass.metadata,
-                                                               'event_handlers_dict').items()]
+                    event_handlers = [(k, v) for k, v in getattr(superclass.metadata,
+                                                                 'event_handlers_dict').items()]
 
         for superclass in superclasses:
             if messages_sent is None:
@@ -657,20 +659,20 @@ class ApplicationSimulationObjMeta(type):
         for superclass in superclasses:
             if class_priority is None:
                 if hasattr(superclass, 'metadata') and hasattr(superclass.metadata, CLASS_PRIORITY):
-                        class_priority = getattr(superclass.metadata, CLASS_PRIORITY)
+                    class_priority = getattr(superclass.metadata, CLASS_PRIORITY)
         if class_priority is not None:
             setattr(new_application_simulation_obj_subclass.metadata, CLASS_PRIORITY, class_priority)
 
         # either messages_sent or event_handlers must contain values
         if (not event_handlers and not messages_sent):
             raise SimulatorError("ApplicationSimulationObject '{}' definition must inherit or provide a "
-                "non-empty '{}' or '{}'.".format(clsname, EVENT_HANDLERS, MESSAGES_SENT))
+                                 "non-empty '{}' or '{}'.".format(clsname, EVENT_HANDLERS, MESSAGES_SENT))
         elif not event_handlers:
             warnings.warn("ApplicationSimulationObject '{}' definition does not inherit or provide a "
-                "non-empty '{}'.".format(clsname, EVENT_HANDLERS))
+                          "non-empty '{}'.".format(clsname, EVENT_HANDLERS))
         elif not messages_sent:
             warnings.warn("ApplicationSimulationObject '{}' definition does not inherit or provide a "
-                 "non-empty '{}'.".format(clsname, MESSAGES_SENT))
+                          "non-empty '{}'.".format(clsname, MESSAGES_SENT))
 
         if event_handlers:
             try:
@@ -681,9 +683,9 @@ class ApplicationSimulationObjMeta(type):
                     if isinstance(handler, str):
                         try:
                             handler = namespace[handler]
-                        except:
+                        except Exception:
                             errors.append("ApplicationSimulationObject '{}' definition must define "
-                                "'{}'.".format(clsname, handler))
+                                          "'{}'.".format(clsname, handler))
                     if not isinstance(handler, str) and not callable(handler):
                         errors.append("handler '{}' must be callable".format(handler))
                     if not issubclass(msg_type, SimulationMessage):
@@ -711,7 +713,7 @@ class ApplicationSimulationObjMeta(type):
                     new_application_simulation_obj_subclass, messages_sent)
             except (TypeError, ValueError):
                 raise SimulatorError("ApplicationSimulationObject '{}': '{}' must iterate over "
-                    "SimulationMessages".format(clsname, MESSAGES_SENT))
+                                     "SimulationMessages".format(clsname, MESSAGES_SENT))
 
         # return the class to instantiate it
         return new_application_simulation_obj_subclass
@@ -724,7 +726,7 @@ class AppSimObjAndABCMeta(ApplicationSimulationObjMeta, ConcreteABCMeta):
 
 
 class ApplicationSimulationObject(SimulationObject, ApplicationSimulationObjectInterface,
-    metaclass=AppSimObjAndABCMeta):
+                                  metaclass=AppSimObjAndABCMeta):
     """ Base class for all simulation objects in a simulation
 
     Attributes:
@@ -732,9 +734,11 @@ class ApplicationSimulationObject(SimulationObject, ApplicationSimulationObjectI
             initialized by `AppSimObjAndABCMeta`
     """
 
-    def send_initial_events(self, *args): pass  # pragma: no cover
+    def send_initial_events(self, *args):
+        pass  # pragma: no cover
 
-    def get_state(self): pass  # pragma: no cover
+    def get_state(self):
+        pass  # pragma: no cover
 
     @classmethod
     def set_class_priority(cls, priority):

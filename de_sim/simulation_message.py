@@ -7,7 +7,6 @@
 """
 
 from abc import ABCMeta
-import inspect
 import warnings
 
 from de_sim.errors import SimulatorError
@@ -38,9 +37,9 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
         """
         if len(args) != len(self.__slots__):
             raise SimulatorError("Constructor for SimulationMessage '{}' expects {} argument(s), but "
-                "{} provided".format(
-                self.__class__.__name__, len(self.__slots__), len(args)))
-        for slot,arg in zip(self.__slots__, args):
+                                 "{} provided".format(
+                                     self.__class__.__name__, len(self.__slots__), len(args)))
+        for slot, arg in zip(self.__slots__, args):
             setattr(self, slot, arg)
 
     def _values(self, to_str=False):
@@ -58,9 +57,9 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
         for attr in self.__slots__:
             if hasattr(self, attr):
                 if to_str:
-                    vals.append(str(getattr(self,attr)))
+                    vals.append(str(getattr(self, attr)))
                 else:
-                    vals.append(getattr(self,attr))
+                    vals.append(getattr(self, attr))
             else:
                 if to_str:
                     vals.append(str(None))
@@ -76,7 +75,7 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
         Returns:
             :obj:`dict`: map attribute -> str(attribute value)
         """
-        return {attr:val for attr,val in zip(self.__slots__, self._values(to_str=True))}
+        return {attr: val for attr, val in zip(self.__slots__, self._values(to_str=True))}
 
     def values(self, annotated=False, as_list=False, separator='\t'):
         """ Provide the values in this `SimulationMessage`
@@ -97,8 +96,8 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
         if not self.attrs():
             return None
         if annotated:
-            list_repr = ["{}:{}".format(attr, val) for attr,val in
-                zip(self.__slots__, self._values(to_str=True))]
+            list_repr = ["{}:{}".format(attr, val) for attr, val in
+                         zip(self.__slots__, self._values(to_str=True))]
         else:
             list_repr = self._values(to_str=True)
         if as_list:
@@ -210,7 +209,7 @@ class SimulationMessageMeta(type):
                     cls.ATTRIBUTES, attributes))
 
             # error if attributes contains dupes
-            if not len(attributes)==len(set(attributes)):
+            if not len(attributes) == len(set(attributes)):
                 raise SimulatorError("'{}' contains duplicates".format(cls.ATTRIBUTES))
             attrs['__slots__'] = attributes
 
@@ -220,7 +219,8 @@ class SimulationMessageMeta(type):
         return new_simulation_message_class
 
 
-class CombinedSimulationMessageMeta(ConcreteABCMeta, SimulationMessageMeta): pass
+class CombinedSimulationMessageMeta(ConcreteABCMeta, SimulationMessageMeta):
+    pass
 
 
 class SimulationMessage(SimulationMessageInterface, metaclass=CombinedSimulationMessageMeta):

@@ -25,7 +25,8 @@ class TestSimulationConfig(unittest.TestCase):
         self.time_init = 3.5
 
         class ExampleClass(object):
-            def f(): pass
+            def f():
+                pass
         ec = ExampleClass()
         self.stop_condition = ec.f
 
@@ -77,7 +78,6 @@ class TestSimulationConfig(unittest.TestCase):
         # test output_dir
         # test output_dir specified relative to home directory
         usr_tmp = os.path.join('~', 'tmp')
-        usr_tmp_abs = os.path.expanduser(usr_tmp)
         output_dir = os.path.join(usr_tmp, 'output_dir')
         cfg = SimulationConfig(self.time_max, output_dir=output_dir)
         self.assertEquals(cfg.validate_individual_fields(), None)
@@ -157,7 +157,10 @@ class TestSimulationConfig(unittest.TestCase):
 
 
 class ExampleClass(object):
-    def f(): pass
+    def f():
+        pass
+
+
 ec = ExampleClass()
 
 

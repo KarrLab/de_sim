@@ -31,8 +31,8 @@ class ExampleSimulationMessage3(SimulationMessage):
 class TestSimulationMessageInterface(unittest.TestCase):
 
     def test_utils(self):
-        attributes = ['arg_1','arg_2']
-        attrs = {'__slots__':attributes}
+        attributes = ['arg_1', 'arg_2']
+        attrs = {'__slots__': attributes}
         SimMsgType = type('test', (SimulationMessageInterface,), attrs)
         with self.assertRaisesRegex(SimulatorError, "Constructor .*'test' expects 2 arg.*but 0 provided"):
             SimMsgType()
@@ -102,7 +102,7 @@ class TestSimulationMessageMeta(unittest.TestCase):
         attr_vals = ('att1_val', 'att2_val')
         example_simulation_message = ExampleSimulationMessage1(*attr_vals)
         attrs = ['attr1', 'attr2']
-        for attr,val in zip(attrs, attr_vals):
+        for attr, val in zip(attrs, attr_vals):
             self.assertEqual(getattr(example_simulation_message, attr), val)
 
         example_simulation_message2 = ExampleSimulationMessage2()
@@ -114,5 +114,5 @@ class TestSimulationMessageMeta(unittest.TestCase):
                 attributes = [2.5]
 
         with self.assertRaisesRegex(SimulatorError, 'contains duplicates'):
-            class BadSimulationMessage2(SimulationMessage):
+            class BadSimulationMessage3(SimulationMessage):
                 attributes = ['x', 'y', 'x']

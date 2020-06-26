@@ -21,9 +21,8 @@ import unittest
 import warnings
 
 from de_sim.config import core
-from de_sim.simulation_metadata import SimulationMetadata, RunMetadata, AuthorMetadata
+from de_sim.simulation_metadata import SimulationMetadata, AuthorMetadata
 from de_sim.errors import SimulatorError
-from de_sim.shared_state_interface import SharedStateInterface
 from de_sim.simulation_config import SimulationConfig
 from de_sim.simulation_engine import SimulationEngine
 from de_sim.simulation_message import SimulationMessage
@@ -31,7 +30,6 @@ from de_sim.simulation_object import SimulationObject, ApplicationSimulationObje
 from de_sim.template_sim_objs import TemplatePeriodicSimulationObject
 from de_sim.testing.some_message_types import InitMsg, Eg1
 from de_sim.utilities import FastLogger
-from wc_utils.util.dict import DictUtil
 
 ALL_MESSAGE_TYPES = [InitMsg, Eg1]
 
@@ -48,7 +46,8 @@ class BasicExampleSimulationObject(ApplicationSimulationObject):
     def get_state(self):
         return "self.num: {}".format(self.num)
 
-    def handle_event(self, event): pass
+    def handle_event(self, event):
+        pass
 
     event_handlers = [(InitMsg, handle_event)]
 
@@ -91,7 +90,7 @@ class CyclicalMessagesSimulationObject(ApplicationSimulationObject):
         self.num_msgs = 0
 
     def next_obj(self):
-        next = (self.obj_num+1) % self.cycle_size
+        next = (self.obj_num + 1) % self.cycle_size
         return self.simulator.simulation_objects[obj_name(next)]
 
     def send_initial_events(self):
@@ -130,6 +129,7 @@ class PeriodicSimulationObject(TemplatePeriodicSimulationObject):
 
 
 NAME_PREFIX = 'sim_obj'
+
 
 def obj_name(i):
     return '{}_{}'.format(NAME_PREFIX, i)
@@ -224,7 +224,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.delete_object(obj)
         try:
             self.simulator.add_object(obj)
-        except:
+        except Exception:
             self.fail('should be able to add object after delete')
 
         self.simulator.reset()
@@ -256,6 +256,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.assertEqual(simulator.simulate(time_max).num_events, time_max + 1)
 
         __stop_cond_end = 3
+
         def stop_cond_eg(time):
             return __stop_cond_end <= time
         simulator = SimulationEngine()
@@ -302,7 +303,7 @@ class TestSimulationEngine(unittest.TestCase):
         for idx, line in enumerate(event_count_lines):
             self.assertIn('3', line)
             self.assertIn('ExampleSimulationObject', line)
-            self.assertIn(obj_name(idx+1), line)
+            self.assertIn(obj_name(idx + 1), line)
 
         self.simulator.reset()
         self.assertEqual(len(self.simulator.simulation_objects), 0)
@@ -316,7 +317,7 @@ class TestSimulationEngine(unittest.TestCase):
     def make_cyclical_messaging_network_sim(self, simulator, num_objs):
         # make simulation with cyclical messaging network
         sim_objects = [CyclicalMessagesSimulationObject(obj_name(i), i, num_objs, self)
-            for i in range(num_objs)]
+                       for i in range(num_objs)]
         simulator.add_objects(sim_objects)
 
     def test_cyclical_messaging_network(self):
@@ -324,19 +325,22 @@ class TestSimulationEngine(unittest.TestCase):
         # natural number for num_objs and any non-negative value of time_max
         self.make_cyclical_messaging_network_sim(self.simulator, 10)
         self.simulator.initialize()
-        self.assertTrue(0<self.simulator.simulate(20).num_events)
+        self.assertTrue(0 < self.simulator.simulate(20).num_events)
 
     def test_message_queues(self):
         warnings.simplefilter("ignore")
         # test with an empty event queue
+
         class InactiveSimulationObject(ApplicationSimulationObject):
 
             def __init__(self):
                 SimulationObject.__init__(self, 'inactive')
 
-            def send_initial_events(self): pass
+            def send_initial_events(self):
+                pass
 
-            def get_state(self): pass
+            def get_state(self):
+                pass
 
             event_handlers = []
 
@@ -368,7 +372,7 @@ class TestSimulationEngine(unittest.TestCase):
         # provide AuthorMetadata
         self.simulator.reset()
         self.make_one_object_simulation()
-        output_dir=tempfile.mkdtemp(dir=self.out_dir)
+        output_dir = tempfile.mkdtemp(dir=self.out_dir)
         config_dict = dict(time_max=time_max, output_dir=output_dir)
         author_name = 'Joe'
         author_metadata = AuthorMetadata(name=author_name)
@@ -382,7 +386,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.run(5.0)
         self.assertIsInstance(self.simulator.sim_metadata, SimulationMetadata)
 
-    ### test simulation performance ###
+    ### test simulation performance ### # noqa: E266
     def prep_simulation(self, simulation_engine, num_sim_objs):
         simulation_engine.reset()
         self.make_cyclical_messaging_network_sim(simulation_engine, num_sim_objs)
@@ -454,9 +458,9 @@ class TestSimulationEngine(unittest.TestCase):
             start_time = time.process_time()
             num_events = simulation_engine.simulate(end_sim_time).num_events
             run_time = time.process_time() - start_time
-            self.assertEqual(num_sim_objs*end_sim_time, num_events)
+            self.assertEqual(num_sim_objs * end_sim_time, num_events)
             unprofiled_perf.append("{}\t{}\t{:8.3f}\t{:8.0f}".format(num_sim_objs, num_events,
-                run_time, num_events/run_time).expandtabs(15))
+                                                                     run_time, num_events / run_time).expandtabs(15))
 
             # profile
             if num_sim_objs < max_num_profile_objects:
@@ -465,7 +469,7 @@ class TestSimulationEngine(unittest.TestCase):
                 locals = {'simulation_engine': simulation_engine,
                           'end_sim_time': end_sim_time}
                 cProfile.runctx('num_events = simulation_engine.simulate(end_sim_time)',
-                    {}, locals, filename=out_file)
+                                {}, locals, filename=out_file)
                 profile = pstats.Stats(out_file)
                 print(f"Profile for {num_sim_objs} simulation objects:")
                 profile.strip_dirs().sort_stats('cumulative').print_stats(20)
@@ -490,7 +494,7 @@ class TestSimulationEngine(unittest.TestCase):
         num_sim_objs = 20
         self.prep_simulation(simulation_engine, num_sim_objs)
         end_sim_time = 200
-        expected_text =['function calls', 'Ordered by: internal time', 'filename:lineno(function)']
+        expected_text = ['function calls', 'Ordered by: internal time', 'filename:lineno(function)']
         sim_config_dict = dict(time_max=end_sim_time,
                                output_dir=self.out_dir,
                                profile=True)
@@ -514,7 +518,7 @@ class TestSimulationEngine(unittest.TestCase):
         time_max = 20
         config_dict = dict(time_max=time_max, output_dir=self.out_dir, object_memory_change_interval=10)
         self.simulator.simulate(config_dict=config_dict)
-        expected_text =['Memory use changes by SummaryTracker', '# objects', 'float']
+        expected_text = ['Memory use changes by SummaryTracker', '# objects', 'float']
         measurements = ''.join(open(self.measurements_pathname, 'r').readlines())
         for text in expected_text:
             self.assertIn(text, measurements)
@@ -535,6 +539,7 @@ class Delicate(SimulationMessage):
 class ReproducibleTestSimulationObject(ApplicationSimulationObject):
     """ This sim obj is used to test whether the simulation engine is reproducible
     """
+
     def __init__(self, name, obj_num, array_size):
         SimulationObject.__init__(self, name)
         self.obj_num = obj_num
@@ -549,7 +554,7 @@ class ReproducibleTestSimulationObject(ApplicationSimulationObject):
     def next_objs(self, num_objs):
         # get the next num_objs sim objs in the array
         sim_objs = []
-        for obj_num in range(self.obj_num, min(self.obj_num+num_objs, self.array_size)):
+        for obj_num in range(self.obj_num, min(self.obj_num + num_objs, self.array_size)):
             sim_objs.append(self.simulator.get_object(obj_name(obj_num)))
         return sim_objs
 
@@ -559,7 +564,7 @@ class ReproducibleTestSimulationObject(ApplicationSimulationObject):
         for sim_obj in self.next_objs(2):
             receivers_n_messages.append((sim_obj, Delicate(self.obj_num)))
         random.shuffle(receivers_n_messages)
-        for receiver,message in receivers_n_messages:
+        for receiver, message in receivers_n_messages:
             self.send_event(1, receiver, message)
 
     def send_initial_events(self):
@@ -571,7 +576,7 @@ class ReproducibleTestSimulationObject(ApplicationSimulationObject):
 
     def handle_delicate_msg(self, event):
         if self.last_time < self.time:
-            self.delicates_before_hello +=1
+            self.delicates_before_hello += 1
         delicate_msg = event.message
         time_delicate_num_pair = (event.event_time, delicate_msg.sender_obj_num)
         if time_delicate_num_pair <= self.last_time_delicate_num_pair:
@@ -588,6 +593,7 @@ class ReproducibleTestSimulationObject(ApplicationSimulationObject):
 class TestSimulationReproducibility(unittest.TestCase):
 
     NUM_SIM_OBJS = 4
+
     def test_reproducibility(self):
         self.simulator = SimulationEngine()
 
@@ -598,7 +604,7 @@ class TestSimulationReproducibility(unittest.TestCase):
         # test all types of event and message sorting
         num_sim_objs = TestSimulationReproducibility.NUM_SIM_OBJS
         for i in range(num_sim_objs):
-            obj_num = i+1
+            obj_num = i + 1
             self.simulator.add_object(
                 ReproducibleTestSimulationObject(obj_name(obj_num), obj_num, num_sim_objs))
         self.simulator.initialize()

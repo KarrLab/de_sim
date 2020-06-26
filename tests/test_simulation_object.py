@@ -12,7 +12,7 @@ import warnings
 
 from de_sim.errors import SimulatorError
 from de_sim.simulation_engine import SimulationEngine
-from de_sim.simulation_object import (EventQueue, SimulationObject, ApplicationSimulationObject,
+from de_sim.simulation_object import (EventQueue, ApplicationSimulationObject,
                                       ApplicationSimulationObjMeta, ApplicationSimulationObjectMetadata,
                                       SimObjClassPriority)
 from de_sim.testing.example_simulation_objects import (ALL_MESSAGE_TYPES, TEST_SIM_OBJ_STATE,
@@ -35,7 +35,7 @@ class TestEventQueue(unittest.TestCase):
         self.sender = sender = ExampleSimulationObject('sender')
         self.receiver = receiver = ExampleSimulationObject('receiver')
         for i in range(self.num_events):
-            self.event_queue.schedule_event(i, i+1, sender, receiver, InitMsg())
+            self.event_queue.schedule_event(i, i + 1, sender, receiver, InitMsg())
 
     def test_reset(self):
         self.event_queue.reset()
@@ -106,11 +106,11 @@ class TestEventQueue(unittest.TestCase):
 
         st, rt = 2, 1
         with self.assertRaisesRegex(SimulatorError,
-            re.escape("receive_time < send_time in schedule_event(): {} < {}".format(rt, st))):
-            eq.schedule_event(st, rt , None, None, '')
+                                    re.escape("receive_time < send_time in schedule_event(): {} < {}".format(rt, st))):
+            eq.schedule_event(st, rt, None, None, '')
 
         with self.assertRaisesRegex(SimulatorError,
-            'message should be an instance of SimulationMessage but is a'):
+                                    'message should be an instance of SimulationMessage but is a'):
             eq.schedule_event(1, 2, None, None, 13)
 
         with self.assertRaisesRegex(SimulatorError, 'send_time .* and/or receive_time .* is NaN'):
@@ -122,7 +122,8 @@ class TestEventQueue(unittest.TestCase):
         self.assertEqual(None, EventQueue().render())
         self.assertEqual('', str(EventQueue()))
         self.assertEqual(self.event_queue.render(), str(self.event_queue))
-        self.assertEqual(len(self.event_queue.render(as_list=True)), self.num_events+1)
+        self.assertEqual(len(self.event_queue.render(as_list=True)), self.num_events + 1)
+
         def get_event_times(eq_rendered_as_list):
             return [row[1] for row in eq_rendered_as_list[1:]]
         self.assertTrue(is_sorted(get_event_times(self.event_queue.render(as_list=True))))
@@ -131,8 +132,8 @@ class TestEventQueue(unittest.TestCase):
         test_eq = EventQueue()
         num_events = 10
         for i in range(num_events):
-            test_eq.schedule_event(i, random.uniform(i, i+num_events), self.sender, self.receiver,
-                MsgWithAttrs(2, 3))
+            test_eq.schedule_event(i, random.uniform(i, i + num_events), self.sender, self.receiver,
+                                   MsgWithAttrs(2, 3))
         self.assertTrue(is_sorted(get_event_times(test_eq.render(as_list=True))))
 
         # test multiple message types
@@ -140,8 +141,8 @@ class TestEventQueue(unittest.TestCase):
         num_events = 20
         for i in range(num_events):
             msg = random.choice([InitMsg(), MsgWithAttrs(2, 3)])
-            test_eq.schedule_event(i, i+1, self.sender, self.receiver, msg)
-        self.assertEqual(len(test_eq.render(as_list=True)), num_events+1)
+            test_eq.schedule_event(i, i + 1, self.sender, self.receiver, msg)
+        self.assertEqual(len(test_eq.render(as_list=True)), num_events + 1)
         self.assertTrue(is_sorted(get_event_times(test_eq.render(as_list=True))))
         for attr in MsgWithAttrs.__slots__:
             self.assertIn("\t{}:".format(attr), test_eq.render())
@@ -154,8 +155,8 @@ class TestEventQueue(unittest.TestCase):
         for time in times:
             self.event_queue.schedule_event(0, time, self.sender, receiver2, InitMsg())
         self.assertEqual(len(self.event_queue.render(sim_obj=self.receiver, as_list=True)),
-            self.num_events+1)
-        self.assertEqual(len(self.event_queue.render(sim_obj=receiver2, as_list=True)), len(times)+1)
+                         self.num_events + 1)
+        self.assertEqual(len(self.event_queue.render(sim_obj=receiver2, as_list=True)), len(times) + 1)
 
 
 class ASOwithoutEventHandlers(ExampleSimulationObject):
@@ -164,12 +165,14 @@ class ASOwithoutEventHandlers(ExampleSimulationObject):
 
 
 class ASOwithoutMessagesSent(ExampleSimulationObject):
-    def handler(self, event): pass
+    def handler(self, event):
+        pass
     event_handlers = [(InitMsg, 'handler')]
 
 
 class ASOwithDefaultClassPriority(ApplicationSimulationObject):
-    def handler(self, event): pass
+    def handler(self, event):
+        pass
     event_handlers = [(InitMsg, 'handler')]
 
 
@@ -196,16 +199,17 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
         ExampleSimObj = ExampleSimulationObject
         self.assertTrue(isinstance(getattr(ExampleSimObj, 'metadata'), ApplicationSimulationObjectMetadata))
         metadata = ExampleSimObj.metadata
-        expected_event_handlers = {InitMsg:ExampleSimObj.handler, Eg1:ExampleSimObj.handler}
+        expected_event_handlers = {InitMsg: ExampleSimObj.handler, Eg1: ExampleSimObj.handler}
         self.assertEqual(metadata.event_handlers_dict, expected_event_handlers)
         event_handler_priorities = metadata.event_handler_priorities
-        self.assertTrue(metadata.event_handler_priorities[InitMsg] < metadata.event_handler_priorities[Eg1])
-        self.assertEqual(metadata.event_handler_priorities[InitMsg], 0)
+        self.assertTrue(event_handler_priorities[InitMsg] < event_handler_priorities[Eg1])
+        self.assertEqual(event_handler_priorities[InitMsg], 0)
         self.assertEqual(metadata.message_types_sent, set(ALL_MESSAGE_TYPES))
 
         # test no messages_sent
         class ChildOfASOwithoutMessagesSent(ApplicationSimulationObject):
-            def handler(self, event): pass
+            def handler(self, event):
+                pass
             event_handlers = [(InitMsg, 'handler')]
         metadata = ChildOfASOwithoutMessagesSent.metadata
         self.assertEqual(metadata.message_types_sent, set())
@@ -234,17 +238,21 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
 
         # missing event_handlers and messages_sent
         expected_error = "ApplicationSimulationObject.*definition must inherit or provide a non-empty '{}' or '{}'".format(
-                EVENT_HANDLERS, MESSAGES_SENT)
+            EVENT_HANDLERS, MESSAGES_SENT)
         with self.assertRaisesRegex(SimulatorError, expected_error):
-            class EmptyASO(ApplicationSimulationObject): pass
+            class EmptyASO(ApplicationSimulationObject):
+                pass
         with self.assertRaisesRegex(SimulatorError, expected_error):
-            class BadASO1(ApplicationSimulationObject): event_handlers = []
+            class BadASO1(ApplicationSimulationObject):
+                event_handlers = []
         with self.assertRaisesRegex(SimulatorError, expected_error):
-            class BadASO2(ApplicationSimulationObject): messages_sent = []
+            class BadASO2(ApplicationSimulationObject):
+                messages_sent = []
 
         # no such handler
         with self.assertRaises(SimulatorError):
-            class BadASO3(ApplicationSimulationObject): event_handlers = [(InitMsg, 'no_such_handler')]
+            class BadASO3(ApplicationSimulationObject):
+                event_handlers = [(InitMsg, 'no_such_handler')]
 
         # handler not callable
         with self.assertRaises(SimulatorError):
@@ -258,16 +266,19 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
                 event_handlers = [(InitMsg, 'handler_not_callable')]
 
         # message must be a subclass of SimulationMessage
-        class Obj(object): pass
+        class Obj(object):
+            pass
         with self.assertRaises(SimulatorError):
             class BadASO5(ApplicationSimulationObject):
-                def handler(self, event): pass
+                def handler(self, event):
+                    pass
                 event_handlers = [(Obj, 'handler')]
 
         # event_handlers isn't iterable over pairs
         with self.assertRaises(SimulatorError):
             class BadASO6(ApplicationSimulationObject):
-                def handler(self, event): pass
+                def handler(self, event):
+                    pass
                 event_handlers = (InitMsg, 'handler')
 
         # message in messages_sent must be a subclass of SimulationMessage
@@ -283,7 +294,8 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
         # message type repeated
         with self.assertRaises(SimulatorError):
             class BadASO9(ApplicationSimulationObject):
-                def handler(self, event): pass
+                def handler(self, event):
+                    pass
                 event_handlers = [(InitMsg, 'handler'), (InitMsg, 'handler')]
 
         # class priority not an int
@@ -299,8 +311,8 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
             class PartlyRegisteredSimulationObject1(ApplicationSimulationObject):
                 messages_sent = [InitMsg]
             self.assertEqual(str(w[-1].message),
-                "ApplicationSimulationObject 'PartlyRegisteredSimulationObject1' definition does not inherit "
-                    "or provide a non-empty '{}'.".format(EVENT_HANDLERS))
+                             "ApplicationSimulationObject 'PartlyRegisteredSimulationObject1' definition does not inherit "
+                             "or provide a non-empty '{}'.".format(EVENT_HANDLERS))
             self.assertTrue(InitMsg in PartlyRegisteredSimulationObject1.metadata.message_types_sent)
             self.assertFalse(PartlyRegisteredSimulationObject1.metadata.event_handlers_dict)
 
@@ -308,13 +320,15 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
         with warnings.catch_warnings(record=True) as w:
             class PartlyRegisteredSimulationObject2(ApplicationSimulationObject):
                 event_handlers = [(InitMsg, 'handler')]
-                def handler(self): pass
+
+                def handler(self):
+                    pass
             self.assertEqual(str(w[-1].message),
-                "ApplicationSimulationObject 'PartlyRegisteredSimulationObject2' definition does not inherit "
-                    "or provide a non-empty '{}'.".format(MESSAGES_SENT))
+                             "ApplicationSimulationObject 'PartlyRegisteredSimulationObject2' definition does not inherit "
+                             "or provide a non-empty '{}'.".format(MESSAGES_SENT))
             self.assertTrue(InitMsg in PartlyRegisteredSimulationObject2.metadata.event_handlers_dict)
             self.assertEqual(PartlyRegisteredSimulationObject2.metadata.event_handlers_dict[InitMsg],
-                PartlyRegisteredSimulationObject2.handler)
+                             PartlyRegisteredSimulationObject2.handler)
 
 
 class TestSimObjClassPriority(unittest.TestCase):
@@ -345,7 +359,8 @@ class TestApplicationSimulationObject(unittest.TestCase):
     def test_set_class_priority(self):
 
         class ASOwithMediumClassPriority(ApplicationSimulationObject):
-            def handler(self, event): pass
+            def handler(self, event):
+                pass
             event_handlers = [(InitMsg, 'handler')]
 
             # set MEDIUM priority
@@ -387,7 +402,7 @@ class TestSimulationObject(unittest.TestCase):
             self.eso1.send_event_absolute(2, self.irso1, InitMsg())
 
         with self.assertRaisesRegex(SimulatorError,
-            "simulation messages must be instances of type 'SimulationMessage'; "):
+                                    "simulation messages must be instances of type 'SimulationMessage'; "):
             self.eso1.send_event_absolute(2, self.irso1, InitMsg)
 
         with self.assertRaisesRegex(SimulatorError, "event_time is 'NaN'"):
@@ -395,12 +410,12 @@ class TestSimulationObject(unittest.TestCase):
 
     def test_get_receiving_priorities_dict(self):
         self.assertTrue(ExampleSimulationObject.metadata.event_handler_priorities[InitMsg] <
-            ExampleSimulationObject.metadata.event_handler_priorities[Eg1])
+                        ExampleSimulationObject.metadata.event_handler_priorities[Eg1])
         receiving_priorities = self.eso1.get_receiving_priorities_dict()
         self.assertTrue(receiving_priorities[InitMsg] < receiving_priorities[Eg1])
 
     def test_send_events(self):
-        times=[2.0, 1.0, 0.5]
+        times = [2.0, 1.0, 0.5]
         # test both send_event methods
         for copy in [False, True]:
             for send_method in [self.o1.send_event, self.o1.send_event_absolute]:
@@ -418,7 +433,7 @@ class TestSimulationObject(unittest.TestCase):
         self.o1.send_event(0, self.o2, Eg1())
         self.o1.send_event(2, self.o2, InitMsg())
 
-        num=20
+        num = 20
         self.o1.send_event(1, self.o2, InitMsg())
         for i in range(num):
             if random.choice([True, False]):
@@ -459,29 +474,29 @@ class TestSimulationObject(unittest.TestCase):
     def test_render_event_queue(self):
         rv = self.o1.render_event_queue()
 
-        times=[2.0, 1.0, 0.5]
+        times = [2.0, 1.0, 0.5]
         for time in times:
             self.o1.send_event(time, self.o1, Eg1())
         rv = self.o1.render_event_queue()
         self.assertIn(self.o1.name, rv)
         # 1 extra row for the header
-        self.assertEqual(len(rv.split('\n')), len(times)+1)
+        self.assertEqual(len(rv.split('\n')), len(times) + 1)
         for time in times:
             self.assertIn(str(time), rv)
 
     def test_event_exceptions(self):
         delay = -1.0
         with self.assertRaisesRegex(SimulatorError,
-            re.escape("delay < 0 in send_event(): {}".format(delay))):
+                                    re.escape("delay < 0 in send_event(): {}".format(delay))):
             self.o1.send_event(delay, self.o2, Eg1())
 
         event_time = -1
         with self.assertRaisesRegex(SimulatorError,
-            r'event_time \(-1.*\) < current time \(0.*\) in send_event_absolute\(\)'):
+                                    r'event_time \(-1.*\) < current time \(0.*\) in send_event_absolute\(\)'):
             self.o1.send_event_absolute(event_time, self.o2, Eg1())
 
         with self.assertRaisesRegex(SimulatorError,
-            "SimulationObject '{}' is already part of a simulator".format(self.o1.name)):
+                                    "SimulationObject '{}' is already part of a simulator".format(self.o1.name)):
             self.o1.add(self.simulator)
 
         with self.assertRaisesRegex(SimulatorError, "delay is 'NaN'"):

@@ -44,7 +44,7 @@ class TestCheckpoint(unittest.TestCase):
         diff_state = [[1, 2], 3, 4]
         diff_random_state = random.RandomState(seed=1)
         diff_attrs = dict(time=diff_time, state=diff_state,
-            random_state=diff_random_state)
+                          random_state=diff_random_state)
         self.diff_checkpoints = []
         for attr in ['time', 'state', 'random_state']:
             args = copy.deepcopy(attrs)
@@ -56,7 +56,7 @@ class TestCheckpoint(unittest.TestCase):
         self.assertEqual(self.empty_checkpoint1, self.empty_checkpoint1)
         self.assertEqual(self.empty_checkpoint1, self.empty_checkpoint2)
         self.assertNotEqual(self.empty_checkpoint1, obj)
-        self.assertTrue(self.empty_checkpoint1 != None)
+        self.assertTrue(self.empty_checkpoint1 is not None)
 
         self.assertEqual(self.non_empty_checkpoint1, self.non_empty_checkpoint1)
         self.assertEqual(self.non_empty_checkpoint1, self.non_empty_checkpoint2)
