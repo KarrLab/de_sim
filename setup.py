@@ -37,7 +37,7 @@ setuptools.setup(
     author="Karr Lab",
     author_email="info@karrlab.org",
     license="MIT",
-    keywords='discrete event simulation DES Python',
+    keywords='discrete event simulation, DES, object-oriented, Python',
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     package_data=md.package_data,
     install_requires=md.install_requires,
