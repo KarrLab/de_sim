@@ -40,7 +40,7 @@ Please see the [API documentation](https://docs.karrlab.org/de_sim).
 The package is released under the [MIT license](LICENSE).
 
 ## Contributing to `DE-Sim`
-We enthusiastically welcome contributions to DE-Sim! Please see the [guide to contributing](CONTRIBUTING.md) and the [developer's code of conduct](CODE_OF_CONDUCT.md).
+We enthusiastically welcome contributions to `DE-Sim`! Please see the [guide to contributing](CONTRIBUTING.md) and the [developer's code of conduct](CODE_OF_CONDUCT.md).
 
 ## Development team
 This package was developed by the [Karr Lab](https://www.karrlab.org) at the Icahn School of Medicine at Mount Sinai in New York, USA by the following individuals:

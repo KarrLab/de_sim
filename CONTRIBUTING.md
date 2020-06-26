@@ -1,6 +1,6 @@
-# Contributing to DE-Sim
+# Contributing to `DE-Sim`
 
-We enthusiastically welcome contributions to DE-Sim!
+We enthusiastically welcome contributions to `DE-Sim`!
 
 ## Coordinating contributions
 
@@ -8,9 +8,9 @@ Before getting started, please contact the lead developers at [info@karrlab.org]
 
 ## Repository organization
 
-DE-Sim follows standard Python conventions:
+`DE-Sim` follows standard Python conventions:
 
-* `README.md`: Overview of DE-Sim
+* `README.md`: Overview of `DE-Sim`
 * `de_sim/`: Source code
 * `docs/`: Documentation
 * `tests/`: Unit tests
@@ -22,12 +22,12 @@ DE-Sim follows standard Python conventions:
 * `manifest.in`: List of files to include in package
 * `codemeta.json`: Package metadata
 * `LICENSE`: License
-* `CONTRIBUTING.md`: Guide to contributing to DE-Sim (this document)
+* `CONTRIBUTING.md`: Guide to contributing to `DE-Sim` (this document)
 * `CODE_OF_CONDUCT.md`: Code of conduct for developers
 
 ## Coding convention
 
-DE-Sim follows standard Python style conventions:
+`DE-Sim` follows standard Python style conventions:
 
 * Class names: `UpperCamelCase`
 * Function names: `lower_snake_case`
@@ -35,7 +35,7 @@ DE-Sim follows standard Python style conventions:
 
 ## Testing and continuous integration
 
-We strive to have complete test coverage of DE-Sim. As such, all contributions to DE-Sim should be tested. 
+We strive to have complete test coverage of `DE-Sim`. As such, all contributions to `DE-Sim` should be tested. 
 
 The tests are located in the `tests`  directory. The tests can be executed by running the following command.
 ```
@@ -54,7 +54,7 @@ Upon each push to GitHub, GitHub will trigger CircleCI to execute all of the tes
 
 ## Documentation convention
 
-DE-Sim is documented using [reStructuredText](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html) and the [napoleon Sphinx plugin](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html). The documentation can be compiled with [Sphinx](https://www.sphinx-doc.org/) by running `sphinx-build docs docs/_build/html`. The compiled documentation is available at [https://docs.karrlab.org/de_sim/](https://docs.karrlab.org/de_sim/).
+`DE-Sim` is documented using [reStructuredText](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html) and the [napoleon Sphinx plugin](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html). The documentation can be compiled with [Sphinx](https://www.sphinx-doc.org/) by running `sphinx-build docs docs/_build/html`. The compiled documentation is available at [https://docs.karrlab.org/de_sim/](https://docs.karrlab.org/de_sim/).
 
 ## Submitting changes
 

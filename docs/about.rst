@@ -14,7 +14,7 @@ The software is released under the MIT license:
 Contributing to `DE-Sim`
 ------------------------
 
-We enthusiastically welcome contributions to DE-Sim! Please see the `guide to contributing <https://github.com/KarrLab/de_sim/blob/master/CONTRIBUTING.md>`_ and the `developer's code of conduct <https://github.com/KarrLab/de_sim/blob/master/CODE_OF_CONDUCT.md>`_.
+We enthusiastically welcome contributions to `DE-Sim`! Please see the `guide to contributing <https://github.com/KarrLab/de_sim/blob/master/CONTRIBUTING.md>`_ and the `developer's code of conduct <https://github.com/KarrLab/de_sim/blob/master/CODE_OF_CONDUCT.md>`_.
 
 ----------------------
 Development team
