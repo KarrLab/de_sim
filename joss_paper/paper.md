@@ -1,22 +1,23 @@
 ---
 title: 'DE-Sim: An Object-Oriented Discrete-Event Simulator in Python'
 tags:
-  - Python
   - dynamical modeling
   - simulation
   - discrete-event simulation
   - object-oriented simulation
   - parallel discrete-event simulation
+  - biochemical modeling
   - whole-cell modeling
+  - Python
 authors:
   - name: Arthur P. Goldberg
     orcid: 0000-0003-2772-1484
     affiliation: "1"
   - name: Jonathan R. Karr
     orcid: 0000-0002-2605-5080
-    affiliation: "1" # (Multiple affiliations must be quoted)
+    affiliation: "1"
 affiliations:
- - name: Department of Genetics and Genomic Sciences, and Icahn Institute for Genomics and Multiscale Biology, Icahn School of Medicine at Mount Sinai, New York, NY, 10029, USA
+ - name: Icahn Institute for Data Science and Genomic Technology and Department of Genetics and Genomic Sciences, Icahn School of Medicine at Mount Sinai, New York, NY 10029, USA
    index: 1
 date: 20 July 2020
 bibliography: paper.bib
@@ -162,6 +163,6 @@ We present the statistics of three runs made in a Docker container executing on 
 # Acknowledgements
 
 This worked was supported by National Science Foundation award 1649014 and National
-Institutes of Health award R35GM119771 to J.K.
+Institutes of Health award R35GM119771 to J.R.K.
 
 # References
