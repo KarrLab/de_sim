@@ -28,7 +28,7 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
     __slots__ = []
 
     def __init__(self, *args):
-        """ Initialize a `SimulationMessage`
+        """ Initialize a :obj:`SimulationMessage`
 
         Args:
             args (:obj:`tuple`): argument list for initializing a subclass instance
@@ -227,15 +227,15 @@ class SimulationMessage(SimulationMessageInterface, metaclass=CombinedSimulation
     """ The simulation message base class
 
     Each simulation event contains a simulation message. All simulation messages are objects. This
-    module supports compact declaration of `SimulationMessage` types. For example::
+    module supports compact declaration of :obj:`SimulationMessage` types. For example::
 
-    class ExampleSimulationMessage1(SimulationMessage):
-        ' My docstring '
-        attributes = ['attr1', 'attr2']
+        class ExampleSimulationMessage1(SimulationMessage):
+            ''' Docstring '''
+            attributes = ['attr1', 'attr2']
 
     defines the `ExampleSimulationMessage1` class with a short docstring and two attributes.
 
-    `SimulationMessage` subclasses must support the comparison operations `<`, `<=`, etc. This is
+    :obj:`SimulationMessage` subclasses must support the comparison operations `<`, `<=`, etc. This is
     provided automatically for attributes that support comparison. Subclasses with message attributes
     that do not support comparison must override `__lt__`, `__le__`, etc.
     """

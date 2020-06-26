@@ -1,7 +1,7 @@
-de_sim documentation
-===================
+DE-Sim documentation
+====================
 
-Python framework for discrete event simulation (DES)
+Python framework for Discrete Event Simulation (DES)
 
 Contents
 --------
