@@ -43,7 +43,7 @@
     "programmingLanguage": {
         "@type": "ComputerLanguage",
         "name": "Python",
-        "version": "3.7",
+        "version": "3.6",
         "url": "https://python.org"
     },
     "funding": "This worked was supported by National Science Foundation award 1649014 and National Institutes of Health award R35GM119771."

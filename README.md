@@ -18,7 +18,7 @@ subclasses of `SimulationObject`.
 ## Installation
 1. Install dependencies
     
-    * Python >= 3.7
+    * Python >= 3.6
     * pip >= 19
 
 2. Install this package 
