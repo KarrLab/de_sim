@@ -6,9 +6,9 @@
 [![License](https://img.shields.io/github/license/KarrLab/de_sim.svg)](LICENSE)
 ![Analytics](https://ga-beacon.appspot.com/UA-86759801-1/de_sim/README.md?pixel)
 
-# de_sim
+# DE-Sim
 
-`de_sim` provides an object-oriented discrete event simulation
+`DE-Sim` provides an object-oriented discrete event simulation
 tool for Python that's similar to Simula.
 Simulation logical processes are objects and they schedule
 simulation events by exchanging messages.
@@ -33,14 +33,23 @@ subclasses of `SimulationObject`.
       pip install git+https://github.com/KarrLab/de_sim.git#egg=de_sim
       ```
 
-## Documentation
+## API documentation
 Please see the [API documentation](https://docs.karrlab.org/de_sim).
 
 ## License
 The package is released under the [MIT license](LICENSE).
 
+## Contributing to `DE-Sim`
+We enthusiastically welcome contributions to DE-Sim! Please see the [guide to contributing](CONTRIBUTING.md) and the [developer's code of conduct](CODE_OF_CONDUCT.md).
+
 ## Development team
-This package was developed by the [Karr Lab](https://www.karrlab.org) at the Icahn School of Medicine at Mount Sinai in New York, USA.
+This package was developed by the [Karr Lab](https://www.karrlab.org) at the Icahn School of Medicine at Mount Sinai in New York, USA by the following individuals:
+
+* [Arthur Goldberg](https://www.mountsinai.org/profiles/arthur-p-goldberg)
+* [Jonathan Karr](https://www.karrlab.org)
+
+## Acknowledgements
+This work was supported by National Science Foundation award 1649014 and National Institutes of Health award R35GM119771.
 
 ## Questions and comments
-Please contact the [Karr Lab](https://www.karrlab.org) with any questions or comments.
+Please submit questions and issues to [GitHub](https://github.com/KarrLab/de_sim/issues) or contact the [Karr Lab](mailto:info@karrlab.org).
