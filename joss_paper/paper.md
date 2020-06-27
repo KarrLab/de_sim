@@ -160,6 +160,20 @@ DE-Sim achieves good performance by using Python's `heapq` priority queue packag
 We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 processor in a MacBook.
 \label{fig:performance}](performance.png)
 
+# Availability
+
+DE-Sim is freely and openly available under the MIT license at the locations below.
+* Python package: [https://pypi.org/project/de-sim/](https://pypi.org/project/de-sim/)
+* Docker image: [https://hub.docker.com/r/karrlab/de_sim](https://hub.docker.com/r/karrlab/de_sim)
+* Documentation, including installation instructions, examples, and API documentation: [https://docs.karrlab.org/de_sim/](https://docs.karrlab.org/de_sim/)
+* Issue tracker: [https://github.com/KarrLab/de_sim/issues/](https://github.com/KarrLab/de_sim/issues/)
+* Source code and guide for contributing to DE-Sim: [https://github.com/KarrLab/de_sim/](https://github.com/KarrLab/de_sim/)
+* Continuous integration: [http://circleci.com/gh/KarrLab/de_sim/](http://circleci.com/gh/KarrLab/de_sim/)
+
+DE-Sim requires [Python](https://www.python.org/) 3.6 or higher and [pip](https://pip.pypa.io/).
+
+This article discusses version 0.0.2 of DE-Sim.
+
 # Acknowledgements
 
 This worked was supported by National Science Foundation award 1649014 and National
