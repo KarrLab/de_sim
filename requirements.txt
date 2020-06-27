@@ -5,4 +5,4 @@ numpy
 progressbar2 >= 3.39
 pympler
 setuptools
-wc_utils[git]
+wc_utils[git] >= 0.0.16
