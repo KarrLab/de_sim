@@ -11,7 +11,13 @@ Latest release from PyPI
 ---------------------------
 Run the following command to install the latest release from PyPI::
 
-    de_sim
+    pip install de_sim
+
+Latest release from DockerHub
+-----------------------------
+Run the following command to install a Docker image with the latest release from DockerHub::
+
+    docker pull karrlab/de_sim
 
 Latest revision from GitHub
 ---------------------------

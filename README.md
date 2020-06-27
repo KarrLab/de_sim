@@ -25,7 +25,12 @@ subclasses of `SimulationObject`.
 
     * Install latest release from PyPI
       ```
-      de_sim
+      pip install de_sim
+      ```
+
+    * Install a Docker image with the latest release from DockerHub
+      ```
+      docker pull karrlab/de_sim
       ```
 
     * Install latest revision from GitHub
