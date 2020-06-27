@@ -4,9 +4,12 @@ include README.rst
 # license
 include LICENSE
 
-# examples
-recursive-include de_sim/examples *
-
 # requirements
 include requirements.txt
 include requirements.optional.txt
+
+# configuration
+recursive-include de_sim/config *.cfg
+
+# examples
+recursive-include de_sim/examples *
