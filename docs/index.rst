@@ -1,12 +1,9 @@
 `DE-Sim` documentation
 ======================
 
-`DE-Sim` provides an object-oriented discrete event simulation
-tool for Python that's similar to Simula.
-Simulation logical processes are objects and they schedule
-simulation events by exchanging messages.
-Simulation applications are composed of multiple
-subclasses of :py:class:`SimulationObject`.
+`DE-Sim` provides an object-oriented discrete event simulation tool for Python. 
+
+`DE-Sim` is similar to `Simula <http://www.simula67.info/>`_. Simulation logical processes are objects, and they schedule simulation events by exchanging messages. Simulation applications are composed of multiple subclasses of :py:class`de_sim.simulation_object.SimulationObject`.
 
 Contents
 --------

@@ -1,4 +1,4 @@
-[//]: # ( [![PyPI package](https://img.shields.io/pypi/v/de_sim.svg)](https://pypi.python.org/pypi/de_sim) )
+[![PyPI package](https://img.shields.io/pypi/v/de_sim.svg)](https://pypi.python.org/pypi/de_sim)
 [![Documentation](https://readthedocs.org/projects/de_sim/badge/?version=latest)](https://docs.karrlab.org/de_sim)
 [![Test results](https://circleci.com/gh/KarrLab/de_sim.svg?style=shield)](https://circleci.com/gh/KarrLab/de_sim)
 [![Test coverage](https://coveralls.io/repos/github/KarrLab/de_sim/badge.svg)](https://coveralls.io/github/KarrLab/de_sim)
@@ -8,12 +8,9 @@
 
 # DE-Sim
 
-`DE-Sim` provides an object-oriented discrete event simulation
-tool for Python that's similar to Simula.
-Simulation logical processes are objects and they schedule
-simulation events by exchanging messages.
-Simulation applications are composed of multiple
-subclasses of `SimulationObject`.
+`DE-Sim` provides an object-oriented discrete event simulation tool for Python. 
+
+`DE-Sim` is similar to [Simula](http://www.simula67.info/). Simulation logical processes are objects, and they schedule simulation events by exchanging messages. Simulation applications are composed of multiple subclasses of `de_sim.simulation_object.SimulationObject`.
 
 ## Installation
 1. Install dependencies
