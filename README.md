@@ -51,7 +51,7 @@ This package was developed by the [Karr Lab](https://www.karrlab.org) at the Ica
 * [Jonathan Karr](https://www.karrlab.org)
 
 ## Acknowledgements
-This work was supported by National Science Foundation award 1649014 and National Institutes of Health award R35GM119771.
+This work was supported by National Science Foundation award 1649014, National Institutes of Health award R35GM119771, and the Icahn Institute for Data Science and Genomic Technology.
 
 ## Questions and comments
 Please submit questions and issues to [GitHub](https://github.com/KarrLab/de_sim/issues) or contact the [Karr Lab](mailto:info@karrlab.org).

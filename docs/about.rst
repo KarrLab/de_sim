@@ -29,7 +29,7 @@ This package was developed by the `Karr Lab <https://www.karrlab.org/>`_ at the 
 Acknowledgements
 ----------------------
 
-This work was supported by National Science Foundation award 1649014 and National Institutes of Health award R35GM119771.
+This work was supported by National Science Foundation award 1649014, National Institutes of Health award R35GM119771, and the Icahn Institute for Data Science and Genomic Technology.
 
 ----------------------
 Questions and comments

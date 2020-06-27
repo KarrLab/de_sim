@@ -177,7 +177,7 @@ This article discusses version 0.0.2 of DE-Sim.
 
 # Acknowledgements
 
-This worked was supported by National Science Foundation award 1649014 and National
-Institutes of Health award R35GM119771 to J.R.K.
+This worked was supported by the National Science Foundation [award 1649014 to J.R.K.], the National
+Institutes of Health [award R35GM119771 to J.R.K], and the Icahn Institute for Data Science and Genomic Technology.
 
 # References
