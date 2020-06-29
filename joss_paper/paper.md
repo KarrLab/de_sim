@@ -25,18 +25,15 @@ bibliography: paper.bib
 
 # Summary
 
-Discrete-event simulation (DES) is a simulation method that modelers use to analyze systems whose events occur at discrete instants in time.
-DES models dynamically create events and determine their simulation times.
-Many fields employ models that use DES, including modeling of biochemical dynamics, computer network performance analysis, war gaming, modeling of infectious disease transmission, and others [@banks2005discrete].
+A central challenge in science is to understand how systems behaviors emerge from complex networks. For example, systems biology seeks to understand how cellular phenotypes emerge from complex biochemical networks. Due to recent advances in data collection and storage, many scientific fields now have extensive data about a wide range of complex networks. Larger and more comprehensive models, such as models of entire cells [@karr2015principles, @goldberg2018emerging, @karr2012whole], are needed to decipher this data. However, it remains difficult to build and simulate complex models.
 
-The construction of a DES model can be simplified and accelerated by using a DES simulator that implements the generic features needed by all DES models, primarily efficient execution of events in increasing simulation time order.
-Model construction can be further enhanced, and models can be made more comprehensible and reusable, by structuring models as object-oriented programs.
-This approach, known as *object-oriented discrete-event simulation* (OO DES), recommends that models represent entities in the system being modeled as objects, and represent interactions between entities as event messages exchanged between objects.
-OO DES was invented in the 1960s by the SIMULA language [@dahl1966simula; @nygaard1978development] and continues to be used by modern tools such as SystemC [@mueller2001simulation; @ieee2012ieee] and SIMUL8 [@concannon2003dynamic].
+One of the most promising methods for simulating large models is discrete-event simulation (DES). DES represents a system as a collection of processes that can read the values of a set of shared variables and create events to modify their values at discrete instants in time. DES is ideal for large models because its discrete structure is conducive to parallel execution. For example, Barnes et al. have executed DES models using nearly 2 million cores [@Barnes2013]. Several DES frameworks are available. This includes basic frameworks such as SimPy [@matloff2008introduction] which enable scientists to implement models using functional programming; high-performance, parallelized, object-oriented frameworks such as POSE [@wilmarth2005pose] and ROSS [@carothers2002ross] which support C-based models; and commercial frameworks such as Simula8 [@concannon2003dynamic] which provide proprietary languages for describing models. DES has been applied to a wide range of models. For example, epidemiologists have used DES to simulate the transmission of infectious disease, computer engineers have used DES to simulate distributed computer networks, and the military often uses DES to simulate wars [@banks2005discrete]. However, it remains challenging to use DES for large data-driven models. It is difficult to implement complex models using functional frameworks such as SimPy, and it is difficult to use high-level data science tools such as Pandas [@mckinney2010data] with C-based frameworks such as POSE and ROSS.
 
-DE-Sim is a Python package that supports OO DES simulations.
+To make it easier to construct and simulate complex, data-driven models, we used Python to develop DE-Sim, an open-source, object-oriented discrete-event simulation framework. Because DE-Sim is implemented in Python, DE-Sim makes it easy to use Python-based data science tools such as NumPy [@oliphant2006guide], Pandas, SciPy [@virtanen2020scipy], and SQLAlchemy [@bayer2020sqlalchemy] to build models and analyze simulation results. We have extensively tested and documented DE-Sim. As described below, DE-Sim is freely available from GitHub and PyPI.
 
-# Research purpose
+Here, we describe the models that DE-Sim enables, outline the features of DE-Sim, provide a brief tutorial of building and simulating models with DE-Sim, analyze the performance of DE-Sim, summarize how we are using DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a simulator for whole-cell models, and describe the advantages of DE-Sim over existing DES frameworks. Additional examples, tutorials, installation instructions, and source code documentation are available at [https://github.com/KarrLab/de_sim](https://github.com/KarrLab/de_sim).
+
+# Need: simpler tools for building and simulating data-driven models
 
 DE-Sim is needed by researchers who want to build OO DES models in Python because existing open source Python simulators do not support an object-oriented, message-passing interface.
 We have used DE-Sim as a platform for a simulator of whole-cell models that comprehensively represent the biochemical dynamics in individual biological cells [@goldberg2020wc_sim; @goldberg2018emerging].
@@ -51,7 +48,27 @@ The OO DES framework makes parallel simulation feasible because 1) objects that 
 An example research model accelerated by parallel simulation analyzes epidemic outbreak phenomena [@perumalla2012discrete].
 We plan to speed up whole-cell models of human cells with parallel simulation in future work [@goldberg2016toward].
 
-# DE-Sim features
+# Key features
+
+DE-Sim offers the following features:
+
+* **Object-oriented Python models:** DE-Sim enables researchers to use object-oriented Python programming to build models. This makes it easy to use large datasets and packages such as NumPy, Pandas, SciPy, and SQLAlchemy to build complex data-driven models.
+* **Stop conditions:** DE-Sim make it easy to use Python functions to implement stop conditions. These functions simply must return true when the simulation state has reached one or more stop conditions.
+* **Recording simulation trajectories:** DE-Sim can record the results of each simulation, as well as metadata such as its start time, run time, and the IP address of the machine which executed the simulation.
+* **Space-time visualizations:** DE-Sim can generate space-time visualization of simulation trajectories (\autoref{fig:phold_space_time_plot}). These diagrams can be valuable tools for understanding and debugging models.
+* **Checkpointing:** DE-Sim can checkpoint the state of simulations. These checkpoints can be used to restart or debug simulations. Checkpointing is particularly helpful for using DE-Sim on clusters that have short execution limits or for using DE-Sim on spot-priced virtual machines in the commercial cloud.
+* --
+* **Simulation configuration:** DE-Sim simulations can be configured using simple text files. These files can be used to control XXX.
+* **Model validation:** Extensive error detection
+
+![A space-time visualization of all messages and events in an 8 time unit simulation of the PHOLD parallel DES benchmark with exponentially-distributed event delays with $\mu=1$ and a probability of 0.5 of objects scheduling the next event for themselves [@fujimoto1990performance; @Barnes2013].
+A timeline for each object shows its events as gray dots.
+Event messages are shown as arrows, with the arrow tail located at the (object instance, simulation time) coordinates when an event message was created and sent, and the arrow head located at the coordinates when the event message is executed.
+At time 0 each PHOLD object sends an initialization message to itself.
+Curved blue arrows represent event messages sent by objects to themselves, while straight purple arrows illustrate messages sent to another object. The source code for the PHOLD model is available in the DE-Sim Git repository.
+\label{fig:phold_space_time_plot}](phold_space_time_plot.png)
+
+# Tutorial: Building and simulating models
 
 A OO DES application that uses DE-Sim can be defined in three steps:
 
@@ -121,37 +138,7 @@ num_events = simulation_engine.run(25)
 ```
 This runs a simulation for 25 time units, and obtains the number of events executed.
 
-DE-Sim offers many additional features:
-
-* Simple configuration from files
-* Optional periodic checkpoints
-* Quick construction of periodic simulation objects from a template
-* Control of simulation termination by a user-defined Python function that returns a boolean
-* Recording of simulation run metadata, including start time, run time, and IP address
-* Visualization of simulation run event messages trace
-* Extensive error detection
-* Logging
-* Performance profiling that uses Python's `cProfile` package
-* Memory use analysis that uses Python's `pympler.tracker` package
-* Extensive documentation
-* Unit tests with 98% coverage
-
-# Visualization of simulation traces
-
-DE-Sim generates space-time visualizations of event traces that help debug and understand an OO DES application.
-\autoref{fig:phold_space_time_plot} visualizes a simulation run of the PHOLD parallel DES benchmark [@fujimoto1990performance; @Barnes2013] (see `phold.py` in DE-Sim's `examples` directory).
-This simulation parameterizes PHOLD as follows.
-An event schedules another event to occur after an exponentially distributed delay with $\mu=1$.
-An object schedules the next event for itself with probability 0.5; otherwise the next event is scheduled for another PHOLD object selected at random.
-
-![A space-time visualization of all messages and events in an 8 time unit simulation of PHOLD.
-A timeline for each object shows its events as gray dots.
-Event messages are shown as arrows, with the arrow tail located at the (object instance, simulation time) coordinates when an event message was created and sent, and the arrow head located at the coordinates when the event message is executed.
-At time 0 each PHOLD object sends an initialization message to itself.
-Curved blue arrows represent event messages sent by objects to themselves, while straight purple arrows illustrate messages sent to another object.
-\label{fig:phold_space_time_plot}](phold_space_time_plot.png)
-
-# DE-Sim performance
+# Performance
 
 DE-Sim achieves good performance by using Python's `heapq` priority queue package to schedule events.
 \autoref{fig:performance} reports the performance of DE-Sim over a range of simulation sizes.
@@ -160,20 +147,33 @@ DE-Sim achieves good performance by using Python's `heapq` priority queue packag
 We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 processor in a MacBook.
 \label{fig:performance}](performance.png)
 
+# Case study: a simulator for whole-cell models
+
+# Comparison with other DES frameworks
+
+* Low-level frameworks in high-level languages
+  * SimPy
+* High-performance C-based frameworks
+  * POSE
+  * ROSS
+* Commercial frameworks with proprietary modeling languages
+  * Simul8
+
 # Availability
 
 DE-Sim is freely and openly available under the MIT license at the locations below.
 
-* Python package: [https://pypi.org/project/de-sim/](https://pypi.org/project/de-sim/)
-* Docker image: [https://hub.docker.com/r/karrlab/de_sim](https://hub.docker.com/r/karrlab/de_sim)
-* Documentation, including installation instructions, examples, and API documentation: [https://docs.karrlab.org/de_sim/](https://docs.karrlab.org/de_sim/)
-* Issue tracker: [https://github.com/KarrLab/de_sim/issues/](https://github.com/KarrLab/de_sim/issues/)
-* Source code and guide for contributing to DE-Sim: [https://github.com/KarrLab/de_sim/](https://github.com/KarrLab/de_sim/)
-* Continuous integration: [http://circleci.com/gh/KarrLab/de_sim/](http://circleci.com/gh/KarrLab/de_sim/)
+* Python package: [PyPI: de-sim](https://pypi.org/project/de-sim/)
+* Docker image: [DockerHub: karrlab/de_sim](https://hub.docker.com/r/karrlab/de_sim)
+* Examples, tutorials, and documentation: [docs.karrlab.org](https://docs.karrlab.org/de_sim/)
+* Issue tracker: [GitHub: KarrLab/de_sim](https://github.com/KarrLab/de_sim/issues/)
+* Source code: [GitHub: KarrLab/de_sim](https://github.com/KarrLab/de_sim/)
+* Guide to contributing and code of conduct: [GitHub: KarrLab/de_sim](https://github.com/KarrLab/de_sim/)
+* Continuous integration: [CircleCI: gh/KarrLab/de_sim](http://circleci.com/gh/KarrLab/de_sim/)
 
 DE-Sim requires [Python](https://www.python.org/) 3.6 or higher and [pip](https://pip.pypa.io/).
 
-This article discusses version 0.0.2 of DE-Sim.
+This article discusses version 0.0.3 of DE-Sim.
 
 # Acknowledgements
 
