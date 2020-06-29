@@ -27,6 +27,8 @@ class TestSimulationMetadata(unittest.TestCase):
 
         simulator_repo, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
         self.simulator_repo = simulator_repo
+        simulator_repo_equal, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
+        self.simulator_repo_equal = simulator_repo_equal
 
         self.simulation_config = simulation_config = SimulationConfig(time_max=100, progress=False)
 
@@ -44,7 +46,7 @@ class TestSimulationMetadata(unittest.TestCase):
         self.run_different.record_run_time()
 
         self.metadata = SimulationMetadata(simulation_config, run, author, simulator_repo)
-        self.metadata_equal = SimulationMetadata(simulation_config, run, author, simulator_repo)
+        self.metadata_equal = SimulationMetadata(simulation_config, run, author, simulator_repo_equal)
         self.metadata_different = SimulationMetadata(simulation_config, run, author_different, simulator_repo)
 
     def tearDown(self):
@@ -78,6 +80,41 @@ class TestSimulationMetadata(unittest.TestCase):
         self.assertEqual(self.author, self.author_equal)
         self.assertNotEqual(self.author, obj)
         self.assertNotEqual(self.author, self.author_different)
+
+    def test_semantically_equal(self):
+        # RunMetadata.semantically_equal always returns True
+        self.assertTrue(self.run.semantically_equal(self.run_equal))
+        self.assertTrue(self.run_equal.semantically_equal(self.run))
+        self.assertTrue(self.run_equal.semantically_equal(self.run_different))
+
+        # SimulationMetadata
+        self.assertTrue(self.metadata.semantically_equal(self.metadata_equal))
+        self.assertTrue(self.metadata_equal.semantically_equal(self.metadata))
+
+        # run not used by SimulationMetadata.semantically_equal
+        self.metadata_equal.run = self.run_different
+        self.assertTrue(self.metadata_equal.semantically_equal(self.metadata))
+
+        # simulation_config used by semantically_equal
+        self.metadata_equal.simulation_config = SimulationConfig(time_max=99)
+        self.assertFalse(self.metadata_equal.semantically_equal(self.metadata))
+        self.assertFalse(self.metadata.semantically_equal(self.metadata_equal))
+        self.metadata_equal.simulation_config = self.simulation_config
+
+        # author used by semantically_equal
+        self.metadata_equal.author = self.author_different
+        self.assertFalse(self.metadata_equal.semantically_equal(self.metadata))
+        self.assertFalse(self.metadata.semantically_equal(self.metadata_equal))
+        self.metadata_equal.author = self.author
+
+        # simulator_repo used by semantically_equal
+        self.metadata_equal.simulator_repo.url = self.simulator_repo_equal.url + 'xxx'
+        self.assertFalse(self.metadata_equal.semantically_equal(self.metadata))
+        self.assertFalse(self.metadata.semantically_equal(self.metadata_equal))
+        self.metadata_equal.simulator_repo = self.simulator_repo
+
+        # still semantically_equal with attributes reset
+        self.assertTrue(self.metadata_equal.semantically_equal(self.metadata))
 
     def test_as_dict(self):
         d = dataclasses.asdict(self.metadata)

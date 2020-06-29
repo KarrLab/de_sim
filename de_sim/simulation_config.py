@@ -124,3 +124,19 @@ class SimulationConfig(EnhancedDataClass):
         if self.profile and 0 < self.object_memory_change_interval:
             raise SimulatorError('profile and object_memory_change_interval cannot both be active, '
                                  'as the combination slows DE Sim dramatically')
+
+    def semantically_equal(self, other):
+        """ Are two instances semantically equal with respect to a simulation's predictions?
+
+        Overrides `semantically_equal` in :obj:`EnhancedDataClass`.
+        The only attributes that are semantically meaningful to a simulation's predictions are
+        `time_max` and `time_init`. Although they're floats, they are compared exactly because
+        they're simulation inputs, not computed outputs.
+
+        Args:
+            other (:obj:`Object`): other object
+
+        Returns:
+            :obj:`bool`: :obj:`True` if `other` is semantically equal to `self`, :obj:`False` otherwise
+        """
+        return self.time_max == other.time_max and self.time_init == other.time_init

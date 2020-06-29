@@ -155,6 +155,16 @@ class TestSimulationConfig(unittest.TestCase):
         simulation_config_copy = copy.deepcopy(self.simulation_config_no_stop_cond)
         self.assertEquals(self.simulation_config_no_stop_cond, simulation_config_copy)
 
+    def test_semantically_equal(self):
+        simulation_config = SimulationConfig(self.time_max, self.time_init,
+                                             self.stop_condition, self.output_dir, self.progress)
+        self.assertTrue(self.simulation_config.semantically_equal(simulation_config))
+        simulation_config.progress = not simulation_config.progress
+        # progress is not semantically meaningful
+        self.assertTrue(self.simulation_config.semantically_equal(simulation_config))
+        simulation_config.time_max += 1E-12
+        self.assertFalse(self.simulation_config.semantically_equal(simulation_config))
+
 
 class ExampleClass(object):
     def f(): pass

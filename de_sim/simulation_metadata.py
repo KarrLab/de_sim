@@ -29,7 +29,7 @@ class RunMetadata(EnhancedDataClass):
     Attributes:
         ip_address (:obj:`str`): ip address of the machine that ran the simulation
         start_time (:obj:`datetime`): simulation clock start time
-        run_time (:obj:`float`): simulation run time in seconds
+        run_time (:obj:`float`): simulation run time in real seconds
     """
 
     ip_address: str = None
@@ -51,6 +51,20 @@ class RunMetadata(EnhancedDataClass):
             super().__setattr__(name, value)
         except TypeError as e:
             raise SimulatorError(e)
+
+    def semantically_equal(self, other):
+        """ Evaluate whether two instances of :obj:`RunMetadata` are semantically equal
+
+        Always returns :obj:`True`, because none of the attributes in :obj:`RunMetadata` are important
+        to a simulations' results
+
+        Args:
+            other (:obj:`Object`): other object
+
+        Returns:
+            :obj:`bool`: :obj:`True`
+        """
+        return True
 
 
 @dataclass
@@ -116,3 +130,21 @@ class SimulationMetadata(EnhancedDataClass):
             super().__setattr__(name, value)
         except TypeError as e:
             raise SimulatorError(e)
+
+    def semantically_equal(self, other):
+        """ Are two instances semantically equal with respect to a simulation's predictions?
+
+        Overrides `semantically_equal` in :obj:`EnhancedDataClass`.
+        Ignore run, as a :obj:`RunMetadata` is not semantically meaningful to a simulation's predictions
+        and depends on a simulation's performance.
+
+        Args:
+            other (:obj:`Object`): other object
+
+        Returns:
+            :obj:`bool`: :obj:`True` if `other` is semantically equal to `self`, :obj:`False` otherwise
+        """
+        return self.simulation_config.semantically_equal(other.simulation_config) and \
+            self.author.semantically_equal(other.author) and \
+            self.simulator_repo == other.simulator_repo # RepositoryMetadata not an EnhancedDataClass,
+                                                        # so it doesn't define semantically_equal()
