@@ -1,4 +1,4 @@
-""" A simple example simulation. Implements PHOLD.
+""" Parallel hold (PHOLD) model commonly used to benchmark discrete-event simulation tools :cite:`fujimoto1990performance`.
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2016-06-10

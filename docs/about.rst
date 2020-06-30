@@ -10,11 +10,19 @@ The software is released under the MIT license:
 .. literalinclude:: ../LICENSE
     :language: text
 
+---------------
+Citing *DE-Sim*
+---------------
+
+Please use the following reference to cite *DE-Sim*:
+
+Arthur P. Goldberg & Jonathan Karr. DE-Sim: an object-oriented discrete-event simulation tool for complex, data-driven modeling. In preparation.
+
 ------------------------
-Contributing to `DE-Sim`
+Contributing to *DE-Sim*
 ------------------------
 
-We enthusiastically welcome contributions to `DE-Sim`! Please see the `guide to contributing <https://github.com/KarrLab/de_sim/blob/master/CONTRIBUTING.md>`_ and the `developer's code of conduct <https://github.com/KarrLab/de_sim/blob/master/CODE_OF_CONDUCT.md>`_.
+We enthusiastically welcome contributions to *DE-Sim*! Please see the `guide to contributing <https://github.com/KarrLab/de_sim/blob/master/CONTRIBUTING.md>`_ and the `developer's code of conduct <https://github.com/KarrLab/de_sim/blob/master/CODE_OF_CONDUCT.md>`_.
 
 ----------------------
 Development team
