@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/github/license/KarrLab/de_sim.svg)](LICENSE)
 ![Analytics](https://ga-beacon.appspot.com/UA-86759801-1/de_sim/README.md?pixel)
 
-# *DE-Sim*: an object-oriented discrete-event simulation tool for complex, data-driven modeling
+# *DE-Sim*: a Python-based object-oriented discrete-event simulation tool for complex, data-driven modeling
 
 *DE-Sim* is an open-source, Python-based object-oriented discrete-event simulation (DES) tool that makes it easy to use large, heterogeneous datasets and high-level data science tools such as [NumPy](https://numpy.org/), [Scipy](https://scipy.org/scipylib/index.html), [pandas](https://pandas.pydata.org/), and [SQLAlchemy](https://www.sqlalchemy.org/) to build and simulate complex computational models. Similar to [Simula](http://www.simula67.info/), *DE-Sim* models are implemented by defining logical process objects which read the values of a set of shared variables and schedule events to modify their values at discrete instants in time.
 
