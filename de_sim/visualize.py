@@ -111,8 +111,9 @@ class SpaceTime(object):
         plt.xlim(0, 1)
         min_time, max_time = self.get_min_max_times()
         plt.ylim(min_time, max_time)
-        ax.set_ylabel('Simulation time')
+        ax.set_ylabel('Time', fontsize=10)
         plt.gca().invert_yaxis()
+        plt.yticks(fontsize=8)
 
         # plot event lines
         for x_location in self.get_obj_x_locations():
@@ -164,21 +165,22 @@ class SpaceTime(object):
             y_loc = -small_height
             text = ax.text(x_loc, y_loc, object_id,
                            horizontalalignment='center',
-                           verticalalignment='bottom')
+                           verticalalignment='bottom',
+                           fontsize=8)
 
         # top label
         # above the object ids
         transf = ax.transData.inverted()
         bounding_box = text.get_window_extent(renderer=plt.figure().canvas.get_renderer())
         bb_datacoords = bounding_box.transformed(transf)
-        label = 'Simulation objects'
+        label = 'Simulation object'
         ax.text(0.5, bb_datacoords.y1 - small_height, label,
                 horizontalalignment='center',
                 verticalalignment='bottom',
-                fontsize=10, fontweight='bold')
+                fontsize=10, fontweight='normal')
 
         # write file
-        fig.savefig(filename)
+        fig.savefig(filename, bbox_inches='tight', pad_inches=0)
         plt.show()
 
     def get_data(self, plot_file):

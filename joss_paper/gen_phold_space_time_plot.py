@@ -88,7 +88,7 @@ def prepare_plot():
     run_phold(8)
     space_time = SpaceTime()
     space_time.get_data(plot_log)
-    space_time_plot = os.path.join(os.path.dirname(__file__), "phold_space_time_plot.png")
+    space_time_plot = os.path.join(os.path.dirname(__file__), "phold_space_time_plot.pdf")
     space_time.plot_data(space_time_plot)
 
     config_file_modifier.clean_up()

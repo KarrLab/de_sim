@@ -18,12 +18,12 @@ from de_sim.examples.debug_logs import logs as debug_logs
 
 def obj_name(obj_num):
     # create object name from index
-    return 'phold_{}'.format(obj_num)
+    return '{}'.format(obj_num)
 
 
 def obj_index(obj_name):
     # get object index from name
-    return int(obj_name.split('_')[1])
+    return int(obj_name)
 
 
 def exp_delay():
