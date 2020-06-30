@@ -33,7 +33,7 @@ To make it easier to construct and simulate complex, data-driven models, we used
 
 Here, we describe the models that DE-Sim enables, outline the features of DE-Sim, provide a brief tutorial of building and simulating models with DE-Sim, analyze the performance of DE-Sim, summarize how we are using DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a simulator for whole-cell models [@karr2015principles, @goldberg2018emerging, @karr2012whole], and describe the advantages of DE-Sim over existing DES tools. Additional examples, tutorials, installation instructions, and source code documentation are available at [https://github.com/KarrLab/de_sim](https://github.com/KarrLab/de_sim).
 
-# Need: simpler tools for building and simulating data-driven models
+# Need: higher-level tools for complex, data-driven models
 
 DE-Sim is needed by researchers who want to build OO DES models in Python because existing open source Python simulators do not support an object-oriented, message-passing interface.
 
