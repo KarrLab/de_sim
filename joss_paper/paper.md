@@ -1,5 +1,5 @@
 ---
-title: 'DE-Sim: An Object-Oriented Discrete-Event Simulator in Python'
+title: 'DE-Sim: an object-oriented discrete-event simulation tool for complex, data-driven modeling'
 tags:
   - dynamical modeling
   - simulation
@@ -27,11 +27,11 @@ bibliography: paper.bib
 
 A central challenge in science is to understand how systems behaviors emerge from complex networks. For example, systems biology seeks to understand how cellular phenotypes emerge from complex biochemical networks. Due to recent advances in data collection and storage, many scientific fields now have extensive data about a wide range of complex networks. Larger and more comprehensive models, such as models of entire cells [@karr2015principles, @goldberg2018emerging, @karr2012whole], are needed to decipher this data. However, it remains difficult to build and simulate complex models.
 
-One of the most promising methods for simulating large models is discrete-event simulation (DES). DES represents a system as a collection of processes that can read the values of a set of shared variables and create events to modify their values at discrete instants in time. DES is ideal for large models because its discrete structure is conducive to parallel execution. For example, Barnes et al. have executed DES models using nearly 2 million cores [@Barnes2013]. Several DES frameworks are available. This includes basic frameworks such as SimPy [@matloff2008introduction] which enable scientists to implement models using functional programming; high-performance, parallelized, object-oriented frameworks such as POSE [@wilmarth2005pose] and ROSS [@carothers2002ross] which support C-based models; and commercial frameworks such as Simula8 [@concannon2003dynamic] which provide proprietary languages for describing models. DES has been applied to a wide range of models. For example, epidemiologists have used DES to simulate the transmission of infectious disease, computer engineers have used DES to simulate distributed computer networks, and the military often uses DES to simulate wars [@banks2005discrete]. However, it remains challenging to use DES for large data-driven models. It is difficult to implement complex models using functional frameworks such as SimPy, and it is difficult to use high-level data science tools such as Pandas [@mckinney2010data] with C-based frameworks such as POSE and ROSS.
+One of the most promising methods for simulating large models is discrete-event simulation (DES). DES represents a system as a collection of processes that can read the values of a set of shared variables and schedule events to modify their values at discrete instants in time. DES is ideal for large models because its discrete structure is conducive to parallel execution. For example, Barnes et al. have executed DES models using nearly 2 million cores [@Barnes2013]. Several DES tools are available. This includes basic tools such as SimPy [@matloff2008introduction] which enable scientists to implement models using functional programming; high-performance, parallelized, object-oriented tools such as POSE [@wilmarth2005pose] and ROSS [@carothers2002ross] which support C-based models; and commercial tools such as Simula8 [@concannon2003dynamic] which provide proprietary languages for describing models. DES has been applied to a wide range of models. For example, epidemiologists have used DES to simulate the transmission of infectious disease, computer engineers have used DES to simulate distributed computer networks, and the military often uses DES to simulate wars [@banks2005discrete]. However, it remains challenging to use DES for large data-driven models. It is difficult to implement complex models using functional tools such as SimPy, and it is difficult to use high-level data science tools such as pandas [@mckinney2010data] with C-based tools such as POSE and ROSS.
 
-To make it easier to construct and simulate complex, data-driven models, we used Python to develop DE-Sim, an open-source, object-oriented discrete-event simulation framework. Because DE-Sim is implemented in Python, DE-Sim makes it easy to use Python-based data science tools such as NumPy [@oliphant2006guide], Pandas, SciPy [@virtanen2020scipy], and SQLAlchemy [@bayer2020sqlalchemy] to build models and analyze simulation results. We have extensively tested and documented DE-Sim. As described below, DE-Sim is freely available from GitHub and PyPI.
+To make it easier to construct and simulate complex, data-driven models, we used Python to develop DE-Sim, an open-source, object-oriented discrete-event simulation tool. Because DE-Sim is implemented in Python, DE-Sim makes it easy to use high-level data science tools such as NumPy [@oliphant2006guide], pandas, SciPy [@virtanen2020scipy], and SQLAlchemy [@bayer2020sqlalchemy] to build models and analyze simulation results. We have extensively tested and documented DE-Sim. As described below, DE-Sim is freely available from GitHub and PyPI.
 
-Here, we describe the models that DE-Sim enables, outline the features of DE-Sim, provide a brief tutorial of building and simulating models with DE-Sim, analyze the performance of DE-Sim, summarize how we are using DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a simulator for whole-cell models, and describe the advantages of DE-Sim over existing DES frameworks. Additional examples, tutorials, installation instructions, and source code documentation are available at [https://github.com/KarrLab/de_sim](https://github.com/KarrLab/de_sim).
+Here, we describe the models that DE-Sim enables, outline the features of DE-Sim, provide a brief tutorial of building and simulating models with DE-Sim, analyze the performance of DE-Sim, summarize how we are using DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a simulator for whole-cell models, and describe the advantages of DE-Sim over existing DES tools. Additional examples, tutorials, installation instructions, and source code documentation are available at [https://github.com/KarrLab/de_sim](https://github.com/KarrLab/de_sim).
 
 # Need: simpler tools for building and simulating data-driven models
 
@@ -50,16 +50,13 @@ We plan to speed up whole-cell models of human cells with parallel simulation in
 
 # Key features
 
-DE-Sim offers the following features:
+To help users build and simulate complex, data-driven models, DE-Sim provides the following features:
 
-* **Object-oriented Python models:** DE-Sim enables researchers to use object-oriented Python programming to build models. This makes it easy to use large datasets and packages such as NumPy, Pandas, SciPy, and SQLAlchemy to build complex data-driven models.
-* **Stop conditions:** DE-Sim make it easy to use Python functions to implement stop conditions. These functions simply must return true when the simulation state has reached one or more stop conditions.
-* **Recording simulation trajectories:** DE-Sim can record the results of each simulation, as well as metadata such as its start time, run time, and the IP address of the machine which executed the simulation.
-* **Space-time visualizations:** DE-Sim can generate space-time visualization of simulation trajectories (\autoref{fig:phold_space_time_plot}). These diagrams can be valuable tools for understanding and debugging models.
-* **Checkpointing:** DE-Sim can checkpoint the state of simulations. These checkpoints can be used to restart or debug simulations. Checkpointing is particularly helpful for using DE-Sim on clusters that have short execution limits or for using DE-Sim on spot-priced virtual machines in the commercial cloud.
-* --
-* **Simulation configuration:** DE-Sim simulations can be configured using simple text files. These files can be used to control XXX.
-* **Model validation:** Extensive error detection
+* **High-level, object-oriented modeling:** DE-Sim makes it easy for researchers to use object-oriented Python programming to build models. This makes it easy to use large, heterogeneous datasets and high-level data science packages such as NumPy, pandas, SciPy, and SQLAlchemy to build complex models.
+* **Powerful stop conditions:** DE-Sim makes it easy to implement complex stop conditions. Stop conditions can be implemented as simple Python functions that return true when the simulation state reaches the desired stop condition.
+* **Simple simulation logging:** DE-Sim provides tools for recording the results of simulations, as well as metadata such as the start and run time of each simulation.
+* **Space-time visualizations for analysis and debugging:** DE-Sim can generate space-time visualizations of simulation trajectories (\autoref{fig:phold_space_time_plot}). These diagrams are valuable tools for understanding and debugging models.
+* **Checkpointing for restarting and debugging:** DE-Sim can checkpoint the state of simulations. These checkpoints can be used to restart or debug simulations. Checkpointing is particularly helpful for using DE-Sim on clusters that have short time limits, or for using DE-Sim on spot-priced virtual machines in commercial clouds.
 
 ![A space-time visualization of all messages and events in an 8 time unit simulation of the PHOLD parallel DES benchmark with exponentially-distributed event delays with $\mu=1$ and a probability of 0.5 of objects scheduling the next event for themselves [@fujimoto1990performance; @Barnes2013].
 A timeline for each object shows its events as gray dots.
@@ -149,14 +146,14 @@ We present the statistics of three runs made in a Docker container executing on 
 
 # Case study: a simulator for whole-cell models
 
-# Comparison with other DES frameworks
+# Comparison with other DES tools
 
-* Low-level frameworks in high-level languages
+* Low-level tools in high-level languages
   * SimPy
-* High-performance C-based frameworks
+* High-performance C-based tools
   * POSE
   * ROSS
-* Commercial frameworks with proprietary modeling languages
+* Commercial tools with proprietary modeling languages
   * Simul8
 
 # Availability
