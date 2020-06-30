@@ -131,7 +131,7 @@ DE-Sim achieves good performance by using Python's `heapq` priority queue packag
 
 # Case study: hybrid simulation tool for whole-cell modeling
 
-We have used DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a hybrid simulation tool for whole-cell models [@karr2015principles, @goldberg2018emerging; @karr2012whole]. Whole-cell models which predict phenotype from genotype by representing all of the biochemical activity in a cell have great potential to help scientists elucidate the basis of cellular behavior, help bioengineers rationally design biosensors and biomachines, and help physicians personalize medicine.
+We have used DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a hybrid simulation tool for whole-cell models [@karr2015principles; @goldberg2018emerging; @karr2012whole]. Whole-cell models which predict phenotype from genotype by representing all of the biochemical activity in a cell have great potential to help scientists elucidate the basis of cellular behavior, help bioengineers rationally design biosensors and biomachines, and help physicians personalize medicine.
 
 Due to the diverse timescales of the reactions inside cells, one promising way to build whole-cell models is to combine fine-grain submodels of slow processes, such as transcription, that are simulated with the Stochastic Simulation Algorithm (SSA, @gillespie1977exact) with medium-grain submodels of faster processes, such as signal transduction, that are simulated with ordinary differential equations (ODEs) and coarse-grained submodels of fast processes, such as metabolism, that are simulated with flux-balance analysis (FBA, @orth2010flux). This requires co-simulating SSA, FBA, and other simulation algorithms. However, there are no tools for co-simulating these algorithms.
 
