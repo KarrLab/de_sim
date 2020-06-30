@@ -140,12 +140,17 @@ To accelerate whole-cell modeling, we have used DE-Sim to implement WC-Sim [@gol
 # Comparison of DE-Sim with other DES tools
 
 * Low-level tools in high-level languages
-  * SimPy
+  * SimPy [@matloff2008introduction]
+* High-level, low-performance C-based tool
+  * SystemC [@mueller2001simulation]
 * High-performance C-based tools
-  * POSE
-  * ROSS
+  * POSE [@wilmarth2005pose]
+  * ROSS [@carothers2002ross]
 * Commercial tools with proprietary modeling languages
-  * Simul8
+  * Simul8 [@concannon2003dynamic]
+
+![**Strengths and weakness of DE-Sim compared to other DES tools.** 
+\label{fig:comparison}](comparison.pdf)
 
 # Availability of DE-Sim
 
