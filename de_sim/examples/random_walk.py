@@ -1,23 +1,23 @@
-""" A trivial simulation that increments or decrements a variable at each event
+""" A simulation of a random walk where a variable is incremented or decremented with equal probability at each event
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2018-02-27
 :Copyright: 2018-2020, Karr Lab
 :License: MIT
 """
-import sys
 import argparse
 import random
+import sys
+from de_sim.simulation_engine import SimulationEngine
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import ApplicationSimulationObject
-from de_sim.simulation_engine import SimulationEngine
 
 
 class MessageSentToSelf(SimulationMessage):
     "A message that's sent to self"
 
 
-class RandomStateVariableSimulationObject(ApplicationSimulationObject):
+class RandomWalkSimulationObject(ApplicationSimulationObject):
     """ The random state variable model
 
     * State: a number
@@ -55,7 +55,7 @@ class RandomStateVariableSimulationObject(ApplicationSimulationObject):
     messages_sent = [MessageSentToSelf]
 
 
-class RunRandomStateVariableSimulation(object):
+class RunRandomWalkSimulation(object):
 
     @staticmethod
     def parse_args(cli_args=None):  # pragma: no cover  # don't bother testing
@@ -86,7 +86,7 @@ class RunRandomStateVariableSimulation(object):
         simulator = SimulationEngine()
 
         # create a simulation object and add it to the simulation
-        simulator.add_object(RandomStateVariableSimulationObject('random state variable object',
+        simulator.add_object(RandomWalkSimulationObject('random state variable object',
                                                                  args.initial_state, args.output))
 
         # run the simulation
@@ -98,7 +98,7 @@ class RunRandomStateVariableSimulation(object):
 
 if __name__ == '__main__':  # pragma: no cover     # reachable only from command line
     try:
-        args = RunRandomStateVariableSimulation.parse_args()
-        RunRandomStateVariableSimulation.main(args)
+        args = RunRandomWalkSimulation.parse_args()
+        RunRandomWalkSimulation.main(args)
     except KeyboardInterrupt:
         pass
