@@ -127,11 +127,10 @@ This runs a simulation for 25 time units, and obtains the number of events execu
 # Performance
 
 DE-Sim achieves good performance by using Python's `heapq` priority queue package to schedule events.
-\autoref{fig:performance} reports the performance of DE-Sim over a range of simulation sizes.
+\autoref{fig:performance} shows the performance of DE-Sim simulating a model of a cyclic messaging network over range of network sizes.
 
-![Performance of DE-Sim executing a simulation that sends events around a cycle of objects.
-We present the statistics of three runs made in a Docker container executing on a 2.9 GHz Intel Core i5 processor in a MacBook.
-\label{fig:performance}](performance.png)
+![**Performance of DE-Sim simulating a model of a cyclic messaging network over a range of network sizes.** Each statistic represents the average of three executions in a Docker container on a 2.9 GHz Intel Core i5 processor. The source code for the cyclic messaging network model is available in the DE-Sim Git repository.
+\label{fig:performance}](performance.pdf)
 
 # Case study: multi-algorithmic simulation tool for whole-cell models
 
