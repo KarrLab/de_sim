@@ -6,7 +6,6 @@
 """
 
 import unittest
-import os
 import math
 import numpy as np
 
@@ -41,7 +40,7 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
 
         period = .1
         pso_2 = SpecialPeriodicSimulationObject('pso_2', period)
-        expected.append([t/10 for t in range(time_max * 10 + 1)])
+        expected.append([t / 10 for t in range(time_max * 10 + 1)])
 
         psos = [pso_1, pso_2]
         simulator.add_objects(psos)

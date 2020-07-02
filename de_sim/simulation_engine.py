@@ -8,21 +8,17 @@
 
 from collections import Counter, namedtuple
 from datetime import datetime
-import copy
 import cProfile
-import dataclasses
 import os
 import pstats
-import sys
 import tempfile
 
 from de_sim.config import core
 from de_sim.simulation_metadata import SimulationMetadata, RunMetadata, AuthorMetadata
 from de_sim.errors import SimulatorError
-from de_sim.event import Event
-from de_sim.shared_state_interface import SharedStateInterface
+from de_sim.shared_state_interface import SharedStateInterface  # noqa: F401
 from de_sim.simulation_config import SimulationConfig
-from de_sim.simulation_object import EventQueue, SimulationObject
+from de_sim.simulation_object import EventQueue, SimulationObject  # noqa: F401
 from de_sim.utilities import SimulationProgressBar, FastLogger
 from wc_utils.util.git import get_repo_metadata, RepoMetadataCollectionType
 
@@ -40,10 +36,10 @@ class SimulationEngine(object):
 
     Attributes:
         time (:obj:`float`): the simulations's current time
-        simulation_objects (:obj:`dict` of `SimulationObject`): all simulation objects, keyed by name
+        simulation_objects (:obj:`dict` of :obj:`SimulationObject`): all simulation objects, keyed by name
         shared_state (:obj:`list` of :obj:`object`, optional): the shared state of the simulation, needed to
             log or checkpoint the entire state of a simulation; all objects in `shared_state` must
-            implement `SharedStateInterface`
+            implement :obj:`SharedStateInterface`
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
         fast_debug_file_logger (:obj:`FastLogger`): a fast logger for debugging messages
         fast_plotting_logger (:obj:`FastLogger`): a fast logger for trajectory data for plotting
@@ -100,7 +96,7 @@ class SimulationEngine(object):
         """ Add many simulation objects into the simulation
 
         Args:
-            simulation_objects (:obj:`iterator` of `SimulationObject`): an iterator of simulation objects
+            simulation_objects (:obj:`iterator` of :obj:`SimulationObject`): an iterator of simulation objects
         """
         for simulation_object in simulation_objects:
             self.add_object(simulation_object)
@@ -272,6 +268,7 @@ class SimulationEngine(object):
 
     SimulationReturnValue = namedtuple('SimulationReturnValue', 'num_events profile_stats',
                                        defaults=(None, None))
+
     def simulate(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
         """ Run a simulation
 
@@ -412,7 +409,7 @@ class SimulationEngine(object):
                 # error will only be raised if an object decreases its time
                 if next_time < next_sim_obj.time:
                     raise SimulatorError("Dispatching '{}', but event time ({}) "
-                        "< object time ({})".format(next_sim_obj.name, next_time, next_sim_obj.time))
+                                         "< object time ({})".format(next_sim_obj.name, next_time, next_sim_obj.time))
 
                 # dispatch object that's ready to execute next event
                 next_sim_obj.time = next_time
@@ -439,7 +436,7 @@ class SimulationEngine(object):
             widths_format = "{{:<{}}}{{:>{}}}{{:>{}}}".format(*widths)
             return widths_format.format(*values)
 
-        if self.num_events_handled % self.sim_config.object_memory_change_interval is 0:
+        if self.num_events_handled % self.sim_config.object_memory_change_interval == 0:
             heading = f"\nMemory use changes by SummaryTracker at event {self.num_events_handled}:"
             if self.sim_config.output_dir:
                 print(heading, file=self.measurements_fh)
@@ -481,10 +478,10 @@ class SimulationEngine(object):
         for simulation_object in self.simulation_objects.values():
             # get object name, type, current time, state
             state_entry = (simulation_object.__class__.__name__,
-                simulation_object.name,
-                simulation_object.time,
-                simulation_object.get_state(),
-                simulation_object.render_event_queue())
+                           simulation_object.name,
+                           simulation_object.time,
+                           simulation_object.get_state(),
+                           simulation_object.render_event_queue())
             sim_objects_state.append(state_entry)
         state.append(sim_objects_state)
 
@@ -492,8 +489,8 @@ class SimulationEngine(object):
         shared_objects_state = []
         for shared_state_obj in self.shared_state:
             state_entry = (shared_state_obj.__class__.__name__,
-                shared_state_obj.get_name(),
-                shared_state_obj.get_shared_state(self.time))
+                           shared_state_obj.get_name(),
+                           shared_state_obj.get_shared_state(self.time))
             shared_objects_state.append(state_entry)
         state.append(shared_objects_state)
         return state

@@ -7,11 +7,11 @@
 
 import unittest
 import warnings
-from capturer import CaptureOutput
 from argparse import Namespace
+from capturer import CaptureOutput
 
-from de_sim.examples.random_state_variable import RunRandomStateVariableSimulation
 from de_sim.examples.config import core
+from de_sim.examples.random_walk import RunRandomWalkSimulation
 
 
 class TestRandomStateVariableSimulation(unittest.TestCase):
@@ -27,9 +27,9 @@ class TestRandomStateVariableSimulation(unittest.TestCase):
         # restore console logging
         self.config['debug_logs']['handlers']['debug.example.console']['level'] = self.console_level
 
-    def test_random_state_variable_simulation(self):
+    def test_random_walk_simulation(self):
         with CaptureOutput(relay=False):
             args = Namespace(initial_state=3, time_max=10, output=False)
-            self.assertTrue(0 < RunRandomStateVariableSimulation.main(args).num_events)
+            self.assertTrue(0 < RunRandomWalkSimulation.main(args).num_events)
             args = Namespace(initial_state=3, time_max=10, output=True)
-            self.assertTrue(0 < RunRandomStateVariableSimulation.main(args).num_events)
+            self.assertTrue(0 < RunRandomWalkSimulation.main(args).num_events)

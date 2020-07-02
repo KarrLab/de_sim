@@ -6,7 +6,6 @@
 :License: MIT
 """
 import argparse
-import sys
 from de_sim.simulation_engine import SimulationEngine
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import ApplicationSimulationObject

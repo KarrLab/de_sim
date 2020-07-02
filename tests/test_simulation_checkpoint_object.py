@@ -9,7 +9,6 @@
 import unittest
 import shutil
 import tempfile
-from math import ceil
 
 from wc_utils.util.rand import RandomStateManager
 from de_sim.simulation_engine import SimulationEngine
@@ -19,7 +18,7 @@ from de_sim.simulation_checkpoint_object import (AbstractCheckpointSimulationObj
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import ApplicationSimulationObject
 from de_sim.errors import SimulatorError
-from de_sim.checkpoint import Checkpoint, AccessCheckpoints
+from de_sim.checkpoint import AccessCheckpoints
 
 
 class PeriodicCheckpointSimuObj(AbstractCheckpointSimulationObject):
@@ -57,7 +56,8 @@ class PeriodicLinearUpdatingSimuObj(ApplicationSimulationObject):
         self.simulation_state.set(self.a * self.time + self.b)
         self.send_event(self.delay, self, MessageSentToSelf())
 
-    def get_state(self): return ''
+    def get_state(self):
+        return ''
 
     # register the event handler and message type sent
     event_handlers = [(MessageSentToSelf, handle_simulation_event)]
@@ -119,7 +119,7 @@ class TestCheckpointSimulationObjects(unittest.TestCase):
         run_time = 100
         self.simulator.run(run_time)
         checkpointing_obj.create_checkpoint()
-        for i in range(1 + int(run_time/self.checkpoint_period)):
+        for i in range(1 + int(run_time / self.checkpoint_period)):
             time, value = checkpoints[i]
             self.assertEqual(time, i * self.checkpoint_period)
             # updating_obj sets the shared value to a * time + b, at the instants 0, update_period, 2 * update_period, ...
@@ -151,7 +151,7 @@ class TestCheckpointSimulationObjects(unittest.TestCase):
         # check results
         self.assertEqual(expected_num_events, num_events)
         expected_checkpoint_times = [float(t) for t in
-                                     range(0, self.checkpoint_period * int(run_time/self.checkpoint_period) + 1,
+                                     range(0, self.checkpoint_period * int(run_time / self.checkpoint_period) + 1,
                                            self.checkpoint_period)]
         access_checkpoints = AccessCheckpoints(self.checkpoint_dir)
         checkpoints = access_checkpoints.list_checkpoints()
@@ -159,7 +159,7 @@ class TestCheckpointSimulationObjects(unittest.TestCase):
         checkpoint = access_checkpoints.get_checkpoint()
         self.assertEqual(checkpoint, access_checkpoints.get_checkpoint(time=run_time))
 
-        for i in range(1 + int(run_time/self.checkpoint_period)):
+        for i in range(1 + int(run_time / self.checkpoint_period)):
             time = i * self.checkpoint_period
             state_value = access_checkpoints.get_checkpoint(time=time).state
             max_value = self.a * self.checkpoint_period * i + self.b

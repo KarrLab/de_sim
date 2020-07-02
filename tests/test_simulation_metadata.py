@@ -17,7 +17,6 @@ from de_sim.errors import SimulatorError
 from de_sim.simulation_config import SimulationConfig
 from de_sim.simulation_metadata import SimulationMetadata, RunMetadata, AuthorMetadata
 from wc_utils.util.git import get_repo_metadata, RepoMetadataCollectionType
-from wc_utils.util.misc import obj_to_str
 
 
 class TestSimulationMetadata(unittest.TestCase):

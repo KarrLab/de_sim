@@ -8,7 +8,7 @@
 
 from unittest import TestCase
 
-from de_sim.simulation_object import SimulationObject, ApplicationSimulationObject
+from de_sim.simulation_object import SimulationObject, ApplicationSimulationObject  # noqa: F401
 
 
 class MockSimulationObject(ApplicationSimulationObject):

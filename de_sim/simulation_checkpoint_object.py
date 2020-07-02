@@ -5,10 +5,8 @@
 :Copyright: 2018-2020, Karr Lab
 :License: MIT
 """
-import sys
 import abc
 
-from de_sim.errors import SimulatorError
 from de_sim.checkpoint import Checkpoint, AccessCheckpoints
 from de_sim.template_sim_objs import TemplatePeriodicSimulationObject
 

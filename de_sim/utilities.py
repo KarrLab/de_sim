@@ -5,7 +5,7 @@
 :Copyright: 2018-2020, Karr Lab
 :License: MIT
 """
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 from logging2 import LogLevel
 from progressbar import widgets
 from progressbar.bar import ProgressBar

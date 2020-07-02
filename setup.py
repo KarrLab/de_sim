@@ -30,14 +30,14 @@ md = pkg_utils.get_package_metadata(dirname, name, package_data_filename_pattern
 setuptools.setup(
     name=name,
     version=md.version,
-    description='Python framework for discrete event simulation',
+    description='Object-oriented discrete-event simulation tool for complex, data-driven modeling',
     long_description=md.long_description,
     url="https://github.com/KarrLab/" + name,
     download_url='https://github.com/KarrLab/' + name,
     author="Karr Lab",
     author_email="info@karrlab.org",
     license="MIT",
-    keywords='discrete event simulation DES Python',
+    keywords='computational modeling, data-driven modeling, discrete event simulation, DES, object-oriented programming, Python',
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     package_data=md.package_data,
     install_requires=md.install_requires,
@@ -46,10 +46,13 @@ setuptools.setup(
     dependency_links=md.dependency_links,
     classifiers=[
         'Development Status :: 3 - Alpha',
+        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
     ],
     entry_points={
         'console_scripts': [

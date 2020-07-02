@@ -1,0 +1,50 @@
+{
+    "@context": "https://raw.githubusercontent.com/codemeta/codemeta/master/codemeta.jsonld",
+    "@type": "Code",
+    "@id": "https://pypi.org/project/de-sim/",
+    "name": "DE-Sim",
+    "description": "An ungodly union of GitHub and figshare",
+    "keywords": ["dynamical modeling", "simulation", "discrete-event simulation", "object-oriented simulation", "parallel discrete-event simulation", "biochemical modeling", "whole-cell modeling", "Python"],
+    "author": [{
+            "@type": "Person",
+            "@id": "http://orcid.org/0000-0003-2772-1484",
+            "givenName": "Arthur",
+            "familyName": "Goldberg",
+            "email": "arthur.p.goldberg@mssm.edu",
+            "affiliation": "Icahn Institute for Data Science and Genomic Technology and Department of Genetics and Genomic Sciences, Icahn School of Medicine at Mount Sinai, New York, NY 10029, USA"
+        },
+        {
+            "@type": "Person",
+            "@id": "http://orcid.org/0000-0002-2605-5080",
+            "givenName": "Jonathan",
+            "familyName": "Karr",
+            "email": "karr@mssm.edu",
+            "affiliation": "Icahn Institute for Data Science and Genomic Technology and Department of Genetics and Genomic Sciences, Icahn School of Medicine at Mount Sinai, New York, NY 10029, USA"
+        }
+    ],
+    "citation": null,
+    "readme": "https://github.com/KarrLab/de_sim/blob/master/README.md",
+    "license": "https://spdx.org/licenses/MIT",
+    "isAccessibleForFree": true,
+    "url": "https://github.com/KarrLab/de_sim",
+    "installUrl": "https://pypi.org/project/de-sim/",
+    "downloadUrl": "https://github.com/KarrLab/de_sim/tags",
+    "softwareHelp": "https://docs.karrlab.org/de_sim/",
+    "codeRepository": "https://github.com/KarrLab/de_sim",
+    "contIntegration": "https://circleci.com/gh/KarrLab/de_sim",
+    "issueTracker": "https://github.com/KarrLab/de_sim/issues",
+    "version": "0.0.1",
+    "developmentStatus": "active",
+    "datePublished": "2020-07-20",
+    "dateCreated": "2019-01-20",
+    "applicationCategory": "Science and engineering",
+    "applicationSubCategory": "Modeling and simulation",
+    "isPartOf": "https://github.com/KarrLab/wc_sim",
+    "programmingLanguage": {
+        "@type": "ComputerLanguage",
+        "name": "Python",
+        "version": "3.6",
+        "url": "https://python.org"
+    },
+    "funding": "This worked was supported by National Science Foundation award 1649014 and National Institutes of Health award R35GM119771."
+}

@@ -7,7 +7,6 @@
 """
 
 import de_sim
-import re
 import unittest
 
 

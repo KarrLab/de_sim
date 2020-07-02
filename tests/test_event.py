@@ -11,11 +11,10 @@ from de_sim.event import Event, iterable_not_str, nested_elements_to_str
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import (ApplicationSimulationObjMeta, ApplicationSimulationObject,
                                       SimObjClassPriority)
-from de_sim.testing.example_simulation_objects import (ALL_MESSAGE_TYPES, TEST_SIM_OBJ_STATE,
-                                                       ExampleSimulationObject)
+from de_sim.testing.example_simulation_objects import ExampleSimulationObject
 from de_sim.testing.some_message_types import InitMsg, Eg1, MsgWithAttrs
 from wc_utils.util.list import elements_to_str
-from wc_utils.util.misc import most_qual_cls_name, round_direct
+from wc_utils.util.misc import round_direct
 
 
 class TestEvent(unittest.TestCase):
@@ -55,7 +54,8 @@ class TestEvent(unittest.TestCase):
 
         # Events with equal event times and recipients in different classes
         class ASOwithLowPriority(ApplicationSimulationObject):
-            def handler(self, event): pass
+            def handler(self, event):
+                pass
             event_handlers = [(InitMsg, 'handler')]
             # low priority
             class_priority = SimObjClassPriority.LOW
@@ -67,7 +67,8 @@ class TestEvent(unittest.TestCase):
 
         # Events with equal event times and recipients in different classes
         class ASOwithDefaultLowPriority(ApplicationSimulationObject):
-            def handler(self, event): pass
+            def handler(self, event):
+                pass
             event_handlers = [(InitMsg, 'handler')]
 
         # give lower priority sim object a name that sorts before 'a'
@@ -88,8 +89,8 @@ class TestEvent(unittest.TestCase):
         self.assertTrue(e7 >= e6)
 
     def test_event_w_message(self):
-        ds = 'docstring'
         attrs = ['attr1', 'attr2']
+
         class TestMsg(SimulationMessage):
             'docstring'
             attributes = ['attr1', 'attr2']
@@ -99,7 +100,7 @@ class TestEvent(unittest.TestCase):
         SENDER = 'sender'
         RECEIVER = 'receiver'
         ev = Event(*(times + (ExampleSimulationObject(SENDER), ExampleSimulationObject(RECEIVER),
-            test_msg)))
+                              test_msg)))
 
         # test headers
         self.assertEqual(Event.BASE_HEADERS, Event.header(as_list=True)[:-1])
@@ -107,7 +108,7 @@ class TestEvent(unittest.TestCase):
         self.assertEqual(Event.BASE_HEADERS, ev.custom_header(as_list=True)[:-len(attrs)])
         self.assertIn('\t'.join(Event.BASE_HEADERS), ev.custom_header())
         self.assertIn('\t'.join(attrs), ev.custom_header())
-        data = list(times) + [SENDER, RECEIVER, TestMsg.__name__]
+        # data = list(times) + [SENDER, RECEIVER, TestMsg.__name__]
 
         # test data
         # todo: fix these tests
@@ -120,7 +121,7 @@ class TestEvent(unittest.TestCase):
         self.assertIn('TestMsg', str(ev))
         offset_times = (0.000001, 0.999999)
         ev_offset = Event(*(offset_times + (ExampleSimulationObject(SENDER), ExampleSimulationObject(RECEIVER),
-            test_msg)))
+                                            test_msg)))
         for t in offset_times:
             self.assertIn(round_direct(t), str(ev_offset.render(round_w_direction=True, as_list=True)))
             self.assertIn(str(round_direct(t)), ev_offset.render(round_w_direction=True))
@@ -129,7 +130,7 @@ class TestEvent(unittest.TestCase):
         class NoBodyMessage(SimulationMessage):
             """A message with no attributes"""
         ev2 = Event(0, 1, ExampleSimulationObject('sender'), ExampleSimulationObject('receiver'),
-            NoBodyMessage())
+                    NoBodyMessage())
         self.assertIn('\t'.join(Event.BASE_HEADERS), ev2.custom_header())
         # self.assertIn('\t'.join([str(t) for t in times]), str(ev2))
 
@@ -137,22 +138,22 @@ class TestEvent(unittest.TestCase):
 class TestStrMapFunctions(unittest.TestCase):
 
     def test_iterable_not_str(self):
-            # some non-string iterables
-            self.assertTrue(iterable_not_str(("f", "f")))   # tuple
-            self.assertTrue(iterable_not_str(["f", "f"]))   # list
-            self.assertTrue(iterable_not_str(iter("ff")))   # iterator
-            self.assertTrue(iterable_not_str(range(4)))     # generator
-            self.assertTrue(iterable_not_str(b"ff"))        # bytes (Python 2 calls this a string)
+        # some non-string iterables
+        self.assertTrue(iterable_not_str(("f", "f")))   # tuple
+        self.assertTrue(iterable_not_str(["f", "f"]))   # list
+        self.assertTrue(iterable_not_str(iter("ff")))   # iterator
+        self.assertTrue(iterable_not_str(range(4)))     # generator
+        self.assertTrue(iterable_not_str(b"ff"))        # bytes (Python 2 calls this a string)
 
-            # strings or non-iterables
-            self.assertFalse(iterable_not_str(u"ff"))    # string
-            self.assertFalse(iterable_not_str(44))       # integer
-            self.assertFalse(iterable_not_str(iterable_not_str)) # function
+        # strings or non-iterables
+        self.assertFalse(iterable_not_str(u"ff"))    # string
+        self.assertFalse(iterable_not_str(44))       # integer
+        self.assertFalse(iterable_not_str(iterable_not_str))  # function
 
     def test_nested_elements_to_str(self):
         arg_and_expected = (([1, 'x'], ['1', 'x']),
                             ((1, 'x'), ['1', 'x']),
                             ((1, [2, 'y']), ['1', ['2', 'y']]),
-                           )
+                            )
         for arg, expected in arg_and_expected:
             self.assertEqual(nested_elements_to_str(arg), expected)

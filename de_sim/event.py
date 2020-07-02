@@ -10,7 +10,7 @@ from collections.abc import Iterable
 
 from wc_utils.util.misc import round_direct
 from wc_utils.util.list import elements_to_str
-from de_sim.simulation_message import SimulationMessage
+from de_sim.simulation_message import SimulationMessage  # noqa: F401
 
 
 class Event(object):
@@ -35,7 +35,7 @@ class Event(object):
             (aka executes) the event
         _order_time (:obj:`tuple`): the event time, sub-time that's used to sort events; cached
             to improve performance
-        message (:obj:`SimulationMessage`): a `SimulationMessage` carried by the event; its type
+        message (:obj:`SimulationMessage`): a :obj:`SimulationMessage` carried by the event; its type
             provides the simulation application's type for an `Event`; it may also carry a payload
             for the `Event` in its attributes.
     """

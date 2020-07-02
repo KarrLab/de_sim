@@ -1,5 +1,8 @@
 configobj
+logging2
+matplotlib
+numpy
 progressbar2 >= 3.39
-setuptools
-wc_utils[git]
 pympler
+setuptools
+wc_utils[git] >= 0.0.16
