@@ -52,7 +52,17 @@ class EventQueue(object):
         self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('de_sim.debug.file'), 'debug')
 
     def reset(self):
+        """ Empty the event queue
+        """
         self.event_heap = []
+
+    def len(self):
+        """ Size of the event queue
+
+        Returns:
+            :obj:`int`: number of events in the event queue
+        """
+        return len(self.event_heap)
 
     def schedule_event(self, send_time, receive_time, sending_object, receiving_object, message):
         """ Create an event and insert in this event queue, scheduled to execute at `receive_time`
@@ -94,7 +104,7 @@ class EventQueue(object):
         event = Event(send_time, receive_time, sending_object, receiving_object, message)
         # As per David Jefferson's thinking, the event queue is ordered by data provided by the
         # simulation application, in particular the tuple (event time, receiving object name).
-        # See the comparison operators for Event. This will achieve deterministic and reproducible
+        # See the comparison operators for Event. This achieves deterministic and reproducible
         # simulations.
         heapq.heappush(self.event_heap, event)
 

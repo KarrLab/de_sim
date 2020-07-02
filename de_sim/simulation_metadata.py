@@ -99,7 +99,6 @@ class AuthorMetadata(EnhancedDataClass):
             raise SimulatorError(e)
 
 
-# TODO(Arthur): exact caching: implement __eq__, ignore run
 @dataclass
 class SimulationMetadata(EnhancedDataClass):
     """ Represents the metadata of a discrete event simulation run

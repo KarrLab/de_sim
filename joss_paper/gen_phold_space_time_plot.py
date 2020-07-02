@@ -21,16 +21,15 @@ SOURCE_CONFIG_FILENAME = os.path.join(os.path.dirname(__file__), '..', '..', 'wc
 TEMP_CONFIG_FILENAME = os.path.expanduser(os.path.join('~', '.wc', 'wc_sim.core.cfg'))
 
 
-class ConfigFileModifier(object):
-    """ Modify the core config file to easily enable testing
+class TempConfigFileModifier(object):
+    """ Create a temporary, modified config file that enables easy testing
 
-    To use, load the config information at run-time, not compile-time.
+    To use, load the config information at run-time after the modified config file has been placed.
 
     Attributes:
-        source_config_filename (:obj:`str`): filename of the permanent config file
+        source_config_filename (:obj:`str`): filename of a permanent config file
         temp_config_filename (:obj:`str`): filename of a temporary config file on the path that loads config files
     """
-
     def __init__(self, source_config_filename=SOURCE_CONFIG_FILENAME, temp_config_filename=TEMP_CONFIG_FILENAME):
         self.source_config_filename = source_config_filename
         self.temp_config_filename = temp_config_filename
@@ -46,7 +45,7 @@ class ConfigFileModifier(object):
             source_config = f.read()
         modified_config = source_config
         for name, value in replacements:
-            modified_config = re.sub(f"{name} .*", f"{name} = {value}", modified_config)
+            modified_config = re.sub(f"(\s+){name}(\s*)=.*", f"{name} = {value}", modified_config)
         with open(self.temp_config_filename, 'w') as f:
             f.write(modified_config)
 
@@ -69,14 +68,14 @@ def prepare_plot():
     # turn on plot logging through config
     source_config_filename = os.path.join(os.path.dirname(__file__), '..', 'de_sim', 'config', 'core.default.cfg')
     temp_config_filename = os.path.expanduser('~/.wc/de_sim.core.cfg')
-    config_file_modifier = ConfigFileModifier(source_config_filename=source_config_filename,
+    config_file_modifier = TempConfigFileModifier(source_config_filename=source_config_filename,
                                               temp_config_filename=temp_config_filename)
     config_file_modifier.write_test_config_file([('log_events', 'True')])
 
     source_debug_conf_filename = os.path.join(os.path.dirname(__file__), '..', 'de_sim', 'config',
                                               'debug.default.cfg')
     temp_debug_conf_filename = os.path.expanduser('~/.wc/de_sim.debug.cfg')
-    debug_conf_file_modifier = ConfigFileModifier(source_config_filename=source_debug_conf_filename,
+    debug_conf_file_modifier = TempConfigFileModifier(source_config_filename=source_debug_conf_filename,
                                               temp_config_filename=temp_debug_conf_filename)
     debug_conf_file_modifier.write_test_config_file([('level', 'debug')])
 

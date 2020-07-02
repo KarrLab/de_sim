@@ -23,10 +23,22 @@ from de_sim.testing.utilities_for_testing import make_args
 # to avoid any other side effects, run the import in a context that creates a temporary environment
 from wc_utils.util.environ import EnvironUtils, MakeEnvironArgs
 make_environ_args = MakeEnvironArgs()
-make_environ_args.add_to_env(['debug_logs', 'handlers', 'debug.console', 'level'], 'error')
+make_environ_args.add_to_env(['debug_logs', 'handlers', 'debug.example.console', 'level'], 'debug')
 env = make_environ_args.get_env()
+print()
+def config_env(state):
+    print(state)
+    for k in os.environ:
+        if 'CONFIG' in k:
+            print(f'os.environ[{k}] == {os.environ[k]}')
+
+config_env('before make_temp_environ')
 with EnvironUtils.make_temp_environ(**env):
+    config_env('in make_temp_environ')
     from de_sim.examples.phold import RunPhold
+config_env('after make_temp_environ')
+
+from de_sim.examples.phold import RunPhold
 
 
 class TestPhold(unittest.TestCase):

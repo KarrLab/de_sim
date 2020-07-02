@@ -14,7 +14,7 @@ import datetime
 from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import SimulationObject, ApplicationSimulationObject
 from de_sim.simulation_engine import SimulationEngine
-from de_sim.examples.debug_logs import logs as debug_logs
+from de_sim.examples.debug_logs import logs
 
 
 def obj_name(obj_num):
@@ -81,7 +81,7 @@ class PholdSimulationObject(ApplicationSimulationObject):
         return str(self.args)
 
     def log_debug_msg(self, msg):
-        log = debug_logs.get_log('de_sim.debug.example.console')
+        log = logs.get_log('de_sim.debug.example.console')
         log.debug(msg, sim_time=self.time)
 
     event_handlers = [(sim_msg_type, 'handle_simulation_event') for sim_msg_type in MESSAGE_TYPES]
