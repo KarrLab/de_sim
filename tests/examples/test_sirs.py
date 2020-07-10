@@ -25,7 +25,7 @@ class TestSIRs(unittest.TestCase):
         warnings.simplefilter("ignore")
 
     def run_sir_test(self, sir_class):
-        with CaptureOutput(relay=True) as capturer:
+        with CaptureOutput(relay=False) as capturer:
             sir_args = dict(name='sir',
                             s=98,
                             i=2,
@@ -62,8 +62,7 @@ class TestSIRs(unittest.TestCase):
                                 gamma=0.15,
                                 state_period=10)
                 seed = random.randrange(1E6)
-                time_max = 60
-                sir = RunSIRs.main(sir_class, time_max=time_max, seed=seed, **sir_args)
+                sir = RunSIRs.main(sir_class, time_max=60, seed=seed, **sir_args)
                 # consider an outbreak to be minor if no infections remain and fewer than 10 people were infected
                 if sir.history[-1]['i'] == 0 and 90 < sir.history[-1]['s']:
                     num_minor_outbreaks += 1
