@@ -50,7 +50,7 @@ class TestSIRs(unittest.TestCase):
 
     def run_P_minor_outbreak_test(self, sir_class):
         # Allen (2017) estimates P[minor outbreak] for the SIR model shown in Fig. 1 as 0.25
-        ensemble_size = 40
+        ensemble_size = 50
         num_minor_outbreaks = 0
         with CaptureOutput(relay=False):
             for _ in range(ensemble_size):
@@ -68,8 +68,8 @@ class TestSIRs(unittest.TestCase):
                     num_minor_outbreaks += 1
         p_minor_outbreak = num_minor_outbreaks / ensemble_size
         expected_p_minor_outbreak = 0.25
-        self.assertGreater(p_minor_outbreak, 0.7 * expected_p_minor_outbreak)
-        self.assertLess(p_minor_outbreak, 1.3 * expected_p_minor_outbreak)
+        self.assertGreater(p_minor_outbreak, 0.6 * expected_p_minor_outbreak)
+        self.assertLess(p_minor_outbreak, 1.4 * expected_p_minor_outbreak)
 
     def test_P_minor_outbreak(self):
         self.run_P_minor_outbreak_test(SIR)
