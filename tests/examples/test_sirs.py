@@ -68,8 +68,8 @@ class TestSIRs(unittest.TestCase):
                     num_minor_outbreaks += 1
         p_minor_outbreak = num_minor_outbreaks / ensemble_size
         expected_p_minor_outbreak = 0.25
-        self.assertGreater(p_minor_outbreak, 0.6 * expected_p_minor_outbreak)
-        self.assertLess(p_minor_outbreak, 1.4 * expected_p_minor_outbreak)
+        self.assertGreater(p_minor_outbreak, 0.5 * expected_p_minor_outbreak)
+        self.assertLess(p_minor_outbreak, 2 * expected_p_minor_outbreak)
 
     def test_P_minor_outbreak(self):
         self.run_P_minor_outbreak_test(SIR)
