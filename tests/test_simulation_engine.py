@@ -9,6 +9,7 @@ from capturer import CaptureOutput
 from datetime import datetime
 from logging2 import LogRegister
 from logging2.levels import LogLevel
+import contextlib
 import cProfile
 import os
 import pstats
@@ -385,8 +386,6 @@ class TestSimulationEngine(unittest.TestCase):
         self.make_one_object_simulation()
         self.simulator.run(5.0)
         self.assertIsInstance(self.simulator.sim_metadata, SimulationMetadata)
-
-        import contextlib
 
 
         @contextlib.contextmanager
