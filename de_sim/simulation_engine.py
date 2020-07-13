@@ -164,7 +164,6 @@ class SimulationEngine(object):
             sim_config (:obj:`SimulationConfig`): information about the simulation's configuration
                 (start time, maximum time, etc.)
         """
-        simulator_repo, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
         if self.author_metadata is None:
             author = AuthorMetadata()
         else:
@@ -172,6 +171,13 @@ class SimulationEngine(object):
         run = RunMetadata()
         run.record_ip_address()
         run.record_start()
+
+        # obtain repo metadaa, if possible
+        simulator_repo = None
+        try:
+            simulator_repo, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
+        except ValueError:
+            pass
         self.sim_metadata = SimulationMetadata(simulation_config=sim_config, run=run, author=author,
                                                simulator_repo=simulator_repo)
 

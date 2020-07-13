@@ -380,7 +380,8 @@ class SimulationObject(object):
         self.simulator.event_queue.schedule_event(self.time, event_time, self,
                                                   receiving_object, message)
         self.log_with_time("Send: ({}, {:6.2f}) -> ({}, {:6.2f}): {}".format(self.name, self.time,
-                                                                             receiving_object.name, event_time, message.__class__.__name__))
+                                                                             receiving_object.name, event_time,
+                                                                             message.__class__.__name__))
 
     def send_event(self, delay, receiving_object, message, copy=False):
         """ Send a simulation event message, specifing the event time as a delay.

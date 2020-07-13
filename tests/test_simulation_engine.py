@@ -386,6 +386,31 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.run(5.0)
         self.assertIsInstance(self.simulator.sim_metadata, SimulationMetadata)
 
+        import contextlib
+
+
+        @contextlib.contextmanager
+        def working_directory(path):
+            """ A context manager that temporarilyt changes the working directory
+
+            Args:
+                path (:obj:`str`): the temporary working directory
+            See http://code.activestate.com/recipes/576620-changedirectory-context-manager/#c2
+            """
+            prev_cwd = os.getcwd()
+            os.chdir(path)
+            yield
+            os.chdir(prev_cwd)
+
+
+        # current directory not a git repo
+        new_dir = tempfile.mkdtemp(dir=self.out_dir)
+        with working_directory(new_dir) as cd:
+            self.simulator.reset()
+            self.make_one_object_simulation()
+            self.simulator.run(5.0)
+        self.assertTrue(self.simulator.sim_metadata.simulator_repo is None)
+
     ### test simulation performance ### # noqa: E266
     def prep_simulation(self, simulation_engine, num_sim_objs):
         simulation_engine.reset()
