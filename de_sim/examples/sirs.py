@@ -1,4 +1,4 @@
-""" Example DE-Sim implementations of a stochastic Susceptible, Infectious, or Recovered (SIR) epidemic model
+""" Example DE-Sim implementations of stochastic Susceptible, Infectious, or Recovered (SIR) epidemic models
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2020-07-08
@@ -40,22 +40,35 @@ class SIR(ApplicationSimulationObject):
     Infectious Disease Modelling, 2(2), pp.128-142.
 
     Attributes:
-        s (:obj:`int`): initial number of susceptible subjects, s(0)
-        i (:obj:`int`): initial number of infectious subjects, i(0)
+        s (:obj:`int`): number of susceptible subjects
+        i (:obj:`int`): number of infectious subjects
         N (:obj:`int`): total number of susceptible subjects, a constant
         beta (:obj:`float`): SIR beta parameter
         gamma (:obj:`float`): SIR gamma parameter
-        state_period (:obj:`float`): time step for recording state
-        random_state (:obj:`numpy.random.RandomState`): random state
+        recording_period (:obj:`float`): time step for recording state
+        random_state (:obj:`numpy.random.RandomState`): a random state
         history (:obj:`list`): list of recorded states
     """
-    def __init__(self, name, s, i, N, beta, gamma, state_period):
+    def __init__(self, name, s, i, N, beta, gamma, recording_period):
+        """ Initialize a SIR instance
+
+        Args:
+            name (:obj:`str`): the instance's name
+            s (:obj:`int`): initial number of susceptible subjects, s(0)
+            i (:obj:`int`): initial number of infectious subjects, i(0)
+            N (:obj:`int`): total number of susceptible subjects, a constant
+            beta (:obj:`float`): SIR beta parameter
+            gamma (:obj:`float`): SIR gamma parameter
+            recording_period (:obj:`float`): time step for recording state
+            random_state (:obj:`numpy.random.RandomState`): random state
+            history (:obj:`list`): list of recorded states
+        """
         self.s = s
         self.i = i
         self.N = N
         self.beta = beta
         self.gamma = gamma
-        self.state_period = state_period
+        self.recording_period = recording_period
         self.random_state = numpy.random.RandomState()
         self.history = []
         super().__init__(name)
@@ -110,7 +123,7 @@ class SIR(ApplicationSimulationObject):
         self.history.append(dict(time=self.time,
                                  s=self.s,
                                  i=self.i))
-        self.send_event(self.state_period, self, RecordTrajectory())
+        self.send_event(self.recording_period, self, RecordTrajectory())
 
     event_handlers = [(SusceptibleToInfectious, 'handle_s_to_i'),
                       (InfectiousToRecovered, 'handle_i_to_r'),
@@ -120,6 +133,7 @@ class SIR(ApplicationSimulationObject):
     messages_sent = MESSAGE_TYPES
 
 
+### SIR epidemic model, version 2 ###
 class StateTransition(SimulationMessage):
     "State transition"
     attributes = ['transition']
@@ -138,8 +152,8 @@ class Transition(enum.Enum):
 class SIR2(SIR):
     """ Version 2 of a SIR epidemic model
 
-    SIR2 is similar to SIR, but uses a event message type for both transitions, and a
-    single message handler to process transition messages.
+    SIR2 is similar to SIR, but uses one event message type for both transitions, and a
+    single message handler to process transition events.
     """
     def schedule_next_event(self):
         """ Schedule the next SIR event
@@ -158,7 +172,7 @@ class SIR2(SIR):
             self.send_event(tau, self, StateTransition(Transition.i_to_r))
 
     def handle_state_transition(self, event):
-        """ Handle an infectious transition
+        """ Handle an infectious state transition
 
         Args:
             event (:obj:`Event`): simulation event that contains the type of transition
@@ -180,7 +194,7 @@ class SIR2(SIR):
         self.history.append(dict(time=self.time,
                                  s=self.s,
                                  i=self.i))
-        self.send_event(self.state_period, self, RecordTrajectory())
+        self.send_event(self.recording_period, self, RecordTrajectory())
 
     event_handlers = [(StateTransition, 'handle_state_transition'),
                       (RecordTrajectory, 'record_trajectory')]

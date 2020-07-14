@@ -32,7 +32,7 @@ class TestSIRs(unittest.TestCase):
                             N=100,
                             beta=0.3,
                             gamma=0.15,
-                            state_period=10)
+                            recording_period=10)
             sir = RunSIRs.main(sir_class, time_max=60, seed=17, **sir_args)
             RunSIRs.print_history(sir)
             expected_output_strings = ['time', '\ts\t', '60\t', 'Executed']
@@ -60,7 +60,7 @@ class TestSIRs(unittest.TestCase):
                                 N=100,
                                 beta=0.3,
                                 gamma=0.15,
-                                state_period=10)
+                                recording_period=10)
                 seed = random.randrange(1E6)
                 sir = RunSIRs.main(sir_class, time_max=60, seed=seed, **sir_args)
                 # consider an outbreak to be minor if no infections remain and fewer than 10 people were infected
