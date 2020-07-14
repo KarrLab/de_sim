@@ -62,9 +62,10 @@ class PholdSimulationObject(ApplicationSimulationObject):
             self.log_debug_msg("{:8.3f}: {} sending to self".format(self.time, self.name))
 
         else:
-            # send to another process; pick process index in [0,num_phold-2], and increment if self
+            # send to another randomly selected process
+            # pick process index in [0, num_phold-2], and increment if self or greater
             index = random.randrange(self.args.num_phold_procs - 1)
-            if index == obj_index(self.name):
+            if obj_index(self.name) <= index:
                 index += 1
             receiver = self.simulator.simulation_objects[obj_name(index)]
             self.log_debug_msg("{:8.3f}: {} sending to {}".format(self.time, self.name,
