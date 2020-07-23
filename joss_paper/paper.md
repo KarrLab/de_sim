@@ -60,18 +60,28 @@ DE-Sim enables the construction and simulation of discrete-event model that help
 DE-Sim is designed for scientists, engineers and their computational colleagues who want to build and use quantitative models of complex, discrete-time systems.
 DE-Sim's features address the needs this audience: it uses Python, one of the most popular languages; it is open-source software; it is easy to learn because it provides extensive tutorials, examples, and documentation; and it is thoroughly tested and reliable.
 
-## Comparison of DE-Sim with existing DES tools
+## Comparison of DE-Sim with existing discrete-event simulation tools
+
+Multiple DES tools already exist.
+\autoref{fig:comparison} lists five of the tools most frequently discussed at the Winter Simulation Conference, as determined by querying Google Scholar.
+All of these tools accept models described in code, while two tools also provide users with the ability to describe models with a graphical interface, SIMUL8 [@concannon2003dynamic] and SimEvents [@clune2006discrete].
+The commercial simulation tools all use proprietary modeling languages.
+DE-Sim and three other tools, SystemC [@mueller2001simulation], SIMSCRIPT III [@rice2005simscript] and SimEvents support the object-oriented descriptions of models [@zeigler1987hierarchical].
+SimEvents obtains its OO functionality from the OO support in MATLAB.                                                    
 
 ![**Comparison of DE-Sim with popular existing DES tools.**
-All existing tools have been mentioned in more than 20 papers published in the Winter Simulation Conference, as reported by Google Scholar.
 The commercial simulation tools all use proprietary modeling languages.
 \label{fig:comparison}](comparison.pdf)
 
-Table:  
+DE-Sim is the only open-source OO DES tool in Python.
+DE-Sim's combination of features makes it uniquely suitable for creating scientific models of complex systems that benefit from 1) the power and convenience of OO modeling and 2) the ability to leverage Python's extensive library of data science tools, such as Pandas, SciPy and NumPy.
+An important benefit of OO models is that individual simulation runs can be sped up by parallel execution on multiple cores.
+More precisely, an OO model whose objects do not share state with each other can be executed on a parallel DES simulator, such as Time Warp.
+By contrast, while SimPy can execute separate simulation runs in parallel, each individual run must execute sequentially [@muller2011running].
 
-
-As introduced above, several DES tools are already available, including functional DES tools such as SimPy [@matloff2008introduction], object-oriented DES tools such as SystemC [@mueller2001simulation], graphical DES tools such as Simul8 [@concannon2003dynamic], and high-performance, parallel DES tools such as POSE [@wilmarth2005pose] and ROSS [@carothers2002ross]. For computational scientists who seek use DES to analyze large datasets, we believe that the primary advantage of DE-Sim is that DE-Sim makes it easier to build complex models from large, heterogeneous datasets. We believe that it is easier to create models with DE-Sim than SimPy because DE-Sim models can be defined using classes, whereas SimPy models must be defined at a lower level using functions. We believe that it is easier to create models with DE-Sim than other object-oriented DES tools because DE-Sim builds upon Python rather than lower-level langauages such as C++. This makes DE-Sim more accessible to a wider range of researchers than many other DES tools, makes it easy for researchers to quickly experiment with models with minimal Python code, and makes it easy to use high-level data science packages such as NumPy [@oliphant2006guide], pandas [@mckinney2010data], SciPy [@virtanen2020scipy], and SQLAlchemy [@bayer2020sqlalchemy] to build complex models from large datasets. Together, we anticipate that these features will enable researchers to create new models of unprecedented size and accuracy of a broad range of systems.
-
+For computational scientists who seek use DES to analyze large datasets, we believe that the primary advantage of DE-Sim is that DE-Sim makes it easier to build complex models from large, heterogeneous datasets.
+We believe that it is easier to create models with DE-Sim than SimPy because DE-Sim models can be defined using classes, whereas SimPy models must be defined at a lower level using functions.
+We believe that it is easier to create models with DE-Sim than other object-oriented DES tools because DE-Sim builds upon Python rather than lower-level langauages such as C++. This makes DE-Sim more accessible to a wider range of researchers than many other DES tools, makes it easy for researchers to quickly experiment with models with minimal Python code, and makes it easy to use high-level data science packages such as NumPy [@oliphant2006guide], pandas [@mckinney2010data], SciPy [@virtanen2020scipy], and SQLAlchemy [@bayer2020sqlalchemy] to build complex models from large datasets. Together, we anticipate that these features will enable researchers to create new models of unprecedented size and accuracy of a broad range of systems.
 
 
 One of the most promising methods for simulating large models is discrete-event simulation (DES). DES represents a system as a collection of processes that can read the values of a set of shared variables and schedule events to modify their values at discrete instants in time. DES is ideal for large models because its discrete structure is conducive to parallel execution. For example, Barnes et al. have executed DES models using nearly 2 million cores [@Barnes2013]. Several DES tools are available, including basic tools such as SimPy [@matloff2008introduction] which enable scientists to implement models using functional programming; high-performance, parallelized, object-oriented tools such as POSE [@wilmarth2005pose] and ROSS [@carothers2002ross] which support C-based models; and commercial tools such as Simula8 [@concannon2003dynamic] which provide proprietary languages for describing models. DES has been applied to a wide range of models. For example, epidemiologists have used DES to simulate the transmission of infectious disease, computer engineers have used DES to simulate distributed computer networks, and the military often uses DES to simulate wars [@banks2005discrete]. However, it remains challenging to use large, heterogeneous datasets to build DES models. It is difficult to implement complex models using functional DES tools such as SimPy, and the C-based DES tools, such as POSE and ROSS, are siloed from popular data science tools such as pandas [@mckinney2010data].
