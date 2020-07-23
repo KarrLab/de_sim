@@ -64,11 +64,11 @@ DE-Sim's features address the needs this audience: it uses Python, one of the mo
 
 | a1 | b1 |    |   |   |
 |----|----|----|---|---|
-| a2 |    |    |   |   |
+| a2 |    |    | &#10004;  |   |
 |    |    | c3 |   |   |
 |    |    |    |   |   |
 
-
+Table: **Comparison of DE-Sim with existing DES tools.** 
 
 
 As introduced above, several DES tools are already available, including functional DES tools such as SimPy [@matloff2008introduction], object-oriented DES tools such as SystemC [@mueller2001simulation], graphical DES tools such as Simul8 [@concannon2003dynamic], and high-performance, parallel DES tools such as POSE [@wilmarth2005pose] and ROSS [@carothers2002ross]. For computational scientists who seek use DES to analyze large datasets, we believe that the primary advantage of DE-Sim is that DE-Sim makes it easier to build complex models from large, heterogeneous datasets. We believe that it is easier to create models with DE-Sim than SimPy because DE-Sim models can be defined using classes, whereas SimPy models must be defined at a lower level using functions. We believe that it is easier to create models with DE-Sim than other object-oriented DES tools because DE-Sim builds upon Python rather than lower-level langauages such as C++. This makes DE-Sim more accessible to a wider range of researchers than many other DES tools, makes it easy for researchers to quickly experiment with models with minimal Python code, and makes it easy to use high-level data science packages such as NumPy [@oliphant2006guide], pandas [@mckinney2010data], SciPy [@virtanen2020scipy], and SQLAlchemy [@bayer2020sqlalchemy] to build complex models from large datasets. Together, we anticipate that these features will enable researchers to create new models of unprecedented size and accuracy of a broad range of systems.
