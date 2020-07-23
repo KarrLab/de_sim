@@ -66,7 +66,7 @@ DE-Sim's features address the needs this audience: it uses Python, one of the mo
 |----|----|--------------------|---|---|
 | a2 |    | :check_mark:       |   |   |
 |    |    | :heavy_check_mark: |   |   |
-|    |    |                    |   |   |
+|    |    |  <ul><li>[x]</li></ul>                   |   |   |
 
 Table: **Comparison of DE-Sim with existing DES tools.** 
 
