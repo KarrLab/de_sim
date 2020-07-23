@@ -62,11 +62,11 @@ DE-Sim's features address the needs this audience: it uses Python, one of the mo
 
 ## Comparison of DE-Sim with existing DES tools
 
-| a1 | b1 |    |   |   |
-|----|----|----|---|---|
-| a2 |    |    | &#10004;  |   |
-|    |    | c3 |   |   |
-|    |    |    |   |   |
+| a1 | b1 | &#10004;           |   |   |
+|----|----|--------------------|---|---|
+| a2 |    | :check_mark:       |   |   |
+|    |    | :heavy_check_mark: |   |   |
+|    |    |                    |   |   |
 
 Table: **Comparison of DE-Sim with existing DES tools.** 
 
