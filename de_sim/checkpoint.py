@@ -1,4 +1,4 @@
-""" Checkpointing log
+""" Checkpoints for a simulation run
 
 :Author: Jonathan Karr <karr@mssm.edu>
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
@@ -84,12 +84,16 @@ class Checkpoint(object):
 
 
 class AccessCheckpoints(object):
-    """ Represents a directory containing simulation checkpoints
+    """ Represent a directory that contains the checkpoints from a simulation run
+
+    Checkpoints are saved in pickle files, named `t.pickle`, where `t` is the simulation time
+    of the checkpoint.
 
     Attributes:
         dir_path (:obj:`str`): a directory containing simulation checkpoints
-        last_dir_mod (:obj:`str`): last time at which `dir_path` was modified
-        all_checkpoints (:obj:`list` of :obj:`str`): all the checkpoints in `dir_path`
+        last_dir_mod (:obj:`str`): most recent wall-clock time when `dir_path` was modified
+        all_checkpoints (:obj:`list` of :obj:`float`): sorted list of the simulation times of all
+            checkpoints in `dir_path`
     """
 
     def __init__(self, dir_path):
@@ -152,7 +156,7 @@ class AccessCheckpoints(object):
             error_if_empty (:obj:`bool`, optional): if set, report an error if no checkpoints found
 
         Returns:
-            :obj:`list`: sorted list of times of saved checkpoints
+            :obj:`list` of :obj:`float`: sorted list of times of saved checkpoints
 
         Raises:
             :obj:`SimulatorError`: if `dirname` doesn't contain any checkpoints

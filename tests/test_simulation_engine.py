@@ -44,9 +44,6 @@ class BasicExampleSimulationObject(ApplicationSimulationObject):
     def send_initial_events(self):
         self.send_event(1, self, InitMsg())
 
-    def get_state(self):
-        return "self.num: {}".format(self.num)
-
     def handle_event(self, event):
         pass
 
@@ -68,13 +65,20 @@ class ExampleSimulationObject(BasicExampleSimulationObject):
 
 class InteractingSimulationObject(BasicExampleSimulationObject):
 
-    def handle_event(self, event):
+    def send_all(self):
         self.num += 1
         # send an event to each object in the simulator
         for obj in self.simulator.simulation_objects.values():
-            self.send_event(1, obj, InitMsg())
+            self.send_event(1, obj, Eg1())
 
-    event_handlers = [(sim_msg_type, 'handle_event') for sim_msg_type in ALL_MESSAGE_TYPES]
+    def handle_init_event(self, event):
+        self.send_all()
+
+    def handle_superpositioned_event(self, events):
+        self.send_all()
+
+    event_handlers = [(InitMsg, 'handle_init_event'),
+                      (Eg1, 'handle_superpositioned_event')]
 
     messages_sent = ALL_MESSAGE_TYPES
 
@@ -310,10 +314,14 @@ class TestSimulationEngine(unittest.TestCase):
         self.assertEqual(len(self.simulator.simulation_objects), 0)
 
     def test_multi_interacting_object_simulation(self):
-        sim_objects = [InteractingSimulationObject(obj_name(i)) for i in range(1, 3)]
+        num_sim_objects = 3
+        sim_objects = [InteractingSimulationObject(obj_name(i)) for i in range(num_sim_objects)]
         self.simulator.add_objects(sim_objects)
         self.simulator.initialize()
-        self.assertEqual(self.simulator.simulate(2.5).num_events, 4)
+        max_time = 4
+        self.assertEqual(self.simulator.simulate(max_time).num_events, num_sim_objects * max_time)
+        for obj in sim_objects:
+            self.assertEqual(obj.num, max_time)
 
     def make_cyclical_messaging_network_sim(self, simulator, num_objs):
         # make simulation with cyclical messaging network
@@ -463,7 +471,7 @@ class TestSimulationEngine(unittest.TestCase):
             fast_logger = FastLogger(debug_logs.get_log(log_name), 'debug')
             self.assertEqual(fast_logger.get_level(), level_by_logger[log_name])
 
-    # @unittest.skip("takes 3 to 5 min.")
+    @unittest.skip("takes 3 to 5 min.")
     def test_performance(self):
         existing_levels = self.suspend_logging(self.log_names)
         simulation_engine = SimulationEngine()
@@ -561,31 +569,23 @@ class Delicate(SimulationMessage):
 
 
 class ReproducibleTestSimulationObject(ApplicationSimulationObject):
-    """ This sim obj is used to test whether the simulation engine is reproducible
-    """
+    """ This sim obj is used to test whether the simulation engine is reproducible """
 
     def __init__(self, name, obj_num, array_size):
         SimulationObject.__init__(self, name)
         self.obj_num = obj_num
         self.array_size = array_size
         self.last_time = 0
-        # Delicate messages should arrive before Hello messages; count the failures
-        self.delicates_before_hello = 0
+        # Delicate messages should arrive AFTER InitMsg messages; count the failures
+        self.delicates_before_init = 0
         # Delicate messages should be delivered in increasing (time, obj_num) order; count the failures
         self.disordered_delicates = 0
         self.last_time_delicate_num_pair = (0, 0)
 
-    def next_objs(self, num_objs):
-        # get the next num_objs sim objs in the array
-        sim_objs = []
-        for obj_num in range(self.obj_num, min(self.obj_num + num_objs, self.array_size)):
-            sim_objs.append(self.simulator.get_object(obj_name(obj_num)))
-        return sim_objs
-
     def sched_events(self):
-        # send InitMsg to self in 1 and Delicate(id) to self and next obj in 1, but randomize send order
+        # send InitMsg to self in 1 and Delicate(id) to all objects, but randomize send order
         receivers_n_messages = [(self, InitMsg())]
-        for sim_obj in self.next_objs(2):
+        for sim_obj in self.simulator.simulation_objects.values():
             receivers_n_messages.append((sim_obj, Delicate(self.obj_num)))
         random.shuffle(receivers_n_messages)
         for receiver, message in receivers_n_messages:
@@ -594,21 +594,22 @@ class ReproducibleTestSimulationObject(ApplicationSimulationObject):
     def send_initial_events(self):
         self.sched_events()
 
-    def handle_init_msg(self, event):
-        self.last_time = self.time
+    def handle_superposed_events(self, event_list):
+        for event in event_list:
+            if isinstance(event.message, InitMsg):
+                self.last_time = self.time
+            elif isinstance(event.message, Delicate):
+                if self.last_time < self.time:
+                    self.delicates_before_init += 1
+                delicate_msg = event.message
+                time_delicate_num_pair = (event.event_time, delicate_msg.sender_obj_num)
+                if time_delicate_num_pair <= self.last_time_delicate_num_pair:
+                    self.disordered_delicates += 1
+                self.last_time_delicate_num_pair = time_delicate_num_pair
         self.sched_events()
 
-    def handle_delicate_msg(self, event):
-        if self.last_time < self.time:
-            self.delicates_before_hello += 1
-        delicate_msg = event.message
-        time_delicate_num_pair = (event.event_time, delicate_msg.sender_obj_num)
-        if time_delicate_num_pair <= self.last_time_delicate_num_pair:
-            self.disordered_delicates += 1
-        self.last_time_delicate_num_pair = time_delicate_num_pair
-
     # register event_handler(s) in message priority order
-    event_handlers = [(InitMsg, handle_init_msg), (Delicate, handle_delicate_msg)]
+    event_handlers = [(InitMsg, handle_superposed_events), (Delicate, handle_superposed_events)]
 
     # register the message types sent
     messages_sent = [InitMsg, Delicate]
@@ -619,7 +620,7 @@ class TestSimulationReproducibility(unittest.TestCase):
     NUM_SIM_OBJS = 4
 
     def test_reproducibility(self):
-        self.simulator = SimulationEngine()
+        simulator = SimulationEngine()
 
         # comprehensive reproducibility test:
         # test whether the simulation engine deterministically delivers events to objects
@@ -629,10 +630,98 @@ class TestSimulationReproducibility(unittest.TestCase):
         num_sim_objs = TestSimulationReproducibility.NUM_SIM_OBJS
         for i in range(num_sim_objs):
             obj_num = i + 1
-            self.simulator.add_object(
+            simulator.add_object(
                 ReproducibleTestSimulationObject(obj_name(obj_num), obj_num, num_sim_objs))
-        self.simulator.initialize()
-        self.simulator.simulate(30)
-        for sim_obj in self.simulator.get_objects():
-            self.assertEqual(0, sim_obj.delicates_before_hello)
+        simulator.initialize()
+        simulator.simulate(5)
+        for sim_obj in simulator.get_objects():
+            self.assertEqual(0, sim_obj.delicates_before_init)
             self.assertEqual(0, sim_obj.disordered_delicates)
+
+
+class Double(SimulationMessage):
+    'Double value'
+
+
+class Increment(SimulationMessage):
+    'Increment value'
+
+
+# Since the composite functions increment(double(x)) and increment(double(x)) are not equivalent
+# simultaneous Increment and Double messages must be processed in that order to ensure reproducibility.
+# INCREMENT_THEN_DOUBLE achieves this because it determines the message type order in `event_handlers`,
+# which determines priorities.
+INCREMENT_THEN_DOUBLE = (Increment, Double)
+
+
+class IncrementThenDoubleSimObject(ApplicationSimulationObject):
+    """ Execute Increment before Double, testing superposition """
+
+    def __init__(self, name):
+        super().__init__(name)
+        self.value = 0
+
+    def send_events(self):
+        # send messages in random order
+        if random.randrange(2):
+            self.send_event(1, self, Double())
+            self.send_event(1, self, Increment())
+        else:
+            self.send_event(1, self, Increment())
+            self.send_event(1, self, Double())
+
+    def send_initial_events(self):
+        self.send_events()
+
+    def handle_superposed_events(self, event_list):
+        """ Process superposed events in an event list """
+        for event in event_list:
+            if isinstance(event.message, Increment):
+                self.value += 1
+            elif isinstance(event.message, Double):
+                self.value *= 2
+        self.send_events()
+
+    event_handlers = [(msg_type, 'handle_superposed_events') for msg_type in INCREMENT_THEN_DOUBLE]
+
+    # register the message types sent
+    messages_sent = INCREMENT_THEN_DOUBLE
+
+
+class BadIncrementThenDoubleSimObject(IncrementThenDoubleSimObject):
+
+    def handle_superposed_events(self, event_list):
+        pass
+
+    def other_event_handler(self, event_list):
+        pass
+
+    # simultaneous events cannot have different handlers
+    event_handlers = [(Increment, 'handle_superposed_events'),
+                      (Double, 'other_event_handler')]
+
+
+class TestSuperposition(unittest.TestCase):
+
+    def INCREMENT_THEN_DOUBLE_from_0(self, iterations):
+        v = 0
+        for _ in range(iterations):
+            v += 1
+            v *= 2
+        return v
+
+    def test_superposition(self):
+        simulator = SimulationEngine()
+        simulator.add_object(IncrementThenDoubleSimObject('name'))
+        simulator.initialize()
+        max_time = 5
+        simulator.simulate(max_time)
+        for sim_obj in simulator.get_objects():
+            self.assertEqual(sim_obj.value, self.INCREMENT_THEN_DOUBLE_from_0(max_time))
+
+    def test_superposition_exception(self):
+        simulator = SimulationEngine()
+        simulator.add_object(BadIncrementThenDoubleSimObject('name'))
+        simulator.initialize()
+        with self.assertRaisesRegex(SimulatorError, 'Superposition requires message types'):
+            simulator.simulate(1)

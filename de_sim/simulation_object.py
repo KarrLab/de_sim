@@ -487,14 +487,41 @@ class SimulationObject(object):
             for event in event_list:
                 self.fast_plot_file_logger.fast_log(str(event), sim_time=self.time)
 
-        # iterate through event_list, branching to handler
-        for event in event_list:
+        '''
+        If multiple event messages are received by a simulation object at the same simulation time,
+        then they are all passed in a list to the simulation object's handler.
+        This functionality, named *superposition* after the concept in physics, is important because
+        simulations must be deterministic, and to achieve that the simulation application must receive all
+        simultanous messages at once and execute them in a deterministically.
+        The alternative, in which the simulator passes simultaneous event messages in an arbitrary
+        order to a simulation object would give the object sufficient information to be deterministic.
+        but if the event messages have different handlers then the simulation engine riases a `SimulatorError` exception
+        which says that superposition requires that the message types have the same handler
+        '''
+        # if only one event message is being handled, call its handler
+        if 1 == len(event_list):
+            event = event_list[0]
             try:
                 handler = self.__class__.metadata.event_handlers_dict[event.message.__class__]
                 handler(self, event)
             except KeyError:  # pragma: no cover
                 # unreachable because of check that receiving sim
                 # obj type is registered to receive the message type
+                raise SimulatorError("No handler registered for Simulation message type: '{}'".format(
+                    event.message.__class__.__name__))
+
+        # if multiple event messages are being handled, pass them as a list to an event handler,
+        # which is known as "superposition"
+        else:
+            try:
+                handler = self.__class__.metadata.event_handlers_dict[event_list[0].message.__class__]
+                for event in event_list[1:]:
+                    if handler != self.__class__.metadata.event_handlers_dict[event.message.__class__]:
+                        message_types = set([type(event.message).__name__ for event in event_list])
+                        raise SimulatorError(f"Superposition requires message types {message_types} have same handler")
+                handler(self, event_list)
+            except KeyError:  # pragma: no cover
+                # unreachable because of check that receiving sim obj type is registered to receive the message type
                 raise SimulatorError("No handler registered for Simulation message type: '{}'".format(
                     event.message.__class__.__name__))
 
