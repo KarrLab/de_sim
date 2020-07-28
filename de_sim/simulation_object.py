@@ -475,11 +475,23 @@ class SimulationObject(object):
         `SimulationEngine` refers to this method via `sim_obj._SimulationObject__handle_event_list`,
         where `sim_obj` is the simulation object that receives the event list.
 
+        If multiple event messages are received by a simulation object at the same simulation time,
+        then they are all passed in a list to the simulation object's handler.
+        This functionality, named *superposition* after the concept in physics, is important because
+        simulations must be deterministic, and to achieve that the simulation application must receive
+        all simultanous messages at once and execute them in a deterministically.
+        The alternative, in which the simulator passes simultaneous event messages in an arbitrary
+        order to a simulation object would **not** give the object sufficient information to be deterministic.
+        But if the event messages have different handlers then the simulation engine raises a
+        `SimulatorError` exception which says that superposition requires that the message types have
+        the same handler.
+
         Attributes:
             event_list (:obj:`list` of :obj:`Event`): the `Event` message(s) in the simulation event
 
         Raises:
-            :obj:`SimulatorError`: if a message in `event_list` has an invalid type
+            :obj:`SimulatorError`: if a message in `event_list` has an invalid type, or
+                if superposed event messages have different handlers
         """
         self.num_events += 1
 
@@ -489,18 +501,6 @@ class SimulationObject(object):
             for event in event_list:
                 self.fast_plot_file_logger.fast_log(str(event), sim_time=self.time)
 
-        '''
-        If multiple event messages are received by a simulation object at the same simulation time,
-        then they are all passed in a list to the simulation object's handler.
-        This functionality, named *superposition* after the concept in physics, is important because
-        simulations must be deterministic, and to achieve that the simulation application must receive
-        all simultanous messages at once and execute them in a deterministically.
-        The alternative, in which the simulator passes simultaneous event messages in an arbitrary
-        order to a simulation object would give the object sufficient information to be deterministic.
-        But if the event messages have different handlers then the simulation engine raises a
-        `SimulatorError` exception which says that superposition requires that the message types have
-        the same handler
-        '''
         # if only one event message is being handled, call its handler
         if 1 == len(event_list):
             event = event_list[0]
