@@ -703,7 +703,7 @@ class BadIncrementThenDoubleSimObject(IncrementThenDoubleSimObject):
 
 class TestSuperposition(unittest.TestCase):
 
-    def INCREMENT_THEN_DOUBLE_from_0(self, iterations):
+    def increment_then_double_from_0(self, iterations):
         v = 0
         for _ in range(iterations):
             v += 1
@@ -717,7 +717,7 @@ class TestSuperposition(unittest.TestCase):
         max_time = 5
         simulator.simulate(max_time)
         for sim_obj in simulator.get_objects():
-            self.assertEqual(sim_obj.value, self.INCREMENT_THEN_DOUBLE_from_0(max_time))
+            self.assertEqual(sim_obj.value, self.increment_then_double_from_0(max_time))
 
     def test_superposition_exception(self):
         simulator = SimulationEngine()
