@@ -8,7 +8,7 @@ Examples
 -----------------------------------
 
 * `Random walk <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/random_walk.py>`_: a random one-dimensional walk which increments or decrements a variable with equal probability at each event
-* `Parallel hold (PHOLD) <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/phold.py>`_: model developed by Richard Fujimoto which is commonly used to benchmark DES simulators
+* `Parallel hold (PHOLD) <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/phold.py>`_: model developed by Richard Fujimoto to benchmark parallel discrete-event simulators
 
 
 -----------------------------------

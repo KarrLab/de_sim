@@ -4,7 +4,7 @@ Installation
 Prerequisites
 --------------------------
 
-* Python >= 3.6
+* Python >= 3.7
 * Pip >= 19
 
 Latest release from PyPI
