@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/github/license/KarrLab/de_sim.svg)](LICENSE)
 ![Analytics](https://ga-beacon.appspot.com/UA-86759801-1/de_sim/README.md?pixel)
 
-# *DE-Sim*: a Python-based object-oriented discrete-event simulation tool for complex, data-driven modeling
+# *DE-Sim*: a Python-based object-oriented discrete-event simulator for modeling complex systems
 
 *DE-Sim* is an open-source, Python-based object-oriented discrete-event simulation (DES) tool that makes it easy to use large, heterogeneous datasets and high-level data science tools such as [NumPy](https://numpy.org/), [Scipy](https://scipy.org/scipylib/index.html), [pandas](https://pandas.pydata.org/), and [SQLAlchemy](https://www.sqlalchemy.org/) to build and simulate complex computational models. Similar to [Simula](http://www.simula67.info/), *DE-Sim* models are implemented by defining logical process objects which read the values of a set of shared variables and schedule events to modify their values at discrete instants in time.
 
@@ -23,7 +23,7 @@ To help users build and simulate complex, data-driven models, *DE-Sim* provides 
 
 ## Examples
 * [Random walk](de_sim/examples/random_walk.py): a random one-dimensional walk which increments or decrements a variable with equal probability at each event
-* [Parallel hold (PHOLD)](de_sim/examples/phold.py): model developed by Richard Fujimoto which is commonly used to benchmark DES simulators
+* [Parallel hold (PHOLD)](de_sim/examples/phold.py): model developed by Richard Fujimoto for benchmarking parallel DES simulators
 
 ## Tutorial
 Please see [sandbox.karrlab.org](https://sandbox.karrlab.org/tree/de_sim) for interactive tutorials on creating and executing models with *DE-Sim*.
@@ -34,7 +34,7 @@ Please see [sandbox.karrlab.org](https://sandbox.karrlab.org/tree/de_sim) for in
 ## Installation
 1. Install dependencies
     
-    * Python >= 3.6
+    * Python >= 3.7
     * pip >= 19
 
 2. Install this package 
