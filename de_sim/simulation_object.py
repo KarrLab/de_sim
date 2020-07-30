@@ -783,7 +783,7 @@ class ApplicationSimulationObject(SimulationObject, ApplicationSimulationObjectI
 
     @classmethod
     def set_class_priority(cls, priority):
-        """ Set the execution priority for simulation object classes, `class_priority`
+        """ Set the execution priority for a simulation object class, `class_priority`
 
         Use this to set the `class_priority` of a subclass of :obj:`SimulationObject` after it
             has been constructed.
