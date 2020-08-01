@@ -554,7 +554,8 @@ class SimulationObject(object):
 class ApplicationSimulationObjectInterface(object, metaclass=ABCMeta):  # pragma: no cover
 
     @abc.abstractmethod
-    def send_initial_events(self, *args):
+    def init_before_run(self):
+        """ Perform initialization before a simulation run """
         pass
 
     @abc.abstractmethod
@@ -775,7 +776,14 @@ class ApplicationSimulationObject(SimulationObject, ApplicationSimulationObjectI
             initialized by `AppSimObjAndABCMeta`
     """
 
-    def send_initial_events(self, *args):
+    def init_before_run(self):
+        """ Perform initialization before a simulation run
+
+        If a simulation object defines `init_before_run`, it will be called by the simulator just before
+        simulation begins, after all simulation objects have been created and loaded.
+        A simulation object that wishes to schedule initial events for itself or for other objects in the simulation
+        should do so in `init_before_run`. It can also perform any other initialization in the method.
+        """
         pass  # pragma: no cover
 
     def get_state(self):

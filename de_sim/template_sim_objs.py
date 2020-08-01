@@ -51,7 +51,7 @@ class TemplatePeriodicSimulationObject(ApplicationSimulationObject):
         """
         pass    # pragma: no cover     # must be overridden
 
-    def send_initial_events(self):
+    def init_before_run(self):
         # create the initial event
         self.schedule_next_event()
 

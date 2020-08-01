@@ -30,7 +30,7 @@ class RandomWalkSimulationObject(ApplicationSimulationObject):
         self.output = output
         super().__init__(name)
 
-    def send_initial_events(self):
+    def init_before_run(self):
         self.send_event(0, self, MessageSentToSelf())
         self.send_event(1, self, MessageSentToSelf())
 

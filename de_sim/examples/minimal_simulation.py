@@ -22,7 +22,7 @@ class MinimalSimulationObject(ApplicationSimulationObject):
         self.delay = delay
         super().__init__(name)
 
-    def send_initial_events(self):
+    def init_before_run(self):
         self.send_event(self.delay, self, MessageSentToSelf())
 
     def handle_simulation_event(self, event):

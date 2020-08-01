@@ -1,6 +1,7 @@
 """ Test Jupyter notebooks
 
 :Author: Jonathan Karr <karr@mssm.edu>
+:Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2020-06-27
 :Copyright: 2020, Karr Lab
 :License: MIT
@@ -11,9 +12,6 @@ import json
 import nbconvert.preprocessors
 import nbformat
 import os
-# import shutil
-# import sys
-# import tempfile
 import unittest
 
 
@@ -47,8 +45,9 @@ class ExamplesTestCase(unittest.TestCase):
             execute_preprocessor = nbconvert.preprocessors.ExecutePreprocessor(timeout=self.TIMEOUT)
             try:            
                 execute_preprocessor.preprocess(notebook, {'metadata': {'path': 'de_sim/examples/jupyter_examples'}})
-            except Exception:
+            except Exception as e:
                 failed_notebooks.append(filename)
+                print(e)
 
         if failed_notebooks:
             raise Exception('The following notebooks could not be executed:\n  {}'.format('\n  '.join(sorted(failed_notebooks))))

@@ -17,7 +17,7 @@ class ExampleSimulationObject(ApplicationSimulationObject):
     def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)
 
-    def send_initial_events(self, *args):
+    def init_before_run(self, *args):
         pass  # pragma: no cover
 
     def get_state(self):
@@ -44,7 +44,7 @@ class ImproperlyRegisteredSimulationObject(ApplicationSimulationObject):
     # register the message types sent
     messages_sent = [InitMsg]
 
-    def send_initial_events(self, *args):
+    def init_before_run(self, *args):
         pass  # pragma: no cover
 
     def get_state(self):

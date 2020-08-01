@@ -143,7 +143,7 @@ class SimulationEngine(object):
     def initialize(self):
         """ Initialize a simulation
 
-        Call `send_initial_events()` in each simulation object that has been loaded.
+        Call `init_before_run()` in each simulation object that has been loaded.
 
         Raises:
             :obj:`SimulatorError`:  if the simulation has already been initialized
@@ -151,7 +151,7 @@ class SimulationEngine(object):
         if self.__initialized:
             raise SimulatorError('Simulation has already been initialized')
         for sim_obj in self.simulation_objects.values():
-            sim_obj.send_initial_events()
+            sim_obj.init_before_run()
         self.event_counts.clear()
         self.__initialized = True
 

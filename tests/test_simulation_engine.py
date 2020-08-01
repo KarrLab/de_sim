@@ -41,7 +41,7 @@ class BasicExampleSimulationObject(ApplicationSimulationObject):
         SimulationObject.__init__(self, name)
         self.num = 0
 
-    def send_initial_events(self):
+    def init_before_run(self):
         self.send_event(1, self, InitMsg())
 
     def handle_event(self, event):
@@ -98,7 +98,7 @@ class CyclicalMessagesSimulationObject(ApplicationSimulationObject):
         next = (self.obj_num + 1) % self.cycle_size
         return self.simulator.simulation_objects[obj_name(next)]
 
-    def send_initial_events(self):
+    def init_before_run(self):
         # send event to next CyclicalMessagesSimulationObject
         self.send_event(1, self.next_obj(), InitMsg())
 
@@ -345,9 +345,6 @@ class TestSimulationEngine(unittest.TestCase):
             def __init__(self):
                 SimulationObject.__init__(self, 'inactive')
 
-            def send_initial_events(self):
-                pass
-
             def get_state(self):
                 pass
 
@@ -591,7 +588,7 @@ class ReproducibleTestSimulationObject(ApplicationSimulationObject):
         for receiver, message in receivers_n_messages:
             self.send_event(1, receiver, message)
 
-    def send_initial_events(self):
+    def init_before_run(self):
         self.sched_events()
 
     def handle_superposed_events(self, event_list):
@@ -670,7 +667,7 @@ class IncrementThenDoubleSimObject(ApplicationSimulationObject):
             self.send_event(1, self, Increment())
             self.send_event(1, self, Double())
 
-    def send_initial_events(self):
+    def init_before_run(self):
         self.send_events()
 
     def handle_superposed_events(self, event_list):

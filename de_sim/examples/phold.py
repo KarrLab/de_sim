@@ -51,7 +51,7 @@ class PholdSimulationObject(ApplicationSimulationObject):
         self.args = args
         super().__init__(name)
 
-    def send_initial_events(self):
+    def init_before_run(self):
         self.send_event(exp_delay(), self, InitMsg())
 
     def handle_simulation_event(self, event):

@@ -73,7 +73,7 @@ class SIR(ApplicationSimulationObject):
         self.history = []
         super().__init__(name)
 
-    def send_initial_events(self):
+    def init_before_run(self):
         """ Send the initial events, and record the initial state
         """
         self.schedule_next_event()

@@ -49,7 +49,7 @@ class PeriodicLinearUpdatingSimuObj(ApplicationSimulationObject):
         self.b = b
         super().__init__(name)
 
-    def send_initial_events(self):
+    def init_before_run(self):
         self.send_event(0, self, MessageSentToSelf())
 
     def handle_simulation_event(self, event):

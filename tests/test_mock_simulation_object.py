@@ -13,7 +13,7 @@ from de_sim.testing.some_message_types import Eg1
 
 class Example(MockSimulationObject):
 
-    def send_initial_events(self):
+    def init_before_run(self):
         pass
 
     def get_state(self):
