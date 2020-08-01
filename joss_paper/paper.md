@@ -117,7 +117,7 @@ class SimpleSimulationObject(ApplicationSimulationObject):
         self.delay = delay
         super().__init__(name)
 
-    def send_initial_events(self):
+    def init_before_run(self):
         self.send_event(self.delay, self, MessageSentToSelf())
 
     def handle_simulation_event(self, event):
@@ -133,7 +133,7 @@ Each object in a simulation must have a unique `name`.
 This example adds an instance attribute that provides the delay between events.
 All `ApplicationSimulationObject`s also have a read-only attribute called `time` that always provides the current simulation time.
 
-A simulation object may define a `send_initial_events` method, which, if present, will be called by the simulator after all objects have been created and before simulation begins.
+A simulation object may define a `init_before_run` method, which, if present, will be called by the simulator after all objects have been created and before simulation begins.
 The method can perform arbitrary initialization, including scheduling events for the object itself or for other objects in the simulation.
 A simulation must schedule at least one initial event to commence.
 
