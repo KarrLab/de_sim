@@ -66,15 +66,15 @@ In addition, because SystemC is designed for modeling digital electronics, its c
 The last three DES tools in \autoref{fig:comparison} are commercial software.
 Two of them, SIMUL8 and SimEvents, specialize in modeling domains that do not contain scientific problems.
 
+![**DE-Sim can generate space-time visualizations of simulation trajectories.** 
+This figure illustrates a space-time visualization of all of the events and messages in a simulation of the parallel hold (PHOLD) DES benchmark model with three simulation objects. The timeline (grey line) for each object shows its events (grey dots). Each event in PHOLD schedules another event, as illustrated by event messages (arrows) sent from the earlier event to the event being scheduled. The curved blue arrows indicate events scheduled by a simulation object for itself in the future, while the straight purple arrows indicate event messages sent to other simulation objects. The programs for the PHOLD model and for visualizing the trajectory of any simulation are available in the DE-Sim Git repository. 
+\label{fig:phold_space_time_plot}](phold_space_time_plot.pdf)
+
 An important benefit of OO DES models is that individual simulation runs may be sped up by parallel execution on multiple cores.
 More precisely, the simulation of an OO DES model composed of objects that only interact with each other via event messages and do not access shared memory might be sped up by distributing its objects across multiple cores and executing them in parallel.
 This simulation would need to be synchronized by a parallel DES simulator, such as Time Warp [@Jefferson1985, @carothers2000ross].
 Parallel DES simulations can achieve substantial speedup, as Barnes et al. demonstrated by running the PHOLD benchmark [@fujimoto1990performance] on nearly 2 million cores [@Barnes2013].
 By contrast, while independent SimPy simulations can be run in parallel, a single SimPy simulation cannot be parallelized [@muller2011running].
-
-![**DE-Sim can generate space-time visualizations of simulation trajectories.** 
-This figure illustrates a space-time visualization of all of the events and messages in a simulation of the parallel hold (PHOLD) DES benchmark model with three simulation objects. The timeline (grey line) for each object shows its events (grey dots). Each event in PHOLD schedules another event, as illustrated by event messages (arrows) sent from the earlier event to the event being scheduled. The curved blue arrows indicate events scheduled by a simulation object for itself in the future, while the straight purple arrows indicate event messages sent to other simulation objects. The programs for the PHOLD model and for visualizing the trajectory of any simulation are available in the DE-Sim Git repository. 
-\label{fig:phold_space_time_plot}](phold_space_time_plot.pdf)
 
 # Tutorial: Building and simulating models with DE-Sim
 
@@ -219,3 +219,4 @@ Institutes of Health [award R35GM119771 to J.R.K], and the Icahn Institute for D
 We thank Yin Hoon Chew for her helpful feedback on this paper.
 
 # References
+
