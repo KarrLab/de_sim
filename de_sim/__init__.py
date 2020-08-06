@@ -9,3 +9,7 @@ from . import simulation_engine  # noqa: F401
 from . import simulation_message  # noqa: F401
 from . import simulation_object  # noqa: F401
 from . import utilities  # noqa: F401
+
+from .simulation_engine import SimulationEngine  # noqa: F401
+from .simulation_message import SimulationMessage  # noqa: F401
+from .simulation_object import ApplicationSimulationObject  # noqa: F401
