@@ -7,16 +7,14 @@
 """
 import argparse
 
-from de_sim.simulation_engine import SimulationEngine
-from de_sim.simulation_message import SimulationMessage
-from de_sim.simulation_object import ApplicationSimulationObject
+import de_sim
 
 
-class MessageSentToSelf(SimulationMessage):
+class MessageSentToSelf(de_sim.SimulationMessage):
     "A message that's sent to self"
 
 
-class MinimalSimulationObject(ApplicationSimulationObject):
+class MinimalSimulationObject(de_sim.ApplicationSimulationObject):
 
     def __init__(self, name, delay):
         self.delay = delay
@@ -62,7 +60,7 @@ class RunMinimalSimulation(object):
     def main(args):
 
         # create a simulator
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
 
         # create a simulation object and add it to the simulation
         simulator.add_object(MinimalSimulationObject('minimal_sim_obj', args.delay))

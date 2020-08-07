@@ -11,7 +11,6 @@ import unittest
 import warnings
 
 from de_sim.errors import SimulatorError
-from de_sim.simulation_engine import SimulationEngine
 from de_sim.simulation_object import (EventQueue, ApplicationSimulationObject,
                                       ApplicationSimulationObjMeta, ApplicationSimulationObjectMetadata,
                                       SimObjClassPriority)
@@ -21,6 +20,7 @@ from de_sim.testing.example_simulation_objects import (ALL_MESSAGE_TYPES, TEST_S
 from de_sim.testing.some_message_types import InitMsg, Eg1, MsgWithAttrs, UnregisteredMsg
 from wc_utils.util.list import is_sorted
 from wc_utils.util.misc import most_qual_cls_name
+import de_sim
 
 EVENT_HANDLERS = ApplicationSimulationObjMeta.EVENT_HANDLERS
 MESSAGES_SENT = ApplicationSimulationObjMeta.MESSAGES_SENT
@@ -378,7 +378,7 @@ class TestSimulationObject(unittest.TestCase):
         self.good_name = 'arthur'
         self.eso1 = ExampleSimulationObject(self.good_name)
         self.irso1 = ImproperlyRegisteredSimulationObject(self.good_name)
-        self.simulator = SimulationEngine()
+        self.simulator = de_sim.SimulationEngine()
         self.o1 = ExampleSimulationObject('o1')
         self.o2 = ExampleSimulationObject('o2')
         self.simulator.add_objects([self.o1, self.o2])

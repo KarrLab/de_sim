@@ -25,12 +25,11 @@ from de_sim.config import core
 from de_sim.simulation_metadata import SimulationMetadata, AuthorMetadata
 from de_sim.errors import SimulatorError
 from de_sim.simulation_config import SimulationConfig
-from de_sim.simulation_engine import SimulationEngine
-from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import SimulationObject, ApplicationSimulationObject
 from de_sim.template_sim_objs import TemplatePeriodicSimulationObject
 from de_sim.testing.some_message_types import InitMsg, Eg1
 from de_sim.utilities import FastLogger
+import de_sim
 
 ALL_MESSAGE_TYPES = [InitMsg, Eg1]
 
@@ -144,7 +143,7 @@ class TestSimulationEngine(unittest.TestCase):
 
     def setUp(self):
         # create simulator
-        self.simulator = SimulationEngine()
+        self.simulator = de_sim.SimulationEngine()
         self.out_dir = tempfile.mkdtemp()
         self.log_names = ['de_sim.debug.file', 'de_sim.plot.file']
         measurements_file = core.get_config()['de_sim']['measurements_file']
@@ -161,26 +160,26 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.initialize()
 
     def test_get_sim_config(self):
-        self.assertEqual(SimulationConfig(5.), SimulationEngine._get_sim_config(time_max=5.))
+        self.assertEqual(SimulationConfig(5.), de_sim.SimulationEngine._get_sim_config(time_max=5.))
 
         config_dict = dict(time_max=5., time_init=2.)
-        self.assertEqual(SimulationConfig(5., 2.), SimulationEngine._get_sim_config(config_dict=config_dict))
+        self.assertEqual(SimulationConfig(5., 2.), de_sim.SimulationEngine._get_sim_config(config_dict=config_dict))
 
         with self.assertRaisesRegex(SimulatorError, 'time_max, sim_config, or config_dict must be provided'):
-            SimulationEngine._get_sim_config()
+            de_sim.SimulationEngine._get_sim_config()
 
         config_dict = dict(time_init=2.)
         with self.assertRaisesRegex(SimulatorError, 'at most 1 of time_max, sim_config, or config_dict'):
-            SimulationEngine._get_sim_config(100, config_dict=config_dict)
+            de_sim.SimulationEngine._get_sim_config(100, config_dict=config_dict)
 
         simulation_config = SimulationConfig(10)
         with self.assertRaisesRegex(SimulatorError,
                                     'sim_config is not provided, sim_config= is probably needed'):
-            SimulationEngine._get_sim_config(simulation_config)
+            de_sim.SimulationEngine._get_sim_config(simulation_config)
 
         config_dict = dict(time_init=2.)
         with self.assertRaisesRegex(SimulatorError, 'time_max must be provided in config_dict'):
-            SimulationEngine._get_sim_config(config_dict=config_dict)
+            de_sim.SimulationEngine._get_sim_config(config_dict=config_dict)
 
     def test_simulate_and_run(self):
         for operation in ['simulate', 'run']:
@@ -215,7 +214,7 @@ class TestSimulationEngine(unittest.TestCase):
         with self.assertRaisesRegex(SimulatorError, 'Simulation has no initial events'):
             self.simulator.simulate(5.0)
 
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
         simulator.add_object(BasicExampleSimulationObject('test'))
         simulator.initialize()
         # start time = 2
@@ -252,7 +251,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.simulate(5.0)
 
     def test_simulation_stop_condition(self):
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
         # 1 event/sec:
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
@@ -264,7 +263,7 @@ class TestSimulationEngine(unittest.TestCase):
 
         def stop_cond_eg(time):
             return __stop_cond_end <= time
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
         sim_config = SimulationConfig(time_max)
@@ -273,7 +272,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.assertEqual(simulator.simulate(sim_config=sim_config).num_events, __stop_cond_end + 1)
 
     def test_progress_bar(self):
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
         print('\nTesting progress bar:', file=sys.stderr)
@@ -471,7 +470,7 @@ class TestSimulationEngine(unittest.TestCase):
     @unittest.skip("takes 3 to 5 min.")
     def test_performance(self):
         existing_levels = self.suspend_logging(self.log_names)
-        simulation_engine = SimulationEngine()
+        simulation_engine = de_sim.SimulationEngine()
         end_sim_time = 100
         num_sim_objs = 4
         max_num_profile_objects = 300
@@ -519,7 +518,7 @@ class TestSimulationEngine(unittest.TestCase):
 
     def test_profiling(self):
         existing_levels = self.suspend_logging(self.log_names)
-        simulation_engine = SimulationEngine()
+        simulation_engine = de_sim.SimulationEngine()
         num_sim_objs = 20
         self.prep_simulation(simulation_engine, num_sim_objs)
         end_sim_time = 200
@@ -560,7 +559,7 @@ class TestSimulationEngine(unittest.TestCase):
                 self.assertIn(text, capturer.get_text())
 
 
-class Delicate(SimulationMessage):
+class Delicate(de_sim.SimulationMessage):
     'Simulation message type for testing arrival order'
     attributes = ['sender_obj_num']
 
@@ -617,7 +616,7 @@ class TestSimulationReproducibility(unittest.TestCase):
     NUM_SIM_OBJS = 4
 
     def test_reproducibility(self):
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
 
         # comprehensive reproducibility test:
         # test whether the simulation engine deterministically delivers events to objects
@@ -636,11 +635,11 @@ class TestSimulationReproducibility(unittest.TestCase):
             self.assertEqual(0, sim_obj.disordered_delicates)
 
 
-class Double(SimulationMessage):
+class Double(de_sim.SimulationMessage):
     'Double value'
 
 
-class Increment(SimulationMessage):
+class Increment(de_sim.SimulationMessage):
     'Increment value'
 
 
@@ -708,7 +707,7 @@ class TestSuperposition(unittest.TestCase):
         return v
 
     def test_superposition(self):
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
         simulator.add_object(IncrementThenDoubleSimObject('name'))
         simulator.initialize()
         max_time = 5
@@ -717,7 +716,7 @@ class TestSuperposition(unittest.TestCase):
             self.assertEqual(sim_obj.value, self.increment_then_double_from_0(max_time))
 
     def test_superposition_exception(self):
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
         simulator.add_object(BadIncrementThenDoubleSimObject('name'))
         simulator.initialize()
         with self.assertRaisesRegex(SimulatorError, 'Superposition requires message types'):

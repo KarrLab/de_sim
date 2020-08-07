@@ -8,22 +8,23 @@
 import unittest
 import warnings
 
-from de_sim.simulation_message import SimulationMessage, SimulationMessageInterface
+from de_sim.simulation_message import SimulationMessageInterface
 from de_sim.errors import SimulatorError
 from wc_utils.util.list import elements_to_str
+import de_sim
 
 
-class ExampleSimulationMessage1(SimulationMessage):
+class ExampleSimulationMessage1(de_sim.SimulationMessage):
     ' My docstring '
     attributes = ['attr1', 'attr2']
 
 
-class ExampleSimulationMessage2(SimulationMessage):
+class ExampleSimulationMessage2(de_sim.SimulationMessage):
     " docstring "
     pass
 
 
-class ExampleSimulationMessage3(SimulationMessage):
+class ExampleSimulationMessage3(de_sim.SimulationMessage):
     " docstring "
     pass
 
@@ -91,9 +92,9 @@ class TestSimulationMessageInterface(unittest.TestCase):
 class TestSimulationMessageMeta(unittest.TestCase):
 
     def test_simulation_message_meta(self):
-        self.assertTrue(issubclass(ExampleSimulationMessage1, SimulationMessage))
+        self.assertTrue(issubclass(ExampleSimulationMessage1, de_sim.SimulationMessage))
         with warnings.catch_warnings(record=True) as w:
-            class BadSimulationMessage2(SimulationMessage):
+            class BadSimulationMessage2(de_sim.SimulationMessage):
                 attributes = ['x']
             self.assertIn("definition does not contain a docstring", str(w[-1].message))
         warnings.simplefilter("ignore")
@@ -110,9 +111,9 @@ class TestSimulationMessageMeta(unittest.TestCase):
         self.assertEqual(example_simulation_message2.header(), None)
 
         with self.assertRaisesRegex(SimulatorError, 'must be a list of strings'):
-            class BadSimulationMessage1(SimulationMessage):
+            class BadSimulationMessage1(de_sim.SimulationMessage):
                 attributes = [2.5]
 
         with self.assertRaisesRegex(SimulatorError, 'contains duplicates'):
-            class BadSimulationMessage3(SimulationMessage):
+            class BadSimulationMessage3(de_sim.SimulationMessage):
                 attributes = ['x', 'y', 'x']

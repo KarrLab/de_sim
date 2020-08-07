@@ -11,8 +11,8 @@ import numpy as np
 
 from de_sim.errors import SimulatorError
 from de_sim.simulation_config import SimulationConfig
-from de_sim.simulation_engine import SimulationEngine
 from de_sim.template_sim_objs import TemplatePeriodicSimulationObject
+import de_sim
 
 
 class SpecialPeriodicSimulationObject(TemplatePeriodicSimulationObject):
@@ -29,7 +29,7 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
 
     def test_TemplatePeriodicSimulationObject(self):
 
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
         time_max = 5
         expected = []
 
@@ -58,7 +58,7 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
     def test_non_zero_time_init(self):
 
         for time_init in [-3, 2]:
-            simulator = SimulationEngine()
+            simulator = de_sim.SimulationEngine()
             time_max = 5
             period = 1
             pso = SpecialPeriodicSimulationObject('pso', period, time_init)

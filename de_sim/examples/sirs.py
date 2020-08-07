@@ -9,28 +9,25 @@
 import enum
 import numpy
 
-from de_sim.event import Event
-from de_sim.simulation_engine import SimulationEngine
-from de_sim.simulation_message import SimulationMessage
-from de_sim.simulation_object import ApplicationSimulationObject
+import de_sim
 
 
-class SusceptibleToInfectious(SimulationMessage):
+class SusceptibleToInfectious(de_sim.SimulationMessage):
     "S -> I transition"
 
 
-class InfectiousToRecovered(SimulationMessage):
+class InfectiousToRecovered(de_sim.SimulationMessage):
     "I -> R transition"
 
 
-class RecordTrajectory(SimulationMessage):
+class RecordTrajectory(de_sim.SimulationMessage):
     "Record trajectory"
 
 
 MESSAGE_TYPES = [SusceptibleToInfectious, InfectiousToRecovered, RecordTrajectory]
 
 
-class SIR(ApplicationSimulationObject):
+class SIR(de_sim.ApplicationSimulationObject):
     """ Implement a Susceptible, Infectious, or Recovered (SIR) epidemic model
 
     This example uses DE-Sim to implement a continuous-time Markov chain (CTMC) SIR
@@ -99,7 +96,7 @@ class SIR(ApplicationSimulationObject):
         """ Handle a susceptible to infectious event
 
         Args:
-            event (:obj:`Event`): simulation event; not used
+            event (:obj:`de_sim.Event`): simulation event; not used
         """
         self.s -= 1
         self.i += 1
@@ -109,7 +106,7 @@ class SIR(ApplicationSimulationObject):
         """ Handle an infectious to recovered event
 
         Args:
-            event (:obj:`Event`): simulation event; not used
+            event (:obj:`de_sim.Event`): simulation event; not used
         """
         self.i -= 1
         self.schedule_next_event()
@@ -118,7 +115,7 @@ class SIR(ApplicationSimulationObject):
         """ Add another record to the SIR history
 
         Args:
-            event (:obj:`Event`): simulation event; not used
+            event (:obj:`de_sim.Event`): simulation event; not used
         """
         self.history.append(dict(time=self.time,
                                  s=self.s,
@@ -134,7 +131,7 @@ class SIR(ApplicationSimulationObject):
 
 
 ### SIR epidemic model, version 2 ###
-class StateTransition(SimulationMessage):
+class StateTransition(de_sim.SimulationMessage):
     "State transition"
     attributes = ['transition']
 
@@ -175,7 +172,7 @@ class SIR2(SIR):
         """ Handle an infectious state transition
 
         Args:
-            event (:obj:`Event`): simulation event that contains the type of transition
+            event (:obj:`de_sim.Event`): simulation event that contains the type of transition
         """
         transition = event.message.transition
         if transition is Transition.s_to_i:
@@ -189,7 +186,7 @@ class SIR2(SIR):
         """ Add another record to the SIR history
 
         Args:
-            event (:obj:`Event`): simulation event; not used
+            event (:obj:`de_sim.Event`): simulation event; not used
         """
         self.history.append(dict(time=self.time,
                                  s=self.s,
@@ -209,7 +206,7 @@ class RunSIRs(object):
     def main(sir_class, time_max, seed, **sir_args):
 
         # create a simulator
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
 
         # create a SIR instance
         sir = sir_class(**sir_args)

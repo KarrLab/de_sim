@@ -5,14 +5,16 @@
 :License: MIT
 """
 
-from de_sim.simulation_object import ApplicationSimulationObject, SimObjClassPriority
+from de_sim.simulation_object import SimObjClassPriority
 from de_sim.testing.some_message_types import InitMsg, Eg1
+import de_sim
+
 
 ALL_MESSAGE_TYPES = [InitMsg, Eg1]
 TEST_SIM_OBJ_STATE = 'Test SimulationObject state'
 
 
-class ExampleSimulationObject(ApplicationSimulationObject):
+class ExampleSimulationObject(de_sim.ApplicationSimulationObject):
 
     def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)
@@ -36,7 +38,7 @@ class ExampleSimulationObject(ApplicationSimulationObject):
     class_priority = SimObjClassPriority.HIGH
 
 
-class ImproperlyRegisteredSimulationObject(ApplicationSimulationObject):
+class ImproperlyRegisteredSimulationObject(de_sim.ApplicationSimulationObject):
 
     # register the event handler for each type of message received
     event_handlers = [(Eg1, 'handler')]

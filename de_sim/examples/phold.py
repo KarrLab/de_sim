@@ -10,10 +10,8 @@ import random
 import sys
 import argparse
 
-from de_sim.simulation_message import SimulationMessage
-from de_sim.simulation_object import ApplicationSimulationObject
-from de_sim.simulation_engine import SimulationEngine
 from de_sim.examples.debug_logs import logs
+import de_sim
 
 
 def obj_name(obj_num):
@@ -30,22 +28,22 @@ def exp_delay():
     return random.expovariate(1.0)
 
 
-class MessageSentToSelf(SimulationMessage):
+class MessageSentToSelf(de_sim.SimulationMessage):
     "A message that's sent to self"
 
 
-class MessageSentToOtherObject(SimulationMessage):
+class MessageSentToOtherObject(de_sim.SimulationMessage):
     "A message that's sent to another PHold simulation object"
 
 
-class InitMsg(SimulationMessage):
+class InitMsg(de_sim.SimulationMessage):
     'initialization message'
 
 
 MESSAGE_TYPES = [MessageSentToSelf, MessageSentToOtherObject, InitMsg]
 
 
-class PholdSimulationObject(ApplicationSimulationObject):
+class PholdSimulationObject(de_sim.ApplicationSimulationObject):
 
     def __init__(self, name, args):
         self.args = args
@@ -130,7 +128,7 @@ class RunPhold(object):
     def main(args):
 
         # create a simulator
-        simulator = SimulationEngine()
+        simulator = de_sim.SimulationEngine()
 
         # create simulation objects, and send each one an initial event message to self
         for obj_id in range(args.num_phold_procs):

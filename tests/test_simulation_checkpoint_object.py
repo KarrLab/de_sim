@@ -11,14 +11,13 @@ import shutil
 import tempfile
 
 from wc_utils.util.rand import RandomStateManager
-from de_sim.simulation_engine import SimulationEngine
 from de_sim.simulation_checkpoint_object import (AbstractCheckpointSimulationObject,
                                                  CheckpointSimulationObject,
                                                  AccessStateObjectInterface)
-from de_sim.simulation_message import SimulationMessage
 from de_sim.simulation_object import ApplicationSimulationObject
 from de_sim.errors import SimulatorError
 from de_sim.checkpoint import AccessCheckpoints
+import de_sim
 
 
 class PeriodicCheckpointSimuObj(AbstractCheckpointSimulationObject):
@@ -34,7 +33,7 @@ class PeriodicCheckpointSimuObj(AbstractCheckpointSimulationObject):
         self.shared_checkpoints.append((self.time, self.simulation_state.get_checkpoint_state(self.time)))
 
 
-class MessageSentToSelf(SimulationMessage):
+class MessageSentToSelf(de_sim.SimulationMessage):
     "A message that's sent to self"
 
 
@@ -93,7 +92,7 @@ class TestCheckpointSimulationObjects(unittest.TestCase):
     def setUp(self):
         self.checkpoint_dir = tempfile.mkdtemp()
 
-        self.simulator = SimulationEngine()
+        self.simulator = de_sim.SimulationEngine()
         self.a = 4
         self.b = 3
         self.state = SharedValue(self.b)
