@@ -22,8 +22,10 @@ To help users build and simulate complex, data-driven models, *DE-Sim* provides 
 *DE-Sim* has been used to develop [WC-Sim](https://github.com/KarrLab/wc_sim), a multi-algorithmic simulator for [whole-cell models](https://www.wholecell.org).
 
 ## Examples
-* [Random walk](de_sim/examples/random_walk.py): a random one-dimensional walk which increments or decrements a variable with equal probability at each event
+* [Minimal simulation](de_sim/examples/minimal_simulation.py): a minimal example of a simulation
+* [Epidemic](de_sim/examples/jupyter_examples/An%20epidemic%20model%20using%20DE-Sim.ipynb): an SIR model of an epidemic of an infectious disease
 * [Parallel hold (PHOLD)](de_sim/examples/phold.py): model developed by Richard Fujimoto for benchmarking parallel DES simulators
+* [Random walk](de_sim/examples/random_walk.py): a random one-dimensional walk which increments or decrements a variable with equal probability at each event
 
 ## Tutorial
 Please see [sandbox.karrlab.org](https://sandbox.karrlab.org/tree/de_sim) for interactive tutorials on creating and executing models with *DE-Sim*.
