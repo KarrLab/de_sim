@@ -6,52 +6,66 @@
 :License: MIT
 """
 import argparse
+import matplotlib.pyplot as plt
 import random
-import sys
 
 import de_sim
 
 
-class MessageSentToSelf(de_sim.SimulationMessage):
-    "A message that's sent to self"
+class RandomStepMessage(de_sim.SimulationMessage):
+    "An event message class that specifies a random step"
+    attributes = ['step']
 
 
 class RandomWalkSimulationObject(de_sim.ApplicationSimulationObject):
-    """ The random state variable model
+    """ A one-dimensional random walk model, with random times between steps
 
-    * State: a number
-    * Event scheduling: schedule events randomly
-    * Event execution: randomly increment or decrement the state
+    Each step moves either -1 or +1, with equal probability.
+    The delay between steps is 1 or 2, also with equal probability.
+
+    Attributes:
+        name (:obj:`str`): this simulation object's name, which is unique across all simulation objects
+        state (:obj:`int`): the current position; initialized to 0
+        history (:obj:`dict` of :obj:`list`): the walk's position as a function of time
     """
 
-    def __init__(self, name, initial_value, output=True):
-        self.state = initial_value
-        self.output = output
+    def __init__(self, name):
         super().__init__(name)
 
+    def schedule_next_step(self):
+        """ Schedule the next event, a step that moves -1 or +1 with equal probability """
+        step = random.choice([-1, +1])
+        # the time between steps is randomly 1 or 2, with equal probability
+        self.send_event(random.choice([1, 2]), self, RandomStepMessage(step))
+
     def init_before_run(self):
-        self.send_event(0, self, MessageSentToSelf())
-        self.send_event(1, self, MessageSentToSelf())
+        """ Initialize before a simulation run; called by the simulator
 
-    def handle_simulation_event(self, event):
-        # print time, state, event queue
-        if self.output:
-            print()
-            print("Time: {}; state: {}".format(self.time, self.state))
-            eq = self.simulator.event_queue.render(sim_obj=self, as_list=True)
-            if eq is None:
-                print("Empty event queue")
-            else:
-                times = [ev[1] for ev in eq[1:]]
-                print("Event queue times: {}".format(times))
-        self.state += random.choice([-1, 1])
-        for i in range(random.choice([0, 1, 2])):
-            self.send_event(random.choice([1, 6]), self, MessageSentToSelf())
+        Schedule the first event
+        """
+        self.position = 0
+        self.history = {'times': [0],
+                        'positions': [0]}
+        self.schedule_next_step()
 
-    event_handlers = [(MessageSentToSelf, handle_simulation_event)]
+    def handle_step_event(self, event):
+        """ Handle a step event
 
-    # register the message types sent
-    messages_sent = [MessageSentToSelf]
+        Update the position and history
+        """
+        step = event.message.step
+        self.position += step
+        self.history['times'].append(self.time)
+        self.history['positions'].append(self.position)
+        self.schedule_next_step()
+
+    # event_handlers is a list of pairs that maps each event message type
+    # received by this simulation object class to the method that handles
+    # the event message class
+    event_handlers = [(RandomStepMessage, handle_step_event)]
+
+    # messages_sent registers all message types sent by this object
+    messages_sent = [RandomStepMessage]
 
 
 class RunRandomWalkSimulation(object):
@@ -67,11 +81,9 @@ class RunRandomWalkSimulation(object):
             :obj:`argparse.Namespace`: parsed command line arguements
         """
         parser = argparse.ArgumentParser(
-            description="A trivial simulation that increments or decrements a variable at each event")
-        parser.add_argument('initial_state', type=int, help="Initial state")
-        parser.add_argument('time_max', type=float, help="End time for the simulation")
-        parser.add_argument('--no-output', dest='output', action='store_false',
-                            help="Don't write progress to stdout")
+            description="A random walk on the integer number line with random times between steps")
+        parser.add_argument('max_time', type=float, help="End time for the simulation")
+        parser.add_argument('--no-output', dest='output', action='store_false', help="Don't write walk history to stdout")
         if cli_args is not None:
             args = parser.parse_args(cli_args)
         else:    # pragma: no cover     # reachable only from command line
@@ -84,15 +96,28 @@ class RunRandomWalkSimulation(object):
         # create a simulator
         simulator = de_sim.SimulationEngine()
 
-        # create a simulation object and add it to the simulation
-        simulator.add_object(RandomWalkSimulationObject('random state variable object',
-                                                                 args.initial_state, args.output))
+        # create a RandomWalkSimulationObject and add it to the simulation
+        random_walk_sim_obj = RandomWalkSimulationObject('random walk simulation object')
+        simulator.add_object(random_walk_sim_obj)
 
         # run the simulation
         simulator.initialize()
-        num_events = simulator.simulate(args.time_max)
-        sys.stderr.write("Executed {} event(s).\n".format(num_events))
-        return(num_events)
+        num_events = simulator.simulate(args.max_time).num_events
+
+        # print the random walk
+        if args.output:
+            print(f'Random walk:')
+            for time, pos in zip(random_walk_sim_obj.history['times'],
+                                 random_walk_sim_obj.history['positions']):
+                print(f"{time:4.0f}{pos:>6}")
+
+        # plot the random walk as a step function
+        plt.step(random_walk_sim_obj.history['times'], random_walk_sim_obj.history['positions'])
+        plt.xlabel('time')
+        plt.ylabel('position')
+        plt.show()
+
+        return num_events
 
 
 if __name__ == '__main__':  # pragma: no cover     # reachable only from command line
