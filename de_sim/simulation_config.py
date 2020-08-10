@@ -33,7 +33,7 @@ class SimulationConfig(EnhancedDataClass):
             the simulation time; a simulation terminates if the function returns `True`
         output_dir (:obj:`str`, optional): directory for saving metadata; will be created if it does't
             exist; if not provided, then metatdata should be saved before another simulation is run
-            with the same :obj:`SimulationEngine`
+            with the same :obj:`Simulator`
         progress (:obj:`bool`, optional): if `True`, output a text bar that dynamically reports the
             simulation's progress
         profile (:obj:`bool`, optional): if `True`, output a profile of the simulation's performance

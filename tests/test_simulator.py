@@ -139,11 +139,11 @@ def obj_name(i):
     return '{}_{}'.format(NAME_PREFIX, i)
 
 
-class TestSimulationEngine(unittest.TestCase):
+class TestSimulator(unittest.TestCase):
 
     def setUp(self):
         # create simulator
-        self.simulator = de_sim.SimulationEngine()
+        self.simulator = de_sim.Simulator()
         self.out_dir = tempfile.mkdtemp()
         self.log_names = ['de_sim.debug.file', 'de_sim.plot.file']
         measurements_file = core.get_config()['de_sim']['measurements_file']
@@ -160,26 +160,26 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.initialize()
 
     def test_get_sim_config(self):
-        self.assertEqual(SimulationConfig(5.), de_sim.SimulationEngine._get_sim_config(time_max=5.))
+        self.assertEqual(SimulationConfig(5.), de_sim.Simulator._get_sim_config(time_max=5.))
 
         config_dict = dict(time_max=5., time_init=2.)
-        self.assertEqual(SimulationConfig(5., 2.), de_sim.SimulationEngine._get_sim_config(config_dict=config_dict))
+        self.assertEqual(SimulationConfig(5., 2.), de_sim.Simulator._get_sim_config(config_dict=config_dict))
 
         with self.assertRaisesRegex(SimulatorError, 'time_max, sim_config, or config_dict must be provided'):
-            de_sim.SimulationEngine._get_sim_config()
+            de_sim.Simulator._get_sim_config()
 
         config_dict = dict(time_init=2.)
         with self.assertRaisesRegex(SimulatorError, 'at most 1 of time_max, sim_config, or config_dict'):
-            de_sim.SimulationEngine._get_sim_config(100, config_dict=config_dict)
+            de_sim.Simulator._get_sim_config(100, config_dict=config_dict)
 
         simulation_config = SimulationConfig(10)
         with self.assertRaisesRegex(SimulatorError,
                                     'sim_config is not provided, sim_config= is probably needed'):
-            de_sim.SimulationEngine._get_sim_config(simulation_config)
+            de_sim.Simulator._get_sim_config(simulation_config)
 
         config_dict = dict(time_init=2.)
         with self.assertRaisesRegex(SimulatorError, 'time_max must be provided in config_dict'):
-            de_sim.SimulationEngine._get_sim_config(config_dict=config_dict)
+            de_sim.Simulator._get_sim_config(config_dict=config_dict)
 
     def test_simulate_and_run(self):
         for operation in ['simulate', 'run']:
@@ -194,7 +194,7 @@ class TestSimulationEngine(unittest.TestCase):
         config_dict = dict(time_max=-1, time_init=-2)
         self.assertEqual(self.simulator.simulate(config_dict=config_dict).num_events, 0)
 
-    def test_simulation_engine_exceptions(self):
+    def test_simulator_exceptions(self):
         obj = ExampleSimulationObject(obj_name(1))
         with self.assertRaisesRegex(SimulatorError, f"cannot delete simulation object '{obj.name}'"):
             self.simulator.delete_object(obj)
@@ -214,7 +214,7 @@ class TestSimulationEngine(unittest.TestCase):
         with self.assertRaisesRegex(SimulatorError, 'Simulation has no initial events'):
             self.simulator.simulate(5.0)
 
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
         simulator.add_object(BasicExampleSimulationObject('test'))
         simulator.initialize()
         # start time = 2
@@ -251,7 +251,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.simulator.simulate(5.0)
 
     def test_simulation_stop_condition(self):
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
         # 1 event/sec:
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
@@ -263,7 +263,7 @@ class TestSimulationEngine(unittest.TestCase):
 
         def stop_cond_eg(time):
             return __stop_cond_end <= time
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
         sim_config = SimulationConfig(time_max)
@@ -272,7 +272,7 @@ class TestSimulationEngine(unittest.TestCase):
         self.assertEqual(simulator.simulate(sim_config=sim_config).num_events, __stop_cond_end + 1)
 
     def test_progress_bar(self):
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
         print('\nTesting progress bar:', file=sys.stderr)
@@ -415,10 +415,10 @@ class TestSimulationEngine(unittest.TestCase):
         self.assertTrue(self.simulator.sim_metadata.simulator_repo is None)
 
     ### test simulation performance ### # noqa: E266
-    def prep_simulation(self, simulation_engine, num_sim_objs):
-        simulation_engine.reset()
-        self.make_cyclical_messaging_network_sim(simulation_engine, num_sim_objs)
-        simulation_engine.initialize()
+    def prep_simulation(self, simulator, num_sim_objs):
+        simulator.reset()
+        self.make_cyclical_messaging_network_sim(simulator, num_sim_objs)
+        simulator.initialize()
 
     def suspend_logging(self, log_names, new_level=LogLevel.exception):
         # cannot use environment variable(s) to modify logging because logging2.Logger() as used
@@ -470,7 +470,7 @@ class TestSimulationEngine(unittest.TestCase):
     @unittest.skip("takes 3 to 5 min.")
     def test_performance(self):
         existing_levels = self.suspend_logging(self.log_names)
-        simulation_engine = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
         end_sim_time = 100
         num_sim_objs = 4
         max_num_profile_objects = 300
@@ -482,9 +482,9 @@ class TestSimulationEngine(unittest.TestCase):
         while num_sim_objs < max_num_sim_objs:
 
             # measure execution time
-            self.prep_simulation(simulation_engine, num_sim_objs)
+            self.prep_simulation(simulator, num_sim_objs)
             start_time = time.process_time()
-            num_events = simulation_engine.simulate(end_sim_time).num_events
+            num_events = simulator.simulate(end_sim_time).num_events
             run_time = time.process_time() - start_time
             self.assertEqual(num_sim_objs * end_sim_time, num_events)
             unprofiled_perf.append("{}\t{}\t{:8.3f}\t{:8.0f}".format(num_sim_objs, num_events,
@@ -492,11 +492,11 @@ class TestSimulationEngine(unittest.TestCase):
 
             # profile
             if num_sim_objs < max_num_profile_objects:
-                self.prep_simulation(simulation_engine, num_sim_objs)
+                self.prep_simulation(simulator, num_sim_objs)
                 out_file = os.path.join(self.out_dir, "profile_out_{}.out".format(num_sim_objs))
-                locals = {'simulation_engine': simulation_engine,
+                locals = {'simulator': simulator,
                           'end_sim_time': end_sim_time}
-                cProfile.runctx('num_events = simulation_engine.simulate(end_sim_time)',
+                cProfile.runctx('num_events = simulator.simulate(end_sim_time)',
                                 {}, locals, filename=out_file)
                 profile = pstats.Stats(out_file)
                 print(f"Profile for {num_sim_objs} simulation objects:")
@@ -518,15 +518,15 @@ class TestSimulationEngine(unittest.TestCase):
 
     def test_profiling(self):
         existing_levels = self.suspend_logging(self.log_names)
-        simulation_engine = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
         num_sim_objs = 20
-        self.prep_simulation(simulation_engine, num_sim_objs)
+        self.prep_simulation(simulator, num_sim_objs)
         end_sim_time = 200
         expected_text = ['function calls', 'Ordered by: internal time', 'filename:lineno(function)']
         sim_config_dict = dict(time_max=end_sim_time,
                                output_dir=self.out_dir,
                                profile=True)
-        stats = simulation_engine.simulate(config_dict=sim_config_dict).profile_stats
+        stats = simulator.simulate(config_dict=sim_config_dict).profile_stats
         self.assertTrue(isinstance(stats, pstats.Stats))
         measurements = ''.join(open(self.measurements_pathname, 'r').readlines())
         for text in expected_text:
@@ -535,7 +535,7 @@ class TestSimulationEngine(unittest.TestCase):
         sim_config_dict = dict(time_max=end_sim_time,
                                profile=True)
         with CaptureOutput(relay=False) as capturer:
-            stats = simulation_engine.simulate(config_dict=sim_config_dict).profile_stats
+            stats = simulator.simulate(config_dict=sim_config_dict).profile_stats
             for text in expected_text:
                 self.assertIn(text, capturer.get_text())
         self.assertTrue(isinstance(stats, pstats.Stats))
@@ -565,7 +565,7 @@ class Delicate(de_sim.EventMessage):
 
 
 class ReproducibleTestSimulationObject(ApplicationSimulationObject):
-    """ This sim obj is used to test whether the simulation engine is reproducible """
+    """ This sim obj is used to test whether the simulator is reproducible """
 
     def __init__(self, name, obj_num, array_size):
         SimulationObject.__init__(self, name)
@@ -616,10 +616,10 @@ class TestSimulationReproducibility(unittest.TestCase):
     NUM_SIM_OBJS = 4
 
     def test_reproducibility(self):
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
 
         # comprehensive reproducibility test:
-        # test whether the simulation engine deterministically delivers events to objects
+        # test whether the simulator deterministically delivers events to objects
         # run a simulation in which sim objects execute multiple concurrent events that contain
         # messages with different types, and messages that have the same type and different contents
         # test all types of event and message sorting
@@ -707,7 +707,7 @@ class TestSuperposition(unittest.TestCase):
         return v
 
     def test_superposition(self):
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
         simulator.add_object(IncrementThenDoubleSimObject('name'))
         simulator.initialize()
         max_time = 5
@@ -716,7 +716,7 @@ class TestSuperposition(unittest.TestCase):
             self.assertEqual(sim_obj.value, self.increment_then_double_from_0(max_time))
 
     def test_superposition_exception(self):
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
         simulator.add_object(BadIncrementThenDoubleSimObject('name'))
         simulator.initialize()
         with self.assertRaisesRegex(SimulatorError, 'Superposition requires message types'):

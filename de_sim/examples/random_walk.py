@@ -94,7 +94,7 @@ class RunRandomWalkSimulation(object):
     def main(args):
 
         # create a simulator
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
 
         # create a RandomWalkSimulationObject and add it to the simulation
         random_walk_sim_obj = RandomWalkSimulationObject('random walk simulation object')

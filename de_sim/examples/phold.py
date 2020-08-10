@@ -128,7 +128,7 @@ class RunPhold(object):
     def main(args):
 
         # create a simulator
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
 
         # create simulation objects, and send each one an initial event message to self
         for obj_id in range(args.num_phold_procs):

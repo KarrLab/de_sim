@@ -15,5 +15,5 @@ class TestEvent(unittest.TestCase):
     def test(self):
         self.assertTrue(hasattr(de_sim, 'EventMessage'))
         self.assertTrue(hasattr(de_sim, 'ApplicationSimulationObject'))
-        self.assertTrue(hasattr(de_sim, 'SimulationEngine'))
+        self.assertTrue(hasattr(de_sim, 'Simulator'))
         self.assertTrue(hasattr(de_sim, 'Event'))

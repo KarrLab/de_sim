@@ -16,7 +16,7 @@ from copy import copy
 from de_sim.testing.utilities_for_testing import make_args
 
 
-# todo: doesn't do anything: fix: see approach in test_simulation_engine.py
+# todo: doesn't do anything: fix: see approach in test_simulator.py
 # turn off logging by changing config to raise the 'debug.console' 'level' above debug, to error
 # share this with phold by setting a temporary config environ variable & then importing phold which imports debug_logs
 # to avoid any other side effects, run the import in a context that creates a temporary environment

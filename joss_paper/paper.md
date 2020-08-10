@@ -168,7 +168,7 @@ class RandomWalkSimulationObject(de_sim.ApplicationSimulationObject):
 Subclasses of `ApplicationSimulationObject` use these special methods and attributes.
 
 * Special `ApplicationSimulationObject` methods:
-    1. `init_before_run` (optional): immediately before a simulation run, after all simulation objects have been added to a `SimulationEngine`, the simulator calls `init_before_run` in each simulation object. Simulation object classes can send initial events and perform other initialization in `init_before_run`. For example, in `RandomWalkSimulationObject`, `init_before_run` schedules the object's first event and initializes the simulation object's position and history attributes. To initiate a simulation's execution, at least one simulation object in the simulation must schedule one initial event.
+    1. `init_before_run` (optional): immediately before a simulation run, after all simulation objects have been added to a `Simulator`, the simulator calls `init_before_run` in each simulation object. Simulation object classes can send initial events and perform other initialization in `init_before_run`. For example, in `RandomWalkSimulationObject`, `init_before_run` schedules the object's first event and initializes the simulation object's position and history attributes. To initiate a simulation's execution, at least one simulation object in the simulation must schedule one initial event.
     2. `send_event`: `send_event(delay, receiving_object, event_message)` schedules an event to occur `delay` time units in the future at simulation object `receiving_object`, which will execute a simulation event containing `event_message`. An event can be scheduled for any simulation object in a simulation, including the object scheduling the event, as shown in `RandomWalkSimulationObject`. `event_message` must be an instance of an `EventMessage`. 
 The event will be executed at its scheduled simulation time by an event handler in the simulation object `receiving_object`.
 The handler has a parameter that receives a simulation event which contains `event_message`. In this example all simulation events are scheduled to be executed by the object that creates the event, but most realistic simulations contain multiple simulation objects which schedule events for each other. 
@@ -180,28 +180,28 @@ Object-oriented DES terminology also describes the event message as being sent b
     2. `messages_sent`: the types of messages sent by a subclass of `ApplicationSimulationObject` must be listed in `messages_sent`. This is used to ensure that a simulation object doesn't send messages of the wrong class.
     3. `time`: `time` is a read-only simulation object attribute that always equals the current simulation time. A `RandomWalkSimulationObject` saves the value of `time` when recording its history.
 
-3: Execute a simulation by creating a `SimulationEngine`, instantiating simulation objects and adding them to the `SimulationEngine`, initializing them and sending their initial event messages, and running the simulation.
+3: Execute a simulation by creating a `Simulator`, instantiating simulation objects and adding them to the `Simulator`, initializing them and sending their initial event messages, and running the simulation.
 
-The `SimulationEngine` class simulates models.
+The `Simulator` class simulates models.
 Its `add_object` method adds a simulation object to the simulator.
 Each object in a simulation must have a unique `name`.
 The `initialize` method, which calls `init_before_run` methods in simulation objects, must be called before a simulation starts.
 Finally, `run` simulates a model. It takes the maximum time to which the simulation can execute. `run` also takes many optional arguments, as described in the DE-Sim API documentation.
 
 ```python
-# create a simulation engine
-simulation_engine = de_sim.SimulationEngine()
+# create a simulator
+simulator = de_sim.Simulator()
 
 # create a simulation object and add it to the simulation
 random_walk_sim_obj = RandomWalkSimulationObject('rand_walk')
-simulation_engine.add_object(random_walk_sim_obj)
+simulator.add_object(random_walk_sim_obj)
 
 # initialize the simulation, and send initial event messages
-simulation_engine.initialize()
+simulator.initialize()
 
 # run the simulation until time 10
 max_time = 10
-simulation_engine.run(max_time)
+simulator.run(max_time)
 
 # plot the random walk as a step function
 import matplotlib.pyplot as plt

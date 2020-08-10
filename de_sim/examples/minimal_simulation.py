@@ -60,7 +60,7 @@ class RunMinimalSimulation(object):
     def main(args):
 
         # create a simulator
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
 
         # create a simulation object and add it to the simulation
         simulator.add_object(MinimalSimulationObject('minimal_sim_obj', args.delay))

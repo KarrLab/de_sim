@@ -1,4 +1,4 @@
-""" Discrete event simulation engine
+""" Discrete event simulator
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2016-06-01
@@ -23,14 +23,14 @@ from de_sim.utilities import SimulationProgressBar, FastLogger
 from wc_utils.util.git import get_repo_metadata, RepoMetadataCollectionType
 
 
-class SimulationEngine(object):
-    """ A simulation engine
+class Simulator(object):
+    """ A simulator
 
     General-purpose simulation mechanisms, including the simulation scheduler.
     Architected as an OO simulation that could be parallelized.
 
-    `SimulationEngine` contains and manipulates global simulation data.
-    SimulationEngine registers all simulation objects types and all simulation objects.
+    `Simulator` contains and manipulates global simulation data.
+    Simulator registers all simulation objects types and all simulation objects.
     Following `simulate()` it runs the simulation, scheduling objects to execute events
     in non-decreasing time order; and generates debugging output.
 
@@ -189,7 +189,7 @@ class SimulationEngine(object):
             SimulationMetadata.write_dataclass(self.sim_metadata, self.sim_config.output_dir)
 
     def reset(self):
-        """ Reset this `SimulationEngine`
+        """ Reset this `Simulator`
 
         Delete all objects and reset any prior initialization.
         """
@@ -256,7 +256,7 @@ class SimulationEngine(object):
         if 1 < num_args:
             raise SimulatorError('at most 1 of time_max, sim_config, or config_dict may be provided')
 
-        # catch common error generated when sim_config= is not used by SimulationEngine.simulate(sim_config)
+        # catch common error generated when sim_config= is not used by Simulator.simulate(sim_config)
         if isinstance(time_max, SimulationConfig):
             raise SimulatorError(f"sim_config is not provided, sim_config= is probably needed")
 

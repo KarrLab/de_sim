@@ -206,7 +206,7 @@ class RunSIRs(object):
     def main(sir_class, time_max, seed, **sir_args):
 
         # create a simulator
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
 
         # create a SIR instance
         sir = sir_class(**sir_args)

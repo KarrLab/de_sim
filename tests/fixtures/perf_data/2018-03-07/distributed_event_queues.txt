@@ -4,7 +4,7 @@ rootdir: /Users/arthur_at_sinai/tmp/wc_sim, inifile:
 plugins: rerunfailures-3.1, cov-2.5.1
 collected 1 item
 
-tests/core/test_simulation_engine.py 
+tests/core/test_simulator.py 
 Performance test of cyclical messaging network: end simulation time: 100
 Profile for 4 simulation objects:
 Wed Mar  7 13:41:05 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp4lt_2_5o/profile_out_4.out
@@ -17,9 +17,9 @@ Wed Mar  7 13:41:05 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
         1    0.000    0.000    0.031    0.031 {built-in method builtins.exec}
         1    0.000    0.000    0.031    0.031 <string>:1(<module>)
-        1    0.003    0.003    0.031    0.031 simulation_engine.py:138(simulate)
-      400    0.001    0.000    0.024    0.000 simulation_object.py:381(_SimulationEngine__handle_event)
-      400    0.002    0.000    0.023    0.000 test_simulation_engine.py:103(handle_event)
+        1    0.003    0.003    0.031    0.031 simulator.py:138(simulate)
+      400    0.001    0.000    0.024    0.000 simulation_object.py:381(_Simulator__handle_event)
+      400    0.002    0.000    0.023    0.000 test_simulator.py:103(handle_event)
       400    0.000    0.000    0.017    0.000 simulation_object.py:309(send_event)
       400    0.002    0.000    0.016    0.000 simulation_object.py:260(send_event_absolute)
  1200/400    0.003    0.000    0.010    0.000 copy.py:137(deepcopy)
@@ -43,9 +43,9 @@ Wed Mar  7 13:41:05 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
         1    0.000    0.000    0.115    0.115 {built-in method builtins.exec}
         1    0.000    0.000    0.115    0.115 <string>:1(<module>)
-        1    0.018    0.018    0.115    0.115 simulation_engine.py:138(simulate)
-     1600    0.003    0.000    0.083    0.000 simulation_object.py:381(_SimulationEngine__handle_event)
-     1600    0.006    0.000    0.080    0.000 test_simulation_engine.py:103(handle_event)
+        1    0.018    0.018    0.115    0.115 simulator.py:138(simulate)
+     1600    0.003    0.000    0.083    0.000 simulation_object.py:381(_Simulator__handle_event)
+     1600    0.006    0.000    0.080    0.000 test_simulator.py:103(handle_event)
      1600    0.002    0.000    0.062    0.000 simulation_object.py:309(send_event)
      1600    0.008    0.000    0.060    0.000 simulation_object.py:260(send_event_absolute)
 4800/1600    0.012    0.000    0.036    0.000 copy.py:137(deepcopy)
@@ -55,7 +55,7 @@ Wed Mar  7 13:41:05 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp
      1600    0.003    0.000    0.008    0.000 simulation_object.py:42(schedule_event)
      6425    0.003    0.000    0.008    0.000 {built-in method builtins.isinstance}
      3204    0.006    0.000    0.006    0.000 {method 'format' of 'str' objects}
-     1600    0.004    0.000    0.006    0.000 test_simulation_engine.py:95(next_obj)
+     1600    0.004    0.000    0.006    0.000 test_simulator.py:95(next_obj)
 
 
 Profile for 64 simulation objects:
@@ -69,9 +69,9 @@ Wed Mar  7 13:41:06 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
         1    0.000    0.000    0.614    0.614 {built-in method builtins.exec}
         1    0.000    0.000    0.614    0.614 <string>:1(<module>)
-        1    0.172    0.172    0.614    0.614 simulation_engine.py:138(simulate)
-     6400    0.011    0.000    0.314    0.000 simulation_object.py:381(_SimulationEngine__handle_event)
-     6400    0.021    0.000    0.303    0.000 test_simulation_engine.py:103(handle_event)
+        1    0.172    0.172    0.614    0.614 simulator.py:138(simulate)
+     6400    0.011    0.000    0.314    0.000 simulation_object.py:381(_Simulator__handle_event)
+     6400    0.021    0.000    0.303    0.000 test_simulator.py:103(handle_event)
      6400    0.006    0.000    0.238    0.000 simulation_object.py:309(send_event)
      6400    0.031    0.000    0.232    0.000 simulation_object.py:260(send_event_absolute)
 19200/6400    0.047    0.000    0.135    0.000 copy.py:137(deepcopy)
@@ -95,10 +95,10 @@ Wed Mar  7 13:41:17 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
         1    0.000    0.000    6.228    6.228 {built-in method builtins.exec}
         1    0.000    0.000    6.228    6.228 <string>:1(<module>)
-        1    2.677    2.677    6.228    6.228 simulation_engine.py:138(simulate)
+        1    2.677    2.677    6.228    6.228 simulator.py:138(simulate)
   6615857    1.791    0.000    1.791    0.000 simulation_object.py:78(next_event_time)
-    25600    0.062    0.000    1.630    0.000 simulation_object.py:381(_SimulationEngine__handle_event)
-    25600    0.108    0.000    1.568    0.000 test_simulation_engine.py:103(handle_event)
+    25600    0.062    0.000    1.630    0.000 simulation_object.py:381(_Simulator__handle_event)
+    25600    0.108    0.000    1.568    0.000 test_simulator.py:103(handle_event)
     25600    0.050    0.000    1.234    0.000 simulation_object.py:309(send_event)
     25600    0.163    0.000    1.184    0.000 simulation_object.py:260(send_event_absolute)
 76800/25600    0.234    0.000    0.676    0.000 copy.py:137(deepcopy)
@@ -121,10 +121,10 @@ Wed Mar  7 13:43:56 2018    /var/folders/sn/78byg29567s1ypsyr679cbf00000gp/T/tmp
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
         1    0.000    0.000   91.088   91.088 {built-in method builtins.exec}
         1    0.000    0.000   91.088   91.088 <string>:1(<module>)
-        1   49.009   49.009   91.088   91.088 simulation_engine.py:138(simulate)
+        1   49.009   49.009   91.088   91.088 simulator.py:138(simulate)
 105111625   32.557    0.000   32.557    0.000 simulation_object.py:78(next_event_time)
-   102400    0.522    0.000    8.741    0.000 simulation_object.py:381(_SimulationEngine__handle_event)
-   102400    0.623    0.000    8.219    0.000 test_simulation_engine.py:103(handle_event)
+   102400    0.522    0.000    8.741    0.000 simulation_object.py:381(_Simulator__handle_event)
+   102400    0.623    0.000    8.219    0.000 test_simulator.py:103(handle_event)
    102400    0.169    0.000    6.338    0.000 simulation_object.py:309(send_event)
    102400    0.900    0.000    6.169    0.000 simulation_object.py:260(send_event_absolute)
 307200/102400    1.117    0.000    3.432    0.000 copy.py:137(deepcopy)

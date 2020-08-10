@@ -25,11 +25,11 @@ from wc_utils.util.misc import most_qual_cls_name, round_direct
 config = core.get_config()
 
 
-# TODO(Arthur): move to engine
+# TODO(Arthur): move to simulator
 class EventQueue(object):
     """ A simulation's event queue
 
-    Stores a `SimulationEngine`'s events in a heap (also known as a priority queue).
+    Stores a `Simulator`'s events in a heap (also known as a priority queue).
     The heap is a 'min heap', which keeps the event with the smallest
     `(event_time, sending_object.name)` at the root in heap[0].
     This is implemented via comparison operations in `Event`.
@@ -40,7 +40,7 @@ class EventQueue(object):
     returned.
 
     Attributes:
-        event_heap (:obj:`list`): a `SimulationEngine`'s heap of events
+        event_heap (:obj:`list`): a `Simulator`'s heap of events
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): a `DebugLogsManager`
     """
 
@@ -271,13 +271,13 @@ class SimulationObject(object):
 
     Attributes:
         name (:obj:`str`): this simulation object's name, which is unique across all simulation objects
-            handled by a `SimulationEngine`
+            handled by a `Simulator`
         time (:obj:`float`): this simulation object's current simulation time
         event_time_tiebreaker (:obj:`str`): the least significant component of an object's 'sub-tme'
             priority, which orders simultaneous events received by different instances of the same
             `ApplicationSimulationObject`
         num_events (:obj:`int`): number of events processed
-        simulator (:obj:`int`): the `SimulationEngine` that uses this `SimulationObject`
+        simulator (:obj:`int`): the `Simulator` that uses this `SimulationObject`
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
     """
     LOG_EVENTS = config['de_sim']['log_events']
@@ -311,7 +311,7 @@ class SimulationObject(object):
         """ Add this object to a simulation.
 
         Args:
-            simulator (:obj:`SimulationEngine`): the simulator that will use this `SimulationObject`
+            simulator (:obj:`Simulator`): the simulator that will use this `SimulationObject`
 
         Raises:
             :obj:`SimulatorError`: if this `SimulationObject` is already registered with a simulator
@@ -411,7 +411,7 @@ class SimulationObject(object):
     def register_handlers(subclass, handlers):
         """ Register a `SimulationObject`'s event handler methods.
 
-        The simulation engine vectors execution of an event message to the message's registered
+        The simulator vectors execution of an event message to the message's registered
         event handler method. The priority of message execution in an event containing multiple messages
         is determined by the sequence of tuples in `handlers`.
         These relationships are stored in an `ApplicationSimulationObject`'s
@@ -472,7 +472,7 @@ class SimulationObject(object):
 
         This is a Python 'dunder' method which creates a class-private member,
         reducing the chance that it will be accidentally called or overwritten.
-        `SimulationEngine` refers to this method via `sim_obj._SimulationObject__handle_event_list`,
+        `Simulator` refers to this method via `sim_obj._SimulationObject__handle_event_list`,
         where `sim_obj` is the simulation object that receives the event list.
 
         If multiple event messages are received by a simulation object at the same simulation time,
@@ -482,7 +482,7 @@ class SimulationObject(object):
         all simultanous messages at once and execute them in a deterministically.
         The alternative, in which the simulator passes simultaneous event messages in an arbitrary
         order to a simulation object would **not** give the object sufficient information to be deterministic.
-        But if the event messages have different handlers then the simulation engine raises a
+        But if the event messages have different handlers then the simulator raises a
         `SimulatorError` exception which says that superposition requires that the message types have
         the same handler.
 

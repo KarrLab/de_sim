@@ -29,7 +29,7 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
 
     def test_TemplatePeriodicSimulationObject(self):
 
-        simulator = de_sim.SimulationEngine()
+        simulator = de_sim.Simulator()
         time_max = 5
         expected = []
 
@@ -58,7 +58,7 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
     def test_non_zero_time_init(self):
 
         for time_init in [-3, 2]:
-            simulator = de_sim.SimulationEngine()
+            simulator = de_sim.Simulator()
             time_max = 5
             period = 1
             pso = SpecialPeriodicSimulationObject('pso', period, time_init)

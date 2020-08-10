@@ -92,7 +92,7 @@ class TestCheckpointSimulationObjects(unittest.TestCase):
     def setUp(self):
         self.checkpoint_dir = tempfile.mkdtemp()
 
-        self.simulator = de_sim.SimulationEngine()
+        self.simulator = de_sim.Simulator()
         self.a = 4
         self.b = 3
         self.state = SharedValue(self.b)

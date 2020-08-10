@@ -378,7 +378,7 @@ class TestSimulationObject(unittest.TestCase):
         self.good_name = 'arthur'
         self.eso1 = ExampleSimulationObject(self.good_name)
         self.irso1 = ImproperlyRegisteredSimulationObject(self.good_name)
-        self.simulator = de_sim.SimulationEngine()
+        self.simulator = de_sim.Simulator()
         self.o1 = ExampleSimulationObject('o1')
         self.o2 = ExampleSimulationObject('o2')
         self.simulator.add_objects([self.o1, self.o2])
