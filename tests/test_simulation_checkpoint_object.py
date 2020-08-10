@@ -33,7 +33,7 @@ class PeriodicCheckpointSimuObj(AbstractCheckpointSimulationObject):
         self.shared_checkpoints.append((self.time, self.simulation_state.get_checkpoint_state(self.time)))
 
 
-class MessageSentToSelf(de_sim.SimulationMessage):
+class MessageSentToSelf(de_sim.EventMessage):
     "A message that's sent to self"
 
 

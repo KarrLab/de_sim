@@ -73,7 +73,7 @@ This figure illustrates a space-time visualization of all of the events and mess
 \label{fig:phold_space_time_plot}](phold_space_time_plot.pdf)
 
 An important benefit of OO DES models is that individual simulation runs may be sped up by parallel execution on multiple cores.
-More precisely, the simulation of an OO DES model composed of objects that only interact with each other via event messages and do not access shared memory might be sped up by distributing its objects across multiple cores and executing them in parallel.
+More precisely, the simulation of an OO DES model composed of objects that only interact with each other vian event messages and do not access shared memory might be sped up by distributing its objects across multiple cores and executing them in parallel.
 This simulation would need to be synchronized by a parallel DES simulator, such as Time Warp [@Jefferson1985, @carothers2000ross].
 Parallel DES simulations can achieve substantial speedup, as Barnes et al. demonstrated by running the PHOLD benchmark on nearly 2 million cores [@Barnes2013].
 By contrast, while independent SimPy simulations can be run in parallel, a single SimPy simulation cannot be parallelized [@muller2011running].
@@ -81,10 +81,10 @@ By contrast, while independent SimPy simulations can be run in parallel, a singl
 # Tutorial: Building and simulating models with DE-Sim
 
 
-A simple DE-Sim model can be defined in three steps: define a simulation message class; define a simulation object class; and build and run a simulation.
+A simple DE-Sim model can be defined in three steps: define an event message class; define a simulation object class; and build and run a simulation.
 We illustrate this process with a model of a random walk on the integer number line. 
 
-1: Create an event message class by subclassing `SimulationMessage`.
+1: Create an event message class by subclassing `EventMessage`.
 
 Each DE-Sim event contains an event message that provides data needed by the simulation object that executes the event.
 The random walk model sends event messages that contain the size of the random step.
@@ -92,11 +92,11 @@ The random walk model sends event messages that contain the size of the random s
 ```python
 import de_sim
 
-class RandomStepMessage(de_sim.SimulationMessage):
+class RandomStepMessage(de_sim.EventMessage):
     " An event message class that specifies a random walk step size "
     attributes = ['step']
 ```
-The attribute `attributes` In the definition of `RandomStepMessage` is a special attribute of a `SimulationMessage` that provides a list of the names of a message class' attributes.
+The attribute `attributes` In the definition of `RandomStepMessage` is a special attribute of an `EventMessage` that provides a list of the names of a message class' attributes.
 It is optional. 
 However, an event message class must be documented by a docstring.
 
@@ -169,7 +169,7 @@ Subclasses of `ApplicationSimulationObject` use these special methods and attrib
 
 * Special `ApplicationSimulationObject` methods:
     1. `init_before_run` (optional): immediately before a simulation run, after all simulation objects have been added to a `SimulationEngine`, the simulator calls `init_before_run` in each simulation object. Simulation object classes can send initial events and perform other initialization in `init_before_run`. For example, in `RandomWalkSimulationObject`, `init_before_run` schedules the object's first event and initializes the simulation object's position and history attributes. To initiate a simulation's execution, at least one simulation object in the simulation must schedule one initial event.
-    2. `send_event`: `send_event(delay, receiving_object, event_message)` schedules an event to occur `delay` time units in the future at simulation object `receiving_object`, which will execute a simulation event containing `event_message`. An event can be scheduled for any simulation object in a simulation, including the object scheduling the event, as shown in `RandomWalkSimulationObject`. `event_message` must be an instance of a `SimulationMessage`. 
+    2. `send_event`: `send_event(delay, receiving_object, event_message)` schedules an event to occur `delay` time units in the future at simulation object `receiving_object`, which will execute a simulation event containing `event_message`. An event can be scheduled for any simulation object in a simulation, including the object scheduling the event, as shown in `RandomWalkSimulationObject`. `event_message` must be an instance of an `EventMessage`. 
 The event will be executed at its scheduled simulation time by an event handler in the simulation object `receiving_object`.
 The handler has a parameter that receives a simulation event which contains `event_message`. In this example all simulation events are scheduled to be executed by the object that creates the event, but most realistic simulations contain multiple simulation objects which schedule events for each other. 
 Object-oriented DES terminology also describes the event message as being sent by the sending object at the message's send time (the simulation time when the sending object schedules the event) and being received by the receiving object at the event's receive time (the simulation time when the event is executed). An event message can thus be viewed as a directed edge in simulation space-time from (sending object, send time) to (receiving object, receive time), as illustrated by \autoref{fig:phold_space_time_plot}.

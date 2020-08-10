@@ -12,15 +12,15 @@ import numpy
 import de_sim
 
 
-class SusceptibleToInfectious(de_sim.SimulationMessage):
+class SusceptibleToInfectious(de_sim.EventMessage):
     "S -> I transition"
 
 
-class InfectiousToRecovered(de_sim.SimulationMessage):
+class InfectiousToRecovered(de_sim.EventMessage):
     "I -> R transition"
 
 
-class RecordTrajectory(de_sim.SimulationMessage):
+class RecordTrajectory(de_sim.EventMessage):
     "Record trajectory"
 
 
@@ -131,7 +131,7 @@ class SIR(de_sim.ApplicationSimulationObject):
 
 
 ### SIR epidemic model, version 2 ###
-class StateTransition(de_sim.SimulationMessage):
+class StateTransition(de_sim.EventMessage):
     "State transition"
     attributes = ['transition']
 

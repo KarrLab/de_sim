@@ -11,23 +11,23 @@ import shutil
 import tempfile
 import unittest
 
-from de_sim.visualize import EventCoordinates, EventMessage, SpaceTime
+from de_sim.visualize import EventCoordinates, SimulationEventMessage, SpaceTime
 
 
 class TestVisualize(unittest.TestCase):
 
     def setUp(self):
         self.sample_data = [
-            EventMessage('self_msg',
+            SimulationEventMessage('self_msg',
                          EventCoordinates('obj_1', 0),
                          EventCoordinates('obj_1', 2)),
-            EventMessage('self_msg',
+            SimulationEventMessage('self_msg',
                          EventCoordinates('obj_2', 0),
                          EventCoordinates('obj_2', 1)),
-            EventMessage('other_msg',
+            SimulationEventMessage('other_msg',
                          EventCoordinates('obj_2', 1),
                          EventCoordinates('obj_1', 3)),
-            EventMessage('other_msg',
+            SimulationEventMessage('other_msg',
                          EventCoordinates('obj_1', 0),
                          EventCoordinates('obj_3', 2.5)),
         ]
@@ -64,10 +64,10 @@ class TestVisualize(unittest.TestCase):
         ems = space_time.get_data(PLOT_LOG)
         self.assertEqual(len(ems), 5)
         self.assertEqual(ems[0],
-                         EventMessage(message_type='InitMsg',
+                         SimulationEventMessage(message_type='InitMsg',
                                       send_coordinates=EventCoordinates(sim_obj_id='obj_2', time=0.0),
                                       receive_coordinates=EventCoordinates(sim_obj_id='obj_2', time=0.044)))
         self.assertEqual(ems[4],
-                         EventMessage(message_type='MessageSentToOtherObject',
+                         SimulationEventMessage(message_type='MessageSentToOtherObject',
                                       send_coordinates=EventCoordinates(sim_obj_id='obj_1', time=0.863),
                                       receive_coordinates=EventCoordinates(sim_obj_id='obj_2', time=1.731)))

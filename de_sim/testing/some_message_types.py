@@ -1,19 +1,19 @@
 # example message types:
-from de_sim.simulation_message import SimulationMessage
+from de_sim.event_message import EventMessage
 
 
-class InitMsg(SimulationMessage):
+class InitMsg(EventMessage):
     'An InitMsg message'
 
 
-class Eg1(SimulationMessage):
-    'Eg1 simulation message'
+class Eg1(EventMessage):
+    'Eg1 event message'
 
 
-class MsgWithAttrs(SimulationMessage):
-    'MsgWithAttrs simulation message'
+class MsgWithAttrs(EventMessage):
+    'MsgWithAttrs event message'
     attributes = ['attr1', 'attr2']
 
 
-class UnregisteredMsg(SimulationMessage):
-    'Unregistered simulation message'
+class UnregisteredMsg(EventMessage):
+    'Unregistered event message'

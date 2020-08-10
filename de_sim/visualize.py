@@ -17,7 +17,7 @@ import matplotlib.patches as patches
 EventCoordinates = namedtuple('EventCoordinates', 'sim_obj_id time',)
 
 
-EventMessage = namedtuple('EventMessage', 'message_type send_coordinates receive_coordinates')
+SimulationEventMessage = namedtuple('SimulationEventMessage', 'message_type send_coordinates receive_coordinates')
 
 
 class SpaceTime(object):
@@ -187,7 +187,7 @@ class SpaceTime(object):
         """ Extract event message data from plot file
 
         Returns:
-            :obj:`list` of :obj:`EventMessage`: list of all event messages in simulation run
+            :obj:`list` of :obj:`SimulationEventMessage`: list of all event messages in simulation run
         """
         # todo: get plot filename from config
         # 1. open file
@@ -210,10 +210,10 @@ class SpaceTime(object):
                 # 3C. extract times from send_time and receive_time
                 send_time = float(send_time.strip('(,)'))
                 receive_time = float(receive_time.strip('(,)'))
-                # create EventMessage
+                # create SimulationEventMessage
                 send_coordinates = EventCoordinates(sender_id, send_time)
                 receive_coordinates = EventCoordinates(receiver_id, receive_time)
-                event_message = EventMessage(msg_type, send_coordinates, receive_coordinates)
+                event_message = SimulationEventMessage(msg_type, send_coordinates, receive_coordinates)
                 event_messages.append(event_message)
         self.data = event_messages
         return event_messages

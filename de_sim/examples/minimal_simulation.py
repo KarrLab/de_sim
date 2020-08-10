@@ -10,7 +10,7 @@ import argparse
 import de_sim
 
 
-class MessageSentToSelf(de_sim.SimulationMessage):
+class MessageSentToSelf(de_sim.EventMessage):
     "A message that's sent to self"
 
 

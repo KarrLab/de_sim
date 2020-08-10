@@ -559,8 +559,8 @@ class TestSimulationEngine(unittest.TestCase):
                 self.assertIn(text, capturer.get_text())
 
 
-class Delicate(de_sim.SimulationMessage):
-    'Simulation message type for testing arrival order'
+class Delicate(de_sim.EventMessage):
+    'event message type for testing arrival order'
     attributes = ['sender_obj_num']
 
 
@@ -635,11 +635,11 @@ class TestSimulationReproducibility(unittest.TestCase):
             self.assertEqual(0, sim_obj.disordered_delicates)
 
 
-class Double(de_sim.SimulationMessage):
+class Double(de_sim.EventMessage):
     'Double value'
 
 
-class Increment(de_sim.SimulationMessage):
+class Increment(de_sim.EventMessage):
     'Increment value'
 
 

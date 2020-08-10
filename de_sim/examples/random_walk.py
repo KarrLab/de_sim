@@ -12,7 +12,7 @@ import random
 import de_sim
 
 
-class RandomStepMessage(de_sim.SimulationMessage):
+class RandomStepMessage(de_sim.EventMessage):
     "An event message class that specifies a random step"
     attributes = ['step']
 

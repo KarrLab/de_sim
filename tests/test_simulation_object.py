@@ -110,7 +110,7 @@ class TestEventQueue(unittest.TestCase):
             eq.schedule_event(st, rt, None, None, '')
 
         with self.assertRaisesRegex(SimulatorError,
-                                    'message should be an instance of SimulationMessage but is a'):
+                                    'message should be an instance of EventMessage but is a'):
             eq.schedule_event(1, 2, None, None, 13)
 
         with self.assertRaisesRegex(SimulatorError, 'send_time .* and/or receive_time .* is NaN'):
@@ -265,7 +265,7 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
                 handler_not_callable = 'string_not_callable'
                 event_handlers = [(InitMsg, 'handler_not_callable')]
 
-        # message must be a subclass of SimulationMessage
+        # message must be a subclass of EventMessage
         class Obj(object):
             pass
         with self.assertRaises(SimulatorError):
@@ -281,7 +281,7 @@ class TestApplicationSimulationObjMeta(unittest.TestCase):
                     pass
                 event_handlers = (InitMsg, 'handler')
 
-        # message in messages_sent must be a subclass of SimulationMessage
+        # message in messages_sent must be a subclass of EventMessage
         with self.assertRaises(SimulatorError):
             class BadASO7(ApplicationSimulationObject):
                 messages_sent = [Obj]
@@ -402,7 +402,7 @@ class TestSimulationObject(unittest.TestCase):
             self.eso1.send_event_absolute(2, self.irso1, InitMsg())
 
         with self.assertRaisesRegex(SimulatorError,
-                                    "simulation messages must be instances of type 'SimulationMessage'; "):
+                                    "event messages must be instances of type 'EventMessage'; "):
             self.eso1.send_event_absolute(2, self.irso1, InitMsg)
 
         with self.assertRaisesRegex(SimulatorError, "event_time is 'NaN'"):

@@ -6,12 +6,12 @@
 :License: MIT
 """
 
-from de_sim.simulation_message import SimulationMessage
+from de_sim.event_message import EventMessage
 from de_sim.simulation_object import ApplicationSimulationObject
 from de_sim.errors import SimulatorError
 
 
-class NextEvent(SimulationMessage):
+class NextEvent(EventMessage):
     "Schedule the next event"
 
 

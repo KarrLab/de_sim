@@ -28,15 +28,15 @@ def exp_delay():
     return random.expovariate(1.0)
 
 
-class MessageSentToSelf(de_sim.SimulationMessage):
+class MessageSentToSelf(de_sim.EventMessage):
     "A message that's sent to self"
 
 
-class MessageSentToOtherObject(de_sim.SimulationMessage):
+class MessageSentToOtherObject(de_sim.EventMessage):
     "A message that's sent to another PHold simulation object"
 
 
-class InitMsg(de_sim.SimulationMessage):
+class InitMsg(de_sim.EventMessage):
     'initialization message'
 
 

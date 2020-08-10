@@ -90,7 +90,7 @@ class TestEvent(unittest.TestCase):
     def test_event_w_message(self):
         attrs = ['attr1', 'attr2']
 
-        class TestMsg(de_sim.SimulationMessage):
+        class TestMsg(de_sim.EventMessage):
             'docstring'
             attributes = ['attr1', 'attr2']
         vals = ['att1_val', 'att2_val']
@@ -126,7 +126,7 @@ class TestEvent(unittest.TestCase):
             self.assertIn(str(round_direct(t)), ev_offset.render(round_w_direction=True))
         # self.assertEqual(data+vals, ev.render(as_list=True))
 
-        class NoBodyMessage(de_sim.SimulationMessage):
+        class NoBodyMessage(de_sim.EventMessage):
             """A message with no attributes"""
         ev2 = de_sim.Event(0, 1, ExampleSimulationObject('sender'), ExampleSimulationObject('receiver'),
                     NoBodyMessage())

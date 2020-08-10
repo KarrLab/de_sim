@@ -17,7 +17,7 @@ import warnings
 from de_sim.config import core
 from de_sim.errors import SimulatorError
 from de_sim.event import Event
-from de_sim.simulation_message import SimulationMessage
+from de_sim.event_message import EventMessage
 from de_sim.utilities import ConcreteABCMeta, FastLogger
 from wc_utils.util.list import elements_to_str
 from wc_utils.util.misc import most_qual_cls_name, round_direct
@@ -76,7 +76,7 @@ class EventQueue(object):
             receiving_object (:obj:`SimulationObject`): the object that will receive the event; when
                 the simulation is parallelized `sending_object` and `receiving_object` will need
                 to be global identifiers.
-            message (:obj:`SimulationMessage`): a `SimulationMessage` carried by the event; its type
+            message (:obj:`EventMessage`): an :obj:`EventMessage` carried by the event; its type
                 provides the simulation application's type for an `Event`; it may also carry a payload
                 for the `Event` in its attributes.
 
@@ -95,9 +95,9 @@ class EventQueue(object):
             raise SimulatorError("receive_time < send_time in schedule_event(): {} < {}".format(
                 receive_time, send_time))
 
-        if not isinstance(message, SimulationMessage):
+        if not isinstance(message, EventMessage):
             raise SimulatorError("message should be an instance of {} but is a '{}'".format(
-                SimulationMessage.__name__, type(message).__name__))
+                EventMessage.__name__, type(message).__name__))
 
         event = Event(send_time, receive_time, sending_object, receiving_object, message)
         # As per David Jefferson's thinking, the event queue is ordered by data provided by the
@@ -330,13 +330,13 @@ class SimulationObject(object):
         self.simulator = None
 
     def send_event_absolute(self, event_time, receiving_object, message, copy=False):
-        """ Send a simulation event message with an absolute event time.
+        """ Schedule an event containing an event message with an absolute event time.
 
         Args:
             event_time (:obj:`float`): the absolute simulation time at which `receiving_object` will execute the event
             receiving_object (:obj:`SimulationObject`): the simulation object that will receive and
                 execute the event
-            message (:obj:`SimulationMessage`): the simulation message which will be carried by the event
+            message (:obj:`EventMessage`): the event message which will be carried by the event
             copy (:obj:`bool`, optional): if `True`, copy the message before adding it to the event;
                 set `False` by default to optimize performance; set `True` as a safety measure to avoid
                 unexpected changes to shared objects
@@ -361,8 +361,8 @@ class SimulationObject(object):
         event_type_name = message.__class__.__name__
 
         # check that the sending object type is registered to send the message type
-        if not isinstance(message, SimulationMessage):
-            raise SimulatorError("simulation messages must be instances of type 'SimulationMessage'; "
+        if not isinstance(message, EventMessage):
+            raise SimulatorError("event messages must be instances of type 'EventMessage'; "
                                  "'{}' is not".format(event_type_name))
         if message.__class__ not in self.__class__.metadata.message_types_sent:
             raise SimulatorError("'{}' simulation objects not registered to send '{}' messages".format(
@@ -384,13 +384,13 @@ class SimulationObject(object):
                                                                              message.__class__.__name__))
 
     def send_event(self, delay, receiving_object, message, copy=False):
-        """ Send a simulation event message, specifing the event time as a delay.
+        """ Schedule an event containing an event message, specifing the event time as a delay.
 
         Args:
             delay (:obj:`float`): the simulation delay at which `receiving_object` should execute the event
             receiving_object (:obj:`SimulationObject`): the simulation object that will receive and
                 execute the event
-            message (:obj:`SimulationMessage`): the simulation message which will be carried by the event
+            message (:obj:`EventMessage`): the event message which will be carried by the event
             copy (:obj:`bool`, optional): if `True`, copy the message before adding it to the event;
                 set `False` by default to optimize performance; set `True` as a safety measure to avoid
                 unexpected changes to shared objects
@@ -411,7 +411,7 @@ class SimulationObject(object):
     def register_handlers(subclass, handlers):
         """ Register a `SimulationObject`'s event handler methods.
 
-        The simulation engine vectors execution of a simulation message to the message's registered
+        The simulation engine vectors execution of an event message to the message's registered
         event handler method. The priority of message execution in an event containing multiple messages
         is determined by the sequence of tuples in `handlers`.
         These relationships are stored in an `ApplicationSimulationObject`'s
@@ -420,14 +420,14 @@ class SimulationObject(object):
 
         Args:
             subclass (:obj:`SimulationObject`): a subclass of `SimulationObject` that is registering
-                the relationships between the simulation messages it receives and the methods that
+                the relationships between the event messages it receives and the methods that
                 handle them
-            handlers (:obj:`list` of (`SimulationMessage`, `function`)): a list of tuples, indicating
-                which method should handle which type of `SimulationMessage` in `subclass`; ordered in
-                decreasing priority for handling simulation message types
+            handlers (:obj:`list` of (`EventMessage`, `function`)): a list of tuples, indicating
+                which method should handle which type of :obj:`EventMessage` in `subclass`; ordered in
+                decreasing priority for handling event message types
 
         Raises:
-            :obj:`SimulatorError`: if a `SimulationMessage` appears repeatedly in `handlers`, or
+            :obj:`SimulatorError`: if an :obj:`EventMessage` appears repeatedly in `handlers`, or
                 if a method in `handlers` is not callable
         """
         for message_type, handler in handlers:
@@ -449,8 +449,8 @@ class SimulationObject(object):
 
         Args:
             subclass (:obj:`SimulationObject`): a subclass of `SimulationObject` that is registering
-                the types of simulation messages it sends
-            sent_messages (:obj:`list` of :obj:`SimulationMessage`): a list of the `SimulationMessage`
+                the types of event messages it sends
+            sent_messages (:obj:`list` of :obj:`EventMessage`): a list of the :obj:`EventMessage`
                 type's which can be sent by `SimulationObject`'s of type `subclass`
         """
         for sent_message_type in sent_messages:
@@ -510,7 +510,7 @@ class SimulationObject(object):
             except KeyError:  # pragma: no cover
                 # unreachable because of check that receiving sim
                 # obj type is registered to receive the message type
-                raise SimulatorError("No handler registered for Simulation message type: '{}'".format(
+                raise SimulatorError("No handler registered for event message type: '{}'".format(
                     event.message.__class__.__name__))
 
         # if multiple event messages are being handled, pass them as a list to an event handler,
@@ -525,7 +525,7 @@ class SimulationObject(object):
                 handler(self, event_list)
             except KeyError:  # pragma: no cover
                 # unreachable because of check that receiving sim obj type is registered to receive the message type
-                raise SimulatorError("No handler registered for Simulation message type: '{}'".format(
+                raise SimulatorError("No handler registered for event message type: '{}'".format(
                     event.message.__class__.__name__))
 
     @property
@@ -643,7 +643,7 @@ class ApplicationSimulationObjMeta(type):
                 or if handlers in `event_handlers` don't refer to methods in the
                     :obj:`ApplicationSimulationObject`,
                 or if `event_handlers` isn't an iterator over pairs,
-                or if a message type sent isn't a subclass of SimulationMessage,
+                or if a message type sent isn't a subclass of EventMessage,
                 or if `messages_sent` isn't an iterator over pairs.
         """
         # Short circuit when ApplicationSimulationObject is defined
@@ -730,8 +730,8 @@ class ApplicationSimulationObjMeta(type):
                                           "'{}'.".format(clsname, handler))
                     if not isinstance(handler, str) and not callable(handler):
                         errors.append("handler '{}' must be callable".format(handler))
-                    if not issubclass(msg_type, SimulationMessage):
-                        errors.append("'{}' must be a subclass of SimulationMessage".format(msg_type.__name__))
+                    if not issubclass(msg_type, EventMessage):
+                        errors.append("'{}' must be a subclass of EventMessage".format(msg_type.__name__))
                     resolved_handers.append((msg_type, handler))
 
                 if errors:
@@ -746,8 +746,8 @@ class ApplicationSimulationObjMeta(type):
             try:
                 errors = []
                 for msg_type in messages_sent:
-                    if not issubclass(msg_type, SimulationMessage):
-                        errors.append("'{}' in '{}' must be a subclass of SimulationMessage".format(
+                    if not issubclass(msg_type, EventMessage):
+                        errors.append("'{}' in '{}' must be a subclass of EventMessage".format(
                             msg_type.__name__, MESSAGES_SENT))
                 if errors:
                     raise SimulatorError("\n".join(errors))
@@ -755,7 +755,7 @@ class ApplicationSimulationObjMeta(type):
                     new_application_simulation_obj_subclass, messages_sent)
             except (TypeError, ValueError):
                 raise SimulatorError("ApplicationSimulationObject '{}': '{}' must iterate over "
-                                     "SimulationMessages".format(clsname, MESSAGES_SENT))
+                                     "EventMessages".format(clsname, MESSAGES_SENT))
 
         # return the class to instantiate it
         return new_application_simulation_obj_subclass

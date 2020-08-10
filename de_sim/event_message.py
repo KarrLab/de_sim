@@ -1,4 +1,4 @@
-""" Base class for simulation messages
+""" Base class for event messages
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2017-03-26
@@ -13,12 +13,12 @@ from de_sim.errors import SimulatorError
 from de_sim.utilities import ConcreteABCMeta
 
 
-class SimulationMessageInterface(object, metaclass=ABCMeta):
-    """ An abstract base class for simulation messages
+class EventMessageInterface(object, metaclass=ABCMeta):
+    """ An abstract base class for event messages
 
-    The comparison operations (`__gt__`, `__lt__`, etc.) order simulation message instances by the
+    The comparison operations (`__gt__`, `__lt__`, etc.) order event message instances by the
     tuple (class name, instance attribute values). This enables deterministic sorting of messages
-    by their content, so that simulation messages can be passed in a deterministic order to
+    by their content, so that event messages can be passed in a deterministic order to
     a simulation object processing them in an event.
 
     Attributes:
@@ -27,7 +27,7 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
     __slots__ = []
 
     def __init__(self, *args):
-        """ Initialize a :obj:`SimulationMessage`
+        """ Initialize an :obj:`EventMessage`
 
         Args:
             args (:obj:`tuple`): argument list for initializing a subclass instance
@@ -36,14 +36,14 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
             :obj:`SimulatorError`: if `args` does not contain an argument for each entry in `__slots__`
         """
         if len(args) != len(self.__slots__):
-            raise SimulatorError("Constructor for SimulationMessage '{}' expects {} argument(s), but "
+            raise SimulatorError("Constructor for EventMessage '{}' expects {} argument(s), but "
                                  "{} provided".format(
                                      self.__class__.__name__, len(self.__slots__), len(args)))
         for slot, arg in zip(self.__slots__, args):
             setattr(self, slot, arg)
 
     def _values(self, to_str=False):
-        """ Provide the values in a `SimulationMessage`
+        """ Provide the values in an :obj:`EventMessage`
 
         Uninitialized attribute values are returned as `None`, or `str(None)` if `to_str` is set.
 
@@ -68,7 +68,7 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
         return vals
 
     def value_map(self):
-        """ Provide a map from attribute to value, cast to strings, for this `SimulationMessage`
+        """ Provide a map from attribute to value, cast to strings, for this :obj:`EventMessage`
 
         Uninitialized values are returned as `str(None)`.
 
@@ -78,7 +78,7 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
         return {attr: val for attr, val in zip(self.__slots__, self._values(to_str=True))}
 
     def values(self, annotated=False, as_list=False, separator='\t'):
-        """ Provide the values in this `SimulationMessage`
+        """ Provide the values in this :obj:`EventMessage`
 
         Uninitialized values are returned as `str(None)`.
 
@@ -90,7 +90,7 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
 
         Returns:
             :obj:`obj`: `None` if this message has no attributes, or a string representation of
-                the attribute names for this `SimulationMessage`, or a :obj:`list`
+                the attribute names for this :obj:`EventMessage`, or a :obj:`list`
                 representation if `as_list` is set
         """
         if not self.attrs():
@@ -106,20 +106,20 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
             return separator.join(list_repr)
 
     def __str__(self):
-        """ Provide a string representation of a `SimulationMessage`
+        """ Provide a string representation of an :obj:`EventMessage`
         """
-        return "SimulationMessage: {}({})".format(self.__class__.__name__, self.value_map())
+        return "EventMessage: {}({})".format(self.__class__.__name__, self.value_map())
 
     def attrs(self):
-        """ Provide a list of the attributes names for this `SimulationMessage`
+        """ Provide a list of the attributes names for this :obj:`EventMessage`
 
         Returns:
-            :obj:`list` of :obj:`str`: the attributes in this `SimulationMessage`
+            :obj:`list` of :obj:`str`: the attributes in this :obj:`EventMessage`
         """
         return self.__slots__
 
     def header(self, as_list=False, separator='\t'):
-        """ Provide the attribute names for this `SimulationMessage`
+        """ Provide the attribute names for this :obj:`EventMessage`
 
         Args:
             as_list (:obj:`bool`, optional): if set, return the attribute names in a :obj:`list`
@@ -128,7 +128,7 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
 
         Returns:
             :obj:`obj`: `None` if this message has no attributes, or a string representation of
-                the attribute names for this `SimulationMessage`, or a :obj:`list`
+                the attribute names for this :obj:`EventMessage`, or a :obj:`list`
                 representation if `as_list` is set
         """
         if not self.attrs():
@@ -139,51 +139,51 @@ class SimulationMessageInterface(object, metaclass=ABCMeta):
             return separator.join(self.attrs())
 
     def __lt__(self, other):
-        """ Does this `SimulationMessage` sort before `other`?
+        """ Does this :obj:`EventMessage` sort before `other`?
 
         Args:
-            other (:obj:`SimulationMessage`): another `SimulationMessage`
+            other (:obj:`EventMessage`): another :obj:`EventMessage`
 
         Returns:
-            :obj:`bool`: `True` if this `SimulationMessage` sorts before `other`
+            :obj:`bool`: `True` if this :obj:`EventMessage` sorts before `other`
         """
         return (self.__class__.__name__, self._values()) < (other.__class__.__name__, other._values())
 
     def __le__(self, other):
-        """ Does this `SimulationMessage` sort before or equal `other`?
+        """ Does this :obj:`EventMessage` sort before or equal `other`?
 
         Args:
-            other (:obj:`SimulationMessage`): another `SimulationMessage`
+            other (:obj:`EventMessage`): another :obj:`EventMessage`
 
         Returns:
-            :obj:`bool`: `True` if this `SimulationMessage` sorts before or equals `other`
+            :obj:`bool`: `True` if this :obj:`EventMessage` sorts before or equals `other`
         """
         return not (other < self)
 
     def __gt__(self, other):
-        """ Does this `SimulationMessage` sort after `other`?
+        """ Does this :obj:`EventMessage` sort after `other`?
 
         Args:
-            other (:obj:`SimulationMessage`): another `SimulationMessage`
+            other (:obj:`EventMessage`): another :obj:`EventMessage`
 
         Returns:
-            :obj:`bool`: `True` if this `SimulationMessage` sorts after `other`
+            :obj:`bool`: `True` if this :obj:`EventMessage` sorts after `other`
         """
         return (self.__class__.__name__, self._values()) > (other.__class__.__name__, other._values())
 
     def __ge__(self, other):
-        """ Does this `SimulationMessage` sort after or equal `other`?
+        """ Does this :obj:`EventMessage` sort after or equal `other`?
 
         Args:
-            other (:obj:`SimulationMessage`): another `SimulationMessage`
+            other (:obj:`EventMessage`): another :obj:`EventMessage`
 
         Returns:
-            :obj:`bool`: `True` if this `SimulationMessage` sorts after or equals `other`
+            :obj:`bool`: `True` if this :obj:`EventMessage` sorts after or equals `other`
         """
         return not (self < other)
 
 
-class SimulationMessageMeta(type):
+class EventMessageMeta(type):
     # attributes mapping keyword
     ATTRIBUTES = 'attributes'
 
@@ -191,12 +191,12 @@ class SimulationMessageMeta(type):
         super().__init__(*args, **kwargs)
 
     def __new__(cls, clsname, superclasses, namespace):
-        # Short circuit when SimulationMessage is defined
-        if clsname == 'SimulationMessage':
+        # Short circuit when EventMessage is defined
+        if clsname == 'EventMessage':
             return super().__new__(cls, clsname, superclasses, namespace)
 
         if '__doc__' not in namespace:
-            warnings.warn("SimulationMessage '{}' definition does not contain a docstring.".format(
+            warnings.warn("EventMessage '{}' definition does not contain a docstring.".format(
                 clsname))
 
         attrs = {}
@@ -219,23 +219,23 @@ class SimulationMessageMeta(type):
         return new_simulation_message_class
 
 
-class CombinedSimulationMessageMeta(ConcreteABCMeta, SimulationMessageMeta):
+class CombinedEventMessageMeta(ConcreteABCMeta, EventMessageMeta):
     pass
 
 
-class SimulationMessage(SimulationMessageInterface, metaclass=CombinedSimulationMessageMeta):
-    """ The simulation message base class
+class EventMessage(EventMessageInterface, metaclass=CombinedEventMessageMeta):
+    """ The event message base class
 
-    Each simulation event contains a simulation message. All simulation messages are objects. This
-    module supports compact declaration of :obj:`SimulationMessage` types. For example::
+    Each simulation event contains an event message. All event messages are objects. This
+    module supports compact declaration of :obj:`EventMessage` types. For example::
 
-        class ExampleSimulationMessage1(SimulationMessage):
+        class ExampleEventMessage1(EventMessage):
             ''' Docstring '''
             attributes = ['attr1', 'attr2']
 
-    defines the `ExampleSimulationMessage1` class with a short docstring and two attributes.
+    defines the `ExampleEventMessage1` class with a short docstring and two attributes.
 
-    :obj:`SimulationMessage` subclasses must support the comparison operations `<`, `<=`, etc. This is
+    :obj:`EventMessage` subclasses must support the comparison operations `<`, `<=`, etc. This is
     provided automatically for attributes that support comparison. Subclasses with message attributes
     that do not support comparison must override `__lt__`, `__le__`, etc.
     """
