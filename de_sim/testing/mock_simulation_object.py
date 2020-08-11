@@ -8,10 +8,10 @@
 
 from unittest import TestCase
 
-from de_sim.simulation_object import SimulationObject, ApplicationSimulationObject  # noqa: F401
+import de_sim
 
 
-class MockSimulationObject(ApplicationSimulationObject):
+class MockSimulationObject(de_sim.SimulationObject):
     """ An object that helps test simulation objects
     """
 

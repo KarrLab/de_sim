@@ -25,7 +25,6 @@ from de_sim.config import core
 from de_sim.simulation_metadata import SimulationMetadata, AuthorMetadata
 from de_sim.errors import SimulatorError
 from de_sim.simulation_config import SimulationConfig
-from de_sim.simulation_object import SimulationObject, ApplicationSimulationObject
 from de_sim.template_sim_objs import TemplatePeriodicSimulationObject
 from de_sim.testing.some_message_types import InitMsg, Eg1
 from de_sim.utilities import FastLogger
@@ -34,10 +33,10 @@ import de_sim
 ALL_MESSAGE_TYPES = [InitMsg, Eg1]
 
 
-class BasicExampleSimulationObject(ApplicationSimulationObject):
+class BasicExampleSimulationObject(de_sim.SimulationObject):
 
     def __init__(self, name):
-        SimulationObject.__init__(self, name)
+        super().__init__(name)
         self.num = 0
 
     def init_before_run(self):
@@ -82,12 +81,12 @@ class InteractingSimulationObject(BasicExampleSimulationObject):
     messages_sent = ALL_MESSAGE_TYPES
 
 
-class CyclicalMessagesSimulationObject(ApplicationSimulationObject):
+class CyclicalMessagesSimulationObject(de_sim.SimulationObject):
     """ Send events around a cycle of objects
     """
 
     def __init__(self, name, obj_num, cycle_size, test_case):
-        SimulationObject.__init__(self, name)
+        super().__init__(name)
         self.obj_num = obj_num
         self.cycle_size = cycle_size
         self.test_case = test_case
@@ -117,7 +116,7 @@ class CyclicalMessagesSimulationObject(ApplicationSimulationObject):
 
 
 class PeriodicSimulationObject(TemplatePeriodicSimulationObject):
-    """ Self-clocking ApplicationSimulationObject
+    """ Self-clocking `SimulationObject`
 
     Attributes:
         period (:obj:`float`): interval between events, in simulated time units
@@ -339,10 +338,10 @@ class TestSimulator(unittest.TestCase):
         warnings.simplefilter("ignore")
         # test with an empty event queue
 
-        class InactiveSimulationObject(ApplicationSimulationObject):
+        class InactiveSimulationObject(de_sim.SimulationObject):
 
             def __init__(self):
-                SimulationObject.__init__(self, 'inactive')
+                super().__init__('inactive')
 
             def get_state(self):
                 pass
@@ -564,11 +563,11 @@ class Delicate(de_sim.EventMessage):
     attributes = ['sender_obj_num']
 
 
-class ReproducibleTestSimulationObject(ApplicationSimulationObject):
+class ReproducibleTestSimulationObject(de_sim.SimulationObject):
     """ This sim obj is used to test whether the simulator is reproducible """
 
     def __init__(self, name, obj_num, array_size):
-        SimulationObject.__init__(self, name)
+        super().__init__(name)
         self.obj_num = obj_num
         self.array_size = array_size
         self.last_time = 0
@@ -650,7 +649,7 @@ class Increment(de_sim.EventMessage):
 INCREMENT_THEN_DOUBLE = (Increment, Double)
 
 
-class IncrementThenDoubleSimObject(ApplicationSimulationObject):
+class IncrementThenDoubleSimObject(de_sim.SimulationObject):
     """ Execute Increment before Double, testing superposition """
 
     def __init__(self, name):

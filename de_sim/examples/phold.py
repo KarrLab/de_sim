@@ -43,7 +43,7 @@ class InitMsg(de_sim.EventMessage):
 MESSAGE_TYPES = [MessageSentToSelf, MessageSentToOtherObject, InitMsg]
 
 
-class PholdSimulationObject(de_sim.ApplicationSimulationObject):
+class PholdSimulationObject(de_sim.SimulationObject):
 
     def __init__(self, name, args):
         self.args = args

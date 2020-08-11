@@ -14,7 +14,7 @@ class MessageSentToSelf(de_sim.EventMessage):
     "A message that's sent to self"
 
 
-class MinimalSimulationObject(de_sim.ApplicationSimulationObject):
+class MinimalSimulationObject(de_sim.SimulationObject):
 
     def __init__(self, name, delay):
         self.delay = delay

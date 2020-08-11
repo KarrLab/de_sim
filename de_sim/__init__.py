@@ -13,4 +13,4 @@ from . import utilities  # noqa: F401
 from .event import Event  # noqa: F401
 from .simulator import Simulator  # noqa: F401
 from .event_message import EventMessage  # noqa: F401
-from .simulation_object import ApplicationSimulationObject  # noqa: F401
+from .simulation_object import SimulationObject  # noqa: F401

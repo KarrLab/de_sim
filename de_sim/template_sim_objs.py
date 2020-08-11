@@ -6,17 +6,16 @@
 :License: MIT
 """
 
-from de_sim.event_message import EventMessage
-from de_sim.simulation_object import ApplicationSimulationObject
 from de_sim.errors import SimulatorError
+import de_sim
 
 
-class NextEvent(EventMessage):
+class NextEvent(de_sim.EventMessage):
     "Schedule the next event"
 
 
-class TemplatePeriodicSimulationObject(ApplicationSimulationObject):
-    """ Template self-clocking ApplicationSimulationObject
+class TemplatePeriodicSimulationObject(de_sim.SimulationObject):
+    """ Template self-clocking `SimulationObject`
 
     Events occur at time `start_time`, `start_time + period`, `start_time + 2*period`, ...
 

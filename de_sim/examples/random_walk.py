@@ -17,7 +17,7 @@ class RandomStepMessage(de_sim.EventMessage):
     attributes = ['step']
 
 
-class RandomWalkSimulationObject(de_sim.ApplicationSimulationObject):
+class RandomWalkSimulationObject(de_sim.SimulationObject):
     """ A one-dimensional random walk model, with random times between steps
 
     Each step moves either -1 or +1, with equal probability.

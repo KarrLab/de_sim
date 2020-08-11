@@ -194,7 +194,7 @@ class EventQueue(object):
         self.fast_debug_file_logger.fast_log(msg, sim_time=event.event_time)
 
     def render(self, sim_obj=None, as_list=False, separator='\t'):
-        """ Return the content of an `EventQueue`
+        """ Return the content of an :obj:`EventQueue`
 
         Make a human-readable event queue, sorted by non-decreasing event time.
         Provide a header row and a row for each event. If all events have the same type of message,
@@ -204,12 +204,12 @@ class EventQueue(object):
         Args:
             sim_obj (:obj:`SimulationObject`, optional): if provided, return only events to be
                 received by `sim_obj`
-            as_list (:obj:`bool`, optional): if set, return the `EventQueue`'s values in a :obj:`list`
+            as_list (:obj:`bool`, optional): if set, return the :obj:`EventQueue`'s values in a :obj:`list`
             separator (:obj:`str`, optional): the field separator used if the values are returned as
                 a string
 
         Returns:
-            :obj:`str`: String representation of the values of an `EventQueue`, or a :obj:`list`
+            :obj:`str`: String representation of the values of an :obj:`EventQueue`, or a :obj:`list`
                 representation if `as_list` is set
         """
         event_heap = self.event_heap
@@ -262,10 +262,10 @@ class EventQueue(object):
         return rv
 
 
-class SimulationObject(object):
+class BaseSimulationObject(object):
     """ Base class for simulation objects.
 
-    SimulationObject is a base class for all simulations objects. It provides basic functionality:
+    :class:`BaseSimulationObject` is a base class for all simulations objects. It provides basic functionality:
     the object's name (which must be unique), its simulation time, a queue of received events,
     and a send_event() method.
 
@@ -275,15 +275,15 @@ class SimulationObject(object):
         time (:obj:`float`): this simulation object's current simulation time
         event_time_tiebreaker (:obj:`str`): the least significant component of an object's 'sub-tme'
             priority, which orders simultaneous events received by different instances of the same
-            `ApplicationSimulationObject`
+            :obj:`SimulationObject`
         num_events (:obj:`int`): number of events processed
-        simulator (:obj:`int`): the `Simulator` that uses this `SimulationObject`
+        simulator (:obj:`Simulator`): the `Simulator` that uses this :class:`BaseSimulationObject`
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
     """
     LOG_EVENTS = config['de_sim']['log_events']
 
     def __init__(self, name, start_time=0, **kwargs):
-        """ Initialize a SimulationObject.
+        """ Initialize a :class:`BaseSimulationObject`.
 
         Create its event queue, initialize its name, and set its start time.
 
@@ -292,7 +292,7 @@ class SimulationObject(object):
             start_time (:obj:`float`, optional): the earliest time at which this object can execute an event
             kwargs (:obj:`dict`): which can contain:
             event_time_tiebreaker (:obj:`str`, optional): used to break ties among simultaneous
-                events; must be unique across all instances of an `ApplicationSimulationObject`
+                events; must be unique across all instances of a :obj:`SimulationObject`
                 class; defaults to `name`
         """
         self.name = name
@@ -311,10 +311,10 @@ class SimulationObject(object):
         """ Add this object to a simulation.
 
         Args:
-            simulator (:obj:`Simulator`): the simulator that will use this `SimulationObject`
+            simulator (:obj:`Simulator`): the simulator that will use this :class:`BaseSimulationObject`
 
         Raises:
-            :obj:`SimulatorError`: if this `SimulationObject` is already registered with a simulator
+            :obj:`SimulatorError`: if this :class:`BaseSimulationObject` is already registered with a simulator
         """
         if self.simulator is None:
             # TODO(Arthur): reference to the simulator is problematic because it means simulator can't be GC'ed
@@ -409,17 +409,17 @@ class SimulationObject(object):
 
     @staticmethod
     def register_handlers(subclass, handlers):
-        """ Register a `SimulationObject`'s event handler methods.
+        """ Register a :class:`BaseSimulationObject`'s event handler methods.
 
         The simulator vectors execution of an event message to the message's registered
         event handler method. The priority of message execution in an event containing multiple messages
         is determined by the sequence of tuples in `handlers`.
-        These relationships are stored in an `ApplicationSimulationObject`'s
+        These relationships are stored in a :obj:`SimulationObject`'s
         `metadata.event_handlers_dict`.
         Each call to `register_handlers` re-initializes all event handler methods.
 
         Args:
-            subclass (:obj:`SimulationObject`): a subclass of `SimulationObject` that is registering
+            subclass (:class:`BaseSimulationObject`): a subclass of :class:`BaseSimulationObject` that is registering
                 the relationships between the event messages it receives and the methods that
                 handle them
             handlers (:obj:`list` of (`EventMessage`, `function`)): a list of tuples, indicating
@@ -443,27 +443,27 @@ class SimulationObject(object):
 
     @staticmethod
     def register_sent_messages(subclass, sent_messages):
-        """ Register the messages sent by a `SimulationObject` subclass
+        """ Register the messages sent by a :class:`BaseSimulationObject` subclass
 
         Calling `register_sent_messages` re-initializes all registered sent message types.
 
         Args:
-            subclass (:obj:`SimulationObject`): a subclass of `SimulationObject` that is registering
+            subclass (:class:`BaseSimulationObject`): a subclass of :class:`BaseSimulationObject` that is registering
                 the types of event messages it sends
             sent_messages (:obj:`list` of :obj:`EventMessage`): a list of the :obj:`EventMessage`
-                type's which can be sent by `SimulationObject`'s of type `subclass`
+                type's which can be sent by :class:`BaseSimulationObject`'s of type `subclass`
         """
         for sent_message_type in sent_messages:
             subclass.metadata.message_types_sent.add(sent_message_type)
 
     def get_receiving_priorities_dict(self):
-        """ Get priorities of message types handled by this `SimulationObject`'s type
+        """ Get priorities of message types handled by this :obj:`SimulationObject`'s type
 
         Returns:
-            :obj:`dict`: mapping from message types handled by this `SimulationObject` to their
+            :obj:`dict`: mapping from message types handled by this :obj:`SimulationObject` to their
                 execution priorities. The highest priority is 0, and higher values have lower
                 priorities. Execution priorities determine the execution order of concurrent events
-                at a `SimulationObject`.
+                at a :obj:`SimulationObject`.
         """
         return self.__class__.metadata.event_handler_priorities
 
@@ -472,7 +472,7 @@ class SimulationObject(object):
 
         This is a Python 'dunder' method which creates a class-private member,
         reducing the chance that it will be accidentally called or overwritten.
-        `Simulator` refers to this method via `sim_obj._SimulationObject__handle_event_list`,
+        `Simulator` refers to this method via `sim_obj._BaseSimulationObject__handle_event_list`,
         where `sim_obj` is the simulation object that receives the event list.
 
         If multiple event messages are received by a simulation object at the same simulation time,
@@ -551,7 +551,7 @@ class SimulationObject(object):
         self.fast_debug_file_logger.fast_log(msg, sim_time=self.time)
 
 
-class ApplicationSimulationObjectInterface(object, metaclass=ABCMeta):  # pragma: no cover
+class SimulationObjectInterface(object, metaclass=ABCMeta):  # pragma: no cover
 
     @abc.abstractmethod
     def init_before_run(self):
@@ -580,34 +580,34 @@ class SimObjClassPriority(IntEnum):
     NINTH = 9
 
     @classmethod
-    def assign_decreasing_priority(cls, aso_classes):
+    def assign_decreasing_priority(cls, so_classes):
         """ Assign decreasing simultaneous execution priorities for a list of simulation object classes
 
         Args:
-            aso_classes (:obj:`iterator` of :obj:`ApplicationSimulationObject`): an iterator over
+            so_classes (:obj:`iterator` of :obj:`SimulationObject`): an iterator over
                 simulation object classes
 
         Raises:
-            :obj:`SimulatorError`: if too many :obj:`ApplicationSimulationObject`\ s are given
+            :obj:`SimulatorError`: if too many :obj:`SimulationObject`\ s are given
         """
-        if cls.LOW < len(aso_classes):
-            raise SimulatorError(f"Too many ApplicationSimulationObjects: {len(aso_classes)}")
-        for index, aso_class in enumerate(aso_classes):
-            aso_class.set_class_priority(SimObjClassPriority(index + 1))
+        if cls.LOW < len(so_classes):
+            raise SimulatorError(f"Too many SimulationObjects: {len(so_classes)}")
+        for index, so_class in enumerate(so_classes):
+            so_class.set_class_priority(SimObjClassPriority(index + 1))
 
     def __str__(self):
         return f'{self.name}: {self.value}'
 
 
-class ApplicationSimulationObjectMetadata(object):
-    """ Metadata for an :class:`ApplicationSimulationObject`
+class SimulationObjectMetadata(object):
+    """ Metadata for an :class:`SimulationObject`
 
     Attributes:
         event_handlers_dict (:obj:`dict`): maps message_type -> event_handler; provides the event
-            handler for each message type for a subclass of `SimulationObject`
+            handler for each message type for a subclass of :class:`BaseSimulationObject`
         event_handler_priorities (:obj:`dict`): maps message_type -> message_type priority; the highest
             priority is 0, and priority decreases with increasing priority values.
-        message_types_sent (:obj:`set`): the types of messages a subclass of `SimulationObject` has
+        message_types_sent (:obj:`set`): the types of messages a subclass of :class:`BaseSimulationObject` has
             registered to send
     """
 
@@ -618,7 +618,7 @@ class ApplicationSimulationObjectMetadata(object):
         self.class_priority = SimObjClassPriority.LOW
 
 
-class ApplicationSimulationObjMeta(type):
+class SimulationObjMeta(type):
     # event handler mapping keyword
     EVENT_HANDLERS = 'event_handlers'
     # messages sent list keyword
@@ -630,24 +630,24 @@ class ApplicationSimulationObjMeta(type):
         """
         Args:
             cls (:obj:`class`): this class
-            clsname (:obj:`str`): name of the :class:`SimulationObject` subclass being created
+            clsname (:obj:`str`): name of the :class:`BaseSimulationObject` subclass being created
             superclasses (:obj:`tuple`): tuple of superclasses
-            namespace (:obj:`dict`): namespace of subclass of `ApplicationSimulationObject` being created
+            namespace (:obj:`dict`): namespace of subclass of :obj:`SimulationObject` being created
 
         Returns:
-            :obj:`SimulationObject`: a new instance of a subclass of `SimulationObject`
+            :obj:`SimulationObject`: a new instance of a subclass of :class:`BaseSimulationObject`
 
         Raises:
             :obj:`SimulatorError`: if class priority is not an `int`,
-                or if the :obj:`ApplicationSimulationObject` doesn't define `messages_sent` or `event_handlers`,
+                or if the :obj:`SimulationObject` doesn't define `messages_sent` or `event_handlers`,
                 or if handlers in `event_handlers` don't refer to methods in the
-                    :obj:`ApplicationSimulationObject`,
+                    :obj:`SimulationObject`,
                 or if `event_handlers` isn't an iterator over pairs,
                 or if a message type sent isn't a subclass of EventMessage,
                 or if `messages_sent` isn't an iterator over pairs.
         """
-        # Short circuit when ApplicationSimulationObject is defined
-        if clsname == 'ApplicationSimulationObject':
+        # Short circuit when SimulationObject is defined
+        if clsname == 'SimulationObject':
             return super().__new__(cls, clsname, superclasses, namespace)
 
         EVENT_HANDLERS = cls.EVENT_HANDLERS
@@ -655,9 +655,9 @@ class ApplicationSimulationObjMeta(type):
         CLASS_PRIORITY = cls.CLASS_PRIORITY
 
         new_application_simulation_obj_subclass = super().__new__(cls, clsname, superclasses, namespace)
-        new_application_simulation_obj_subclass.metadata = ApplicationSimulationObjectMetadata()
+        new_application_simulation_obj_subclass.metadata = SimulationObjectMetadata()
 
-        # use 'abstract' to indicate that an ApplicationSimulationObject should not be instantiated
+        # use 'abstract' to indicate that an SimulationObject should not be instantiated
         if 'abstract' in namespace and namespace['abstract'] is True:
             return new_application_simulation_obj_subclass
 
@@ -683,7 +683,7 @@ class ApplicationSimulationObjMeta(type):
         if CLASS_PRIORITY in namespace:
             class_priority = namespace[CLASS_PRIORITY]
             if not isinstance(class_priority, int):
-                raise SimulatorError(f"ApplicationSimulationObject '{clsname}' {CLASS_PRIORITY} must be "
+                raise SimulatorError(f"SimulationObject '{clsname}' {CLASS_PRIORITY} must be "
                                      f"an int, but '{class_priority}' is a {type(class_priority).__name__}")
 
         for superclass in superclasses:
@@ -707,13 +707,13 @@ class ApplicationSimulationObjMeta(type):
 
         # either messages_sent or event_handlers must contain values
         if (not event_handlers and not messages_sent):
-            raise SimulatorError("ApplicationSimulationObject '{}' definition must inherit or provide a "
+            raise SimulatorError("SimulationObject '{}' definition must inherit or provide a "
                                  "non-empty '{}' or '{}'.".format(clsname, EVENT_HANDLERS, MESSAGES_SENT))
         elif not event_handlers:
-            warnings.warn("ApplicationSimulationObject '{}' definition does not inherit or provide a "
+            warnings.warn("SimulationObject '{}' definition does not inherit or provide a "
                           "non-empty '{}'.".format(clsname, EVENT_HANDLERS))
         elif not messages_sent:
-            warnings.warn("ApplicationSimulationObject '{}' definition does not inherit or provide a "
+            warnings.warn("SimulationObject '{}' definition does not inherit or provide a "
                           "non-empty '{}'.".format(clsname, MESSAGES_SENT))
 
         if event_handlers:
@@ -726,7 +726,7 @@ class ApplicationSimulationObjMeta(type):
                         try:
                             handler = namespace[handler]
                         except Exception:
-                            errors.append("ApplicationSimulationObject '{}' definition must define "
+                            errors.append("SimulationObject '{}' definition must define "
                                           "'{}'.".format(clsname, handler))
                     if not isinstance(handler, str) and not callable(handler):
                         errors.append("handler '{}' must be callable".format(handler))
@@ -739,7 +739,7 @@ class ApplicationSimulationObjMeta(type):
                 new_application_simulation_obj_subclass.register_handlers(
                     new_application_simulation_obj_subclass, resolved_handers)
             except (TypeError, ValueError):
-                raise SimulatorError("ApplicationSimulationObject '{}': '{}' must iterate over pairs".format(
+                raise SimulatorError("SimulationObject '{}': '{}' must iterate over pairs".format(
                     clsname, EVENT_HANDLERS))
 
         if messages_sent:
@@ -748,32 +748,31 @@ class ApplicationSimulationObjMeta(type):
                 for msg_type in messages_sent:
                     if not issubclass(msg_type, EventMessage):
                         errors.append("'{}' in '{}' must be a subclass of EventMessage".format(
-                            msg_type.__name__, MESSAGES_SENT))
+                                      msg_type.__name__, MESSAGES_SENT))
                 if errors:
                     raise SimulatorError("\n".join(errors))
                 new_application_simulation_obj_subclass.register_sent_messages(
                     new_application_simulation_obj_subclass, messages_sent)
             except (TypeError, ValueError):
-                raise SimulatorError("ApplicationSimulationObject '{}': '{}' must iterate over "
+                raise SimulatorError("SimulationObject '{}': '{}' must iterate over "
                                      "EventMessages".format(clsname, MESSAGES_SENT))
 
         # return the class to instantiate it
         return new_application_simulation_obj_subclass
 
 
-class AppSimObjAndABCMeta(ApplicationSimulationObjMeta, ConcreteABCMeta):
+class SimulationObjectAndABCMeta(SimulationObjMeta, ConcreteABCMeta):
     """ A concrete class based on two Meta classes to be used as a metaclass for classes derived from both
     """
     pass
 
 
-class ApplicationSimulationObject(SimulationObject, ApplicationSimulationObjectInterface,
-                                  metaclass=AppSimObjAndABCMeta):
+class SimulationObject(BaseSimulationObject, SimulationObjectInterface, metaclass=SimulationObjectAndABCMeta):
     """ Base class for all simulation objects in a simulation
 
     Attributes:
-        metadata (:obj:`ApplicationSimulationObjectMetadata`): metadata for event message sending and handling,
-            initialized by `AppSimObjAndABCMeta`
+        metadata (:obj:`SimulationObjectMetadata`): metadata for event message sending and handling,
+            initialized by `SimulationObjectAndABCMeta`
     """
 
     def init_before_run(self):
@@ -793,11 +792,11 @@ class ApplicationSimulationObject(SimulationObject, ApplicationSimulationObjectI
     def set_class_priority(cls, priority):
         """ Set the execution priority for a simulation object class, `class_priority`
 
-        Use this to set the `class_priority` of a subclass of :obj:`SimulationObject` after it
+        Use this to set the `class_priority` of a subclass of :class:`BaseSimulationObject` after it
             has been constructed.
 
         Args:
             priority (:obj:`SimObjClassPriority`): the desired `class_priority` for a subclass
-                of :obj:`SimulationObject`
+                of :class:`BaseSimulationObject`
         """
-        setattr(cls.metadata, ApplicationSimulationObjMeta.CLASS_PRIORITY, priority)
+        setattr(cls.metadata, SimulationObjMeta.CLASS_PRIORITY, priority)

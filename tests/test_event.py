@@ -8,7 +8,7 @@
 import unittest
 
 from de_sim.event import iterable_not_str, nested_elements_to_str
-from de_sim.simulation_object import (ApplicationSimulationObjMeta, SimObjClassPriority)
+from de_sim.simulation_object import (SimulationObjMeta, SimObjClassPriority)
 from de_sim.testing.example_simulation_objects import ExampleSimulationObject
 from de_sim.testing.some_message_types import InitMsg, Eg1, MsgWithAttrs
 from wc_utils.util.list import elements_to_str
@@ -35,7 +35,7 @@ class TestEvent(unittest.TestCase):
     def test_get_order_time(self):
         event_time = 1
         e = de_sim.Event(0, event_time, self.sim_obj_a, self.sim_obj_a, InitMsg())
-        class_priority_attr = ApplicationSimulationObjMeta.CLASS_PRIORITY
+        class_priority_attr = SimulationObjMeta.CLASS_PRIORITY
         self.assertEqual(e._get_order_time(),
                          (event_time, getattr(ExampleSimulationObject, class_priority_attr),
                           self.sim_obj_a.event_time_tiebreaker))
@@ -52,7 +52,7 @@ class TestEvent(unittest.TestCase):
         self.comparison(e1, e3)
 
         # Events with equal event times and recipients in different classes
-        class ASOwithLowPriority(de_sim.ApplicationSimulationObject):
+        class SOwithLowPriority(de_sim.SimulationObject):
             def handler(self, event):
                 pass
             event_handlers = [(InitMsg, 'handler')]
@@ -60,18 +60,18 @@ class TestEvent(unittest.TestCase):
             class_priority = SimObjClassPriority.LOW
 
         # give lower priority sim object a name that sorts before 'a'
-        new_sim_obj_a = ASOwithLowPriority('Z')
+        new_sim_obj_a = SOwithLowPriority('Z')
         e4 = de_sim.Event(0, 1, self.sim_obj_a, new_sim_obj_a, InitMsg())
         self.comparison(e1, e4)
 
         # Events with equal event times and recipients in different classes
-        class ASOwithDefaultLowPriority(de_sim.ApplicationSimulationObject):
+        class SOwithDefaultLowPriority(de_sim.SimulationObject):
             def handler(self, event):
                 pass
             event_handlers = [(InitMsg, 'handler')]
 
         # give lower priority sim object a name that sorts before 'a'
-        new_sim_obj_a = ASOwithDefaultLowPriority('Z')
+        new_sim_obj_a = SOwithDefaultLowPriority('Z')
         e4 = de_sim.Event(0, 1, self.sim_obj_a, new_sim_obj_a, InitMsg())
         self.comparison(e1, e4)
 

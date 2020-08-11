@@ -27,7 +27,7 @@ class RecordTrajectory(de_sim.EventMessage):
 MESSAGE_TYPES = [SusceptibleToInfectious, InfectiousToRecovered, RecordTrajectory]
 
 
-class SIR(de_sim.ApplicationSimulationObject):
+class SIR(de_sim.SimulationObject):
     """ Implement a Susceptible, Infectious, or Recovered (SIR) epidemic model
 
     This example uses DE-Sim to implement a continuous-time Markov chain (CTMC) SIR

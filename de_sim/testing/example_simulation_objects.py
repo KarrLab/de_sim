@@ -14,7 +14,7 @@ ALL_MESSAGE_TYPES = [InitMsg, Eg1]
 TEST_SIM_OBJ_STATE = 'Test SimulationObject state'
 
 
-class ExampleSimulationObject(de_sim.ApplicationSimulationObject):
+class ExampleSimulationObject(de_sim.SimulationObject):
 
     def __init__(self, name, **kwargs):
         super().__init__(name, **kwargs)
@@ -38,7 +38,7 @@ class ExampleSimulationObject(de_sim.ApplicationSimulationObject):
     class_priority = SimObjClassPriority.HIGH
 
 
-class ImproperlyRegisteredSimulationObject(de_sim.ApplicationSimulationObject):
+class ImproperlyRegisteredSimulationObject(de_sim.SimulationObject):
 
     # register the event handler for each type of message received
     event_handlers = [(Eg1, 'handler')]

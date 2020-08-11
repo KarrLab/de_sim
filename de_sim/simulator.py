@@ -425,7 +425,7 @@ class Simulator(object):
                 for e in next_events:
                     e_name = ' - '.join([next_sim_obj.__class__.__name__, next_sim_obj.name, e.message.__class__.__name__])
                     self.event_counts[e_name] += 1
-                next_sim_obj._SimulationObject__handle_event_list(next_events)
+                next_sim_obj._BaseSimulationObject__handle_event_list(next_events)
                 self.num_events_handled += 1
                 self.progress.progress(next_time)
 

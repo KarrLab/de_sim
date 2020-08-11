@@ -14,7 +14,6 @@ from wc_utils.util.rand import RandomStateManager
 from de_sim.simulation_checkpoint_object import (AbstractCheckpointSimulationObject,
                                                  CheckpointSimulationObject,
                                                  AccessStateObjectInterface)
-from de_sim.simulation_object import ApplicationSimulationObject
 from de_sim.errors import SimulatorError
 from de_sim.checkpoint import AccessCheckpoints
 import de_sim
@@ -37,7 +36,7 @@ class MessageSentToSelf(de_sim.EventMessage):
     "A message that's sent to self"
 
 
-class PeriodicLinearUpdatingSimuObj(ApplicationSimulationObject):
+class PeriodicLinearUpdatingSimuObj(de_sim.SimulationObject):
     """ Sets a shared value to a linear function of the simulation time
     """
 
