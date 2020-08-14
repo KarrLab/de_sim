@@ -227,6 +227,14 @@ Object-oriented DES terminology often describes the event message as being sent 
     2. **`messages_sent`**: the types of messages sent by a subclass of `SimulationObject` must be listed in `messages_sent`. It ensures that a simulation object doesn't send messages of the wrong `EventMessage` class.
     3. **`time`**: `time` is a read-only attribute that always equals the current simulation time in every simulation object. For example, a `RandomWalkSimulationObject` saves the value of `time` when recording its history.
 
+![**Trajectory of a simulation of a model of a random walk on the integer number line.**
+The random walk model starts at position 0 and moves +1 or -1 with equal probability at each step.
+Steps take place every 1 or 2 time units, also with equal probability.
+This trajectory illustrates two key characteristics of discrete-event models. First, the state, in this case the position, changes at discrete times.
+Second, since the state does not change between instantaneous events, the trajectory of any state variable is a step function.
+The source code for this model is available in the DE-Sim Git repository.
+\label{fig:random_walk_trajectory}](random_walk_trajectory.png)
+
 3: Execute a simulation by creating and initializing a `Simulator`, and running the simulation.
 
 The `Simulator` class simulates models.
@@ -263,14 +271,6 @@ plt.show()
 ```
 This example runs a simulation for `max_time` time units, and plots the random walk’s trajectory (\autoref{fig:random_walk_trajectory}).
 This tutorial and additional examples are available in a [Jupyter notebook](https://sandbox.karrlab.org/notebooks/de_sim/1.%20DE-Sim%20tutorial.ipynb).
-
-![**Trajectory of a simulation of a model of a random walk on the integer number line.**
-The random walk model starts at position 0 and moves +1 or -1 with equal probability at each step.
-Steps take place every 1 or 2 time units, also with equal probability.
-This trajectory illustrates two key characteristics of discrete-event models. First, the state, in this case the position, changes at discrete times.
-Second, since the state does not change between instantaneous events, the trajectory of any state variable is a step function.
-The source code for this model is available in the DE-Sim Git repository.
-\label{fig:random_walk_trajectory}](random_walk_trajectory.png)
 
 # Performance of DE-Sim
 
