@@ -246,6 +246,7 @@ plt.ylabel('position')
 plt.show()
 ```
 This runs a simulation for `max_time` time units, and plots the random walk’s trajectory (\autoref{fig:random_walk_trajectory}).
+This tutorial and additional examples are available in a [Jupyter notebook](https://sandbox.karrlab.org/notebooks/de_sim/1.%20DE-Sim%20tutorial.ipynb).
 
 ![**Trajectory of a simulation of a model of a random walk on the integer number line.**
 The random walk model starts at position 0 and moves +1 or -1 with equal probability at each step.
@@ -254,8 +255,6 @@ This trajectory illustrates two key characteristics of discrete-event models. Fi
 Second, as a consequence of the first characteristic, the state does not change in between instantaneous events, and the trajectory of any state variable is a step function.
 The source code for this model is available in the DE-Sim Git repository.
 \label{fig:random_walk_trajectory}](random_walk_trajectory.png)
-
-This tutorial and additional examples are available in a [Jupyter notebook](https://sandbox.karrlab.org/notebooks/de_sim/1.%20DE-Sim%20tutorial.ipynb).
 
 # Performance of DE-Sim
 
@@ -270,30 +269,30 @@ The number of simulation objects in the ring is given by **Nodes**.
 
 # Case study: a multi-algorithmic simulation tool for whole-cell modeling implemented using DE-Sim
 
-We have used DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a multi-algorithmic simulation tool that simulates comprehensive whole-cell models of the biochemical dynamics inside biological cells [@karr2015principles; @goldberg2018emerging; @karr2012whole]. 
+We have used DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a multi-algorithmic simulator for comprehensive whole-cell models of the biochemical dynamics inside biological cells [@karr2015principles; @goldberg2018emerging; @karr2012whole]. 
 Whole-cell models which predict phenotype from genotype by representing all of the biochemical activity in a cell have great potential to help scientists elucidate the basis of cellular behavior, help bioengineers rationally design biosensors and biomachines, and help physicians personalize medicine.
 
-Due to the diverse timescales of the reactions inside cells, one promising way to simulate whole-cell models is to simulate each reaction with an appropriate algorithm for its scale. For example, slow biochemical reactions, such as transcription, can be simulated with the Stochastic Simulation Algorithm (SSA, @gillespie1977exact). Faster processes, such as signal transduction, can be simulated with ordinary differential equations (ODEs). Metabolism, another fast process, can be simulated with flux-balance analysis (FBA, @orth2010flux). Simulating entire cells requires co-simulating SSA, ODE and FBA. However, tools for co-simulating these algorithms do not exist.
+Due to the diverse timescales of the reactions inside cells, one promising way to simulate whole-cell models is to simulate each reaction with an appropriate algorithm for its scale. For example, slow biochemical reactions, such as transcription, can be simulated with the Stochastic Simulation Algorithm (SSA, @gillespie1977exact). Faster processes, such as signal transduction, can be simulated with ordinary differential equations (ODEs). Metabolism, another fast process, can be simulated with flux-balance analysis (FBA, @orth2010flux). Simulating entire cells requires co-simulating SSA, ODE and FBA. However, tools for co-simulating these algorithms did not exist.
 
 To accelerate whole-cell modeling, we have created WC-Sim, a tool for simulating multi-algorithmic whole-cell models described in the WC-Lang language [@karr2020wc_lang].
-We implemented WC-Sim by using DE-Sim to construct a simulation object class for each of SSA, ODE, and FBA.
-DE-Sim event messages schedule the activities of each simulation object, while the exact simulation time of events is used to coordinate the objects’ shared access to the counts of molecules that represent the shared state of the cell.
-DE-Sim’s object-oriented modeling functionality made it easy to separately develop SSA, ODE, and FBA simulation objects and compose them into a multi-algorithmic simulator.
-DE-Sim’s discrete-event framework provided the control needed to  synchronize the interactions between these classes of objects.
-In addition, accessing Python's data-science tools greatly reduced the effort required to build WC-Sim. We used NumPy's random number generator for stochastic simulation, and its arrays to store and compare molecule counts; DataFrames in pandas to store simulation predictions and transfer them to and from files; networkx’s [@hagberg2008exploring] directed graphs and DFS algorithm to analyze reaction network dependencies; the ODE solver  in scikits.ODES [@malengier2018odes] to determine the time derivatives of molecule counts; and matplotlib [@Hunter:2007] to visualize simulation predictions.
-We anticipate that WC-Sim will enable researchers to conduct unprecedented simulation experiments about cellular biochemistry.
+We implemented WC-Sim by using DE-Sim to construct separate simulation object classes for SSA, ODE, and FBA.
+A cell’s state is given by the population of its molecular species, which are stored in a shared object.
+DE-Sim event messages schedule the activities of each simulation object, while the exact simulation time of events is used to coordinate the objects’ shared access to the cell’s state.
+DE-Sim’s object-oriented modeling functionality made it easy to separately develop SSA, ODE, and FBA simulation object classes and compose them into a multi-algorithmic simulator.
+DE-Sim’s discrete-event framework provided the control needed to  synchronize the interactions between these classes.
+In addition, accessing Python's data-science tools reduced the effort required to build WC-Sim. 
+We use NumPy's random number generator for stochastic simulation, and its arrays to store and compare molecule counts; pandas DataFrames store simulation predictions and transfer them to and from files; networkx’s [@hagberg2008exploring] directed graphs and DFS algorithm analyze reaction network dependencies; the ODE solver in scikits.ODES [@malengier2018odes] determines the rate of change of species populations modeled by ODEs; and matplotlib [@Hunter:2007] visualizes simulation predictions.
+We anticipate that WC-Sim will enable researchers to conduct unprecedented simulation studies of cellular biochemistry.
 
-# Conclusion
+# Conclusions
 
-[summarize DE-Sim]
-DE-Sim is an object-oriented, discrete-event simulation tool in Python.
-We encourage researchers who wish to use discrete-event models to understand the dynamics of complex systems to try DE-Sim.
-Its ability to use object-oriented 
-object-o
-build and simulate models of 
-[what might DE-Sim enable?]
+[DE-Sim]( https://pypi.org/project/de-sim/) is an open-source, object-oriented, discrete-event simulation tool implemented in Python.
+We encourage researchers who use discrete-event models to understand the dynamics of complex systems to try DE-Sim because it combines two features not available together in other tools.
+First, discrete-event models defined in DE-Sim are constructed from multiple, interacting simulation objects.
+This gives modelers the ability to intuitively model a complex system that contains multiple types of interacting components by encoding each component as a different DE-Sim simulation object class.
+Second, to conveniently store, manage and analyze the large, heterogeneous data needed by models of complex systems, modelers using DE-Sim can access Python’s extensive library of data science.
 
-complex, data-driven modeling
+We anticipate that DE-Sim will enable the construction and use of ambitiously detailed models of complex systems, and that simulation studies conducted with these models contribute to important engineering innovations and scientific discoveries.
 
 # Availability of DE-Sim
 
