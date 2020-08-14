@@ -27,22 +27,27 @@ bibliography: paper.bib
 
 Recent advances in data collection and storage have created unprecedented opportunities to gain insights into complex systems such as the biochemical networks that generate cellular behavior. 
 Understanding the behavior of such systems will likely require larger and more comprehensive dynamical models that are based on a combination of first principles and large datasets.
-The first principles typically use mechanistic descriptions of the interactions within a system to develop mathematical representations that can be parameterized by data.
-Large models often contain multiple types of components, and multiple types of interactions between components. 
+Large models often contain multiple types of components, and multiple types of interactions between component types. 
+The first principles often use a mechanistic approximation of the interactions in a system, such as reactants in a chemical reaction may bond when they collide, to derive mathematics that must be parameterized by data.
+
 One of the most promising methods for building and simulating large, data-driven dynamical models is to simulate them with discrete-event simulation (DES) [@fishman2013discrete].
-For example, discrete-event simulations are frequently used to study the dynamics of biochemical networks, characterize the performance of computer networks, evaluate potential war strategies, and forecast epidemics [@banks2005discrete].
+For example, discrete-event simulations are frequently used to study the dynamics of biochemical networks, characterize the performance of computer networks, evaluate potential military strategies, and forecast epidemics [@banks2005discrete].
 However, it is difficult to design, encode and simulate large, comprehensive models of complex systems as discrete-event simulations because the existing DES tools lack adequate expressive power.
-We present DE-Sim ([https://github.com/KarrLab/de_sim](https://github.com/KarrLab/de_sim)) an object-oriented (OO), Python-based DES tool that makes it easier to create and use dynamical models of complex systems.
-Because DE-Sim encodes discrete-event simulations in OO Python programs, numerous types of complex interactions can be modeled by leveraging Python's powerful OO features.
-In addition, because DE-Sim is implemented in Python, DE-Sim models can easily use Python's powerful data science tools such as pandas and SciPy to help build complex models, to analyze and store data during simulations, and to analyze simulation results.
-We anticipate the DE-Sim will enable a new generation of models that capture systems with unprecedented breadth and depth.
-We are already using DE-Sim to develop a multi-algorithm simulation tool for whole-cell models that predict phenotype from genotype by capturing all of the biochemical activity in a biological cell.
+
+To address this problem, we present DE-Sim an [open-source](https://github.com/KarrLab/de_sim), object-oriented (OO), Python-based DES tool that makes it easier to create and use dynamical models of complex systems.
+Because DE-Sim encodes discrete-event simulations in OO Python programs, numerous types of components and complex interactions can be modeled by leveraging Python's powerful OO features.
+In addition, because DE-Sim is implemented in Python, DE-Sim models can easily use Python's powerful data science tools such as pandas and SciPy to help build complex models, to store and analyze data during simulations, and to analyze simulation results.
+We anticipate that DE-Sim will enable a new generation of models which capture systems with unprecedented breadth and depth.
+An initial example is a multi-algorithmic simulation tool we are developing on DE-Sim to simulate whole-cell models that predict phenotype from genotype by capturing all of the biochemical activity in a biological cell.
 
 # The need for tools that help researchers build and simulate complex models
 
-DE-Sim simplifies the construction and simulation of *discrete-event models* which represent the dynamics of a system as a sequence of instantaneous events. 
+Many scientific fields can now collect detailed data about the components of complex systems and their interactions. For example, the revolution in deep sequencing has dramatically increased the availability of molecular data.
+When the measurements of a complex system generate a large, heterogeneous dataset, models of the system that use the measurements are invariably complex because the dataset contains measurements of many types of components, and many instances of each component.
+For example, measurements of the biochemistry in a cell collect the properties of many types of molecules, of many types of processes that transform or translocate molecules, and many instances of each type, which leads to complex models of cells.
 
-Recent advances in data collection have enabled many scientific fields to collect detailed data about the components of complex systems and their interactions. For example, the revolution in deep sequencing has dramatically increased the availability of molecular data. These data be used to parameterize discrete-event models. Dynamical models constructed with DE-Sim can leverage Python's extensive suite of high-quality data science tools to easily manage and integrate large, heterogeneous, multidimensional data into models. For example, tools such as NumPy [@oliphant2006guide], pandas [@mckinney2010data], SciPy [@virtanen2020scipy], and SQLAlchemy [@bayer2020sqlalchemy] can be used by DE-Sim models to store and integrate model inputs, simplify analyses and data storage during simulation, and organize and save predictions for downstream analysis.
+DE-Sim simplifies the construction and simulation of *discrete-event models* which represent the dynamics of a complex system as a sequence of instantaneous events. 
+Dynamical models constructed with DE-Sim can leverage Python's extensive suite of high-quality data science tools to easily manage and integrate large, heterogeneous, multidimensional data into models. For example, tools such as NumPy [@oliphant2006guide], pandas [@mckinney2010data], SciPy [@virtanen2020scipy], and SQLAlchemy [@bayer2020sqlalchemy] can be used by DE-Sim models to store and integrate model inputs, simplify analyses and data storage during simulation, and organize and save predictions for downstream analysis.
 
 The complexity of large discrete-event models makes them challenging to construct. DE-Sim addresses this challenge by structuring discrete-event models as object-oriented programs. This approach, known as *object-oriented discrete-event simulation* (OO DES), implements the component types in models as simulation object classes and implements their interaction events as messages that schedule the simulations objects to execute events at specific times [@zeigler1987hierarchical]. With DE-Sim, users define classes of simulation object by subclassing DE-Sim’s base simulation object class and specifying their behavior. Complex systems that contain multiple types of components can be easily modeled in DE-Sim by creating multiple classes of simulation objects. Users can model arbitrarily many instances of a type of component by creating multiple instances of the corresponding simulation object class. DE-Sim simulation object classes can exploit all the features of Python objects. For example, hierarchical relationships among the components in a system being modeled can be mirrored by subclass relationships among the simulation object classes that represent the components in a DE-Sim model. Thus, a model of a biochemical system that represents macromolecule components such as DNA and RNA could define a macromolecule class, and then define DNA and RNA subclasses of the macromolecule class. 
 In our experience, DE-Sim’s use of OO programming to construct discrete-event models simplifies and accelerates the design and development of models.
@@ -317,4 +322,3 @@ We thank Yin Hoon Chew for her helpful feedback on this paper. This worked was s
 Institutes of Health [award R35GM119771 to J.R.K], and the Icahn Institute for Data Science and Genomic Technology.
 
 # References
-
