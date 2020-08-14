@@ -123,7 +123,7 @@ The random walk model sends event messages that contain the value of a random st
 import de_sim
 
 class RandomStepMessage(de_sim.EventMessage):
-    " An event message class that specifies the value of a random walk step "
+    " An event message class that stores the value of a random walk step "
     attributes = ['step']
 ```
 The attribute `attributes` in the definition of `RandomStepMessage` is a special attribute of a `EventMessage` that specifies the names of a message class' attributes.
@@ -229,7 +229,8 @@ simulator = de_sim.Simulator()
 random_walk_sim_obj = RandomWalkSimulationObject('rand_walk')
 simulator.add_object(random_walk_sim_obj)
 
-# Initialize the simulation, which executes ` init_before_run in `random_walk_sim_obj`
+# Initialize the simulation
+# This executes `init_before_run in `random_walk_sim_obj`
 simulator.initialize()
 
 # Run the simulation until time 10
@@ -284,6 +285,16 @@ We anticipate that WC-Sim will enable researchers to conduct unprecedented simul
 
 # Conclusion
 
+[summarize DE-Sim]
+DE-Sim is an object-oriented, discrete-event simulation tool in Python.
+We encourage researchers who wish to use discrete-event models to understand the dynamics of complex systems to try DE-Sim.
+Its ability to use object-oriented 
+object-o
+build and simulate models of 
+[what might DE-Sim enable?]
+
+complex, data-driven modeling
+
 # Availability of DE-Sim
 
 DE-Sim is freely and openly available under the MIT license at the locations below.
@@ -307,3 +318,4 @@ We thank Yin Hoon Chew for her helpful feedback on this paper. This worked was s
 Institutes of Health [award R35GM119771 to J.R.K], and the Icahn Institute for Data Science and Genomic Technology.
 
 # References
+
