@@ -259,12 +259,12 @@ This tutorial and additional examples are available in a [Jupyter notebook](http
 # Performance of DE-Sim
 
 \autoref{fig:performance} shows the performance of DE-Sim simulating a model of a cyclic messaging network over range of network sizes.
+The code for this performance test is available in the DE-Sim Git repository and a [Jupyter notebook that runs the test](https://sandbox.karrlab.org/notebooks/de_sim/4.%20DE-Sim%20performance%20test.ipynb).
 
 ![**Performance of DE-Sim simulating a model of a cyclic messaging network over a range of network sizes.** Each statistic represents the average of three simulation runs in a Docker container on a 2.9 GHz Intel Core i5 processor. 
 The cyclic messaging network model consists of a ring of simulation objects. Each simulation object executes an event at every time unit and schedules an event for the next object in the ring 1 time unit in the future. 
 Each simulation run executes for 100 time units.
-The number of simulation objects in the ring is given by **Nodes**. 
-The code for this performance test is available in the DE-Sim Git repository and a Jupyter notebook that [runs the test](https://sandbox.karrlab.org/notebooks/de_sim/4.%20DE-Sim%20performance%20test.ipynb).
+The number of simulation objects in the ring is given by **Nodes**.
 \label{fig:performance}](performance.pdf)
 
 # Case study: a multi-algorithmic simulation tool for whole-cell modeling implemented using DE-Sim
