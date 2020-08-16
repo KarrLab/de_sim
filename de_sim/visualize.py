@@ -110,7 +110,7 @@ class SpaceTime(object):
         ax.get_xaxis().set_ticks([])
         plt.xlim(0, 1)
         min_time, max_time = self.get_min_max_times()
-        plt.ylim(min_time, max_time)
+        plt.ylim(min_time, 1.02 * max_time) # continue plot slightly beyond the last event
         ax.set_ylabel('Time', fontsize=10)
         plt.gca().invert_yaxis()
         plt.yticks(fontsize=8)
