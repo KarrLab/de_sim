@@ -19,22 +19,6 @@ import unittest
 class ExamplesTestCase(unittest.TestCase):
     TIMEOUT = 600
 
-    """
-    @classmethod
-    def setUpClass(cls):
-        sys.path.insert(0, 'examples')
-
-    @classmethod
-    def tearDownClass(cls):
-        sys.path.remove('examples')
-
-    def setUp(self):
-        self.dirname = tempfile.mkdtemp()
-
-    def tearDown(self):
-        shutil.rmtree(self.dirname)
-    """
-
     def test_jupyter(self):
         failed_notebooks = []
         for filename in glob.glob('de_sim/examples/jupyter_examples/*.ipynb'):
@@ -46,8 +30,7 @@ class ExamplesTestCase(unittest.TestCase):
             try:            
                 execute_preprocessor.preprocess(notebook, {'metadata': {'path': 'de_sim/examples/jupyter_examples'}})
             except Exception as e:
-                failed_notebooks.append(filename)
-                print(e)
+                failed_notebooks.append(f"Notebook {filename} failed with error '{e}'")
 
         if failed_notebooks:
             raise Exception('The following notebooks could not be executed:\n  {}'.format('\n  '.join(sorted(failed_notebooks))))
