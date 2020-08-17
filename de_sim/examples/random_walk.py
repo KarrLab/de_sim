@@ -1,4 +1,4 @@
-""" A simulation of a random walk where a variable is incremented or decremented with equal probability at each event
+""" A simulation of a random walk whose position is incremented or decremented with equal probability at each event
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2018-02-27
@@ -13,7 +13,7 @@ import de_sim
 
 
 class RandomStepMessage(de_sim.EventMessage):
-    "An event message class that specifies a random step"
+    """ An event message class that stores the value of a random walk step """
     attributes = ['step']
 
 
@@ -32,12 +32,6 @@ class RandomWalkSimulationObject(de_sim.SimulationObject):
     def __init__(self, name):
         super().__init__(name)
 
-    def schedule_next_step(self):
-        """ Schedule the next event, a step that moves -1 or +1 with equal probability """
-        step = random.choice([-1, +1])
-        # the time between steps is randomly 1 or 2, with equal probability
-        self.send_event(random.choice([1, 2]), self, RandomStepMessage(step))
-
     def init_before_run(self):
         """ Initialize before a simulation run; called by the simulator
 
@@ -48,19 +42,27 @@ class RandomWalkSimulationObject(de_sim.SimulationObject):
                         'positions': [0]}
         self.schedule_next_step()
 
-    def handle_step_event(self, event):
-        """ Handle a step event
+    def schedule_next_step(self):
+        """ Schedule the next event, which is a step """
+        # A step moves -1 or +1 with equal probability
+        step_value = random.choice([-1, +1])
+        # The time between steps is 1 or 2, with equal probability
+        delay = random.choice([1, 2])
+        # Schedule an event `delay` in the future for this object
+        # The event contains a `RandomStepMessage` with `step=step_value`
+        self.send_event(delay, self, RandomStepMessage(step_value))
 
-        Update the position and history
-        """
+    def handle_step_event(self, event):
+        """ Handle a step event """
+        # Update the position and history
         step = event.message.step
         self.position += step
         self.history['times'].append(self.time)
         self.history['positions'].append(self.position)
         self.schedule_next_step()
 
-    # event_handlers is a list of pairs that maps each event message type
-    # received by this simulation object class to the method that handles
+    # `event_handlers` contains pairs that map each event message class
+    # received by this simulation object to the method that handles
     # the event message class
     event_handlers = [(RandomStepMessage, handle_step_event)]
 
