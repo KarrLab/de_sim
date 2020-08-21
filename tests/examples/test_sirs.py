@@ -6,10 +6,11 @@
 :License: MIT
 """
 
-import unittest
-import random
-import warnings
 from capturer import CaptureOutput
+import random
+import tempfile
+import unittest
+import warnings
 
 from de_sim.examples.sirs import SIR, SIR2, RunSIRs
 
@@ -26,23 +27,26 @@ class TestSIRs(unittest.TestCase):
 
     def run_sir_test(self, sir_class):
         with CaptureOutput(relay=False) as capturer:
-            sir_args = dict(name='sir',
-                            s=98,
-                            i=2,
-                            N=100,
-                            beta=0.3,
-                            gamma=0.15,
-                            recording_period=10)
-            sir = RunSIRs.main(sir_class, time_max=60, seed=17, **sir_args)
-            RunSIRs.print_history(sir)
-            expected_output_strings = ['time', '\ts\t', '60\t', 'Executed']
-            for expected_output_string in expected_output_strings:
-                self.assertIn(expected_output_string, capturer.get_text())
+            with tempfile.TemporaryDirectory() as tmpdirname:
+                sir_args = dict(name='sir',
+                                s=98,
+                                i=2,
+                                N=100,
+                                beta=0.3,
+                                gamma=0.15,
+                                recording_period=10)
+                run_sirs = RunSIRs(tmpdirname)
+                run_sirs.simulate(sir_class, time_max=60, **sir_args)
+                run_sirs.print_history()
+                expected_output_strings = ['time', '\ts\t', '60.0\t', 'Executed']
+                for expected_output_string in expected_output_strings:
+                    self.assertIn(expected_output_string, capturer.get_text())
 
         with CaptureOutput(relay=False):
-            # test lambda_val == 0
-            sir_args['i'] = 0
-            RunSIRs.main(sir_class, time_max=20, seed=13, **sir_args)
+            with tempfile.TemporaryDirectory() as tmpdirname:
+                # test lambda_val == 0
+                sir_args['i'] = 0
+                RunSIRs(tmpdirname).simulate(sir_class, time_max=20, **sir_args)
 
     def test_run_sir(self):
         self.run_sir_test(SIR)
@@ -61,11 +65,14 @@ class TestSIRs(unittest.TestCase):
                                 beta=0.3,
                                 gamma=0.15,
                                 recording_period=10)
-                seed = random.randrange(1E6)
-                sir = RunSIRs.main(sir_class, time_max=60, seed=seed, **sir_args)
-                # consider an outbreak to be minor if no infections remain and fewer than 10 people were infected
-                if sir.history[-1]['i'] == 0 and 90 < sir.history[-1]['s']:
-                    num_minor_outbreaks += 1
+                with tempfile.TemporaryDirectory() as tmpdirname:
+                    run_sirs = RunSIRs(tmpdirname)
+                    run_sirs.simulate(sir_class, time_max=60, **sir_args)
+
+                    # consider an outbreak to be minor if no infections remain and fewer than 10 people were infected
+                    last_checkpoint_state = run_sirs.last_checkpoint().state
+                    if last_checkpoint_state['i'] == 0 and 90 < last_checkpoint_state['s']:
+                        num_minor_outbreaks += 1
         p_minor_outbreak = num_minor_outbreaks / ensemble_size
         expected_p_minor_outbreak = 0.25
         self.assertGreater(p_minor_outbreak, 0.5 * expected_p_minor_outbreak)
