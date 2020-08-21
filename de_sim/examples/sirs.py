@@ -8,7 +8,6 @@
 
 import enum
 import numpy
-import tempfile
 
 import de_sim
 from de_sim.checkpoint import AccessCheckpoints, Checkpoint
