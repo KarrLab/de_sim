@@ -37,7 +37,7 @@ class Event(object):
             to improve performance
         message (:obj:`EventMessage`): an :obj:`EventMessage` carried by the event; its type
             provides the simulation application's type for an `Event`; it may also carry a payload
-            for the `Event` in its attributes.
+            for the `Event` in its `msg_field_names`.
     """
     # TODO(Arthur): for performance, perhaps pre-allocate and reuse events
 

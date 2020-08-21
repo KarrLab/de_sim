@@ -136,11 +136,11 @@ import de_sim
 
 class RandomStepMessage(de_sim.EventMessage):
     "An event message class that stores the value of a random walk step"
-    attributes = ['step']
+    msg_field_names = ['step']
 ```
-The attribute `attributes` is a special attribute of a `EventMessage` that specifies the names of an event message class' attributes.
+The attribute `msg_field_names` is a special attribute of a `EventMessage` that specifies the names of an event message class' attributes.
 These names must be valid Python identifiers.
-`attributes` is optional. 
+`msg_field_names` is optional. 
 
 An event message class must be documented by a docstring, as illustrated.
 

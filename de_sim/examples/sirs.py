@@ -119,7 +119,7 @@ class SIR(de_sim.SimulationObject):
 ### SIR epidemic model, version 2 ###
 class TransitionMessage(de_sim.EventMessage):
     "Message for all model transitions"
-    attributes = ['transition_type']
+    msg_field_names = ['transition_type']
 
 
 MESSAGE_TYPES = [TransitionMessage]

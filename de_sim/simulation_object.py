@@ -78,7 +78,7 @@ class EventQueue(object):
                 to be global identifiers.
             message (:obj:`EventMessage`): an :obj:`EventMessage` carried by the event; its type
                 provides the simulation application's type for an `Event`; it may also carry a payload
-                for the `Event` in its attributes.
+                for the `Event` in its `msg_field_names`.
 
         Raises:
             :obj:`SimulatorError`: if `receive_time` < `send_time`, or `receive_time` or `send_time` is NaN

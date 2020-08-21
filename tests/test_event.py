@@ -92,7 +92,7 @@ class TestEvent(unittest.TestCase):
 
         class TestMsg(de_sim.EventMessage):
             'docstring'
-            attributes = ['attr1', 'attr2']
+            msg_field_names = ['attr1', 'attr2']
         vals = ['att1_val', 'att2_val']
         test_msg = TestMsg(*vals)
         times = (0, 1)
@@ -127,7 +127,7 @@ class TestEvent(unittest.TestCase):
         # self.assertEqual(data+vals, ev.render(as_list=True))
 
         class NoBodyMessage(de_sim.EventMessage):
-            """A message with no attributes"""
+            """A message with no `msg_field_names`"""
         ev2 = de_sim.Event(0, 1, ExampleSimulationObject('sender'), ExampleSimulationObject('receiver'),
                     NoBodyMessage())
         self.assertIn('\t'.join(de_sim.Event.BASE_HEADERS), ev2.custom_header())

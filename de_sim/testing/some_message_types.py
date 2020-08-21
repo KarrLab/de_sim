@@ -12,7 +12,7 @@ class Eg1(EventMessage):
 
 class MsgWithAttrs(EventMessage):
     'MsgWithAttrs event message'
-    attributes = ['attr1', 'attr2']
+    msg_field_names = ['attr1', 'attr2']
 
 
 class UnregisteredMsg(EventMessage):

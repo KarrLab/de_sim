@@ -89,7 +89,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
                 are returned as a string
 
         Returns:
-            :obj:`obj`: `None` if this message has no attributes, or a string representation of
+            :obj:`obj`: `None` if this message has no `msg_field_names`, or a string representation of
                 the attribute names for this :obj:`EventMessage`, or a :obj:`list`
                 representation if `as_list` is set
         """
@@ -111,10 +111,10 @@ class EventMessageInterface(object, metaclass=ABCMeta):
         return "EventMessage: {}({})".format(self.__class__.__name__, self.value_map())
 
     def attrs(self):
-        """ Provide a list of the attributes names for this :obj:`EventMessage`
+        """ Provide a list of the field names for this :obj:`EventMessage`
 
         Returns:
-            :obj:`list` of :obj:`str`: the attributes in this :obj:`EventMessage`
+            :obj:`list` of :obj:`str`: the `msg_field_names` in this :obj:`EventMessage`
         """
         return self.__slots__
 
@@ -127,7 +127,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
                 as a string
 
         Returns:
-            :obj:`obj`: `None` if this message has no attributes, or a string representation of
+            :obj:`obj`: `None` if this message has no `msg_field_names`, or a string representation of
                 the attribute names for this :obj:`EventMessage`, or a :obj:`list`
                 representation if `as_list` is set
         """
@@ -184,8 +184,8 @@ class EventMessageInterface(object, metaclass=ABCMeta):
 
 
 class EventMessageMeta(type):
-    # attributes mapping keyword
-    ATTRIBUTES = 'attributes'
+    # msg_field_names mapping keyword
+    MSG_FIELD_NAMES = 'msg_field_names'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -200,18 +200,18 @@ class EventMessageMeta(type):
                 clsname))
 
         attrs = {}
-        if cls.ATTRIBUTES in namespace:
+        if cls.MSG_FIELD_NAMES in namespace:
 
             # check types
-            attributes = namespace[cls.ATTRIBUTES]
-            if not (isinstance(attributes, list) and all([isinstance(attr, str) for attr in attributes])):
+            msg_field_names = namespace[cls.MSG_FIELD_NAMES]
+            if not (isinstance(msg_field_names, list) and all([isinstance(attr, str) for attr in msg_field_names])):
                 raise SimulatorError("'{}' must be a list of strings, but is '{}'".format(
-                    cls.ATTRIBUTES, attributes))
+                    cls.MSG_FIELD_NAMES, msg_field_names))
 
-            # error if attributes contains dupes
-            if not len(attributes) == len(set(attributes)):
-                raise SimulatorError("'{}' contains duplicates".format(cls.ATTRIBUTES))
-            attrs['__slots__'] = attributes
+            # error if msg_field_names contains dupes
+            if not len(msg_field_names) == len(set(msg_field_names)):
+                raise SimulatorError("'{}' contains duplicates".format(cls.MSG_FIELD_NAMES))
+            attrs['__slots__'] = msg_field_names
 
         new_simulation_message_class = super().__new__(cls, clsname, superclasses, attrs)
         if '__doc__' in namespace:
@@ -231,12 +231,12 @@ class EventMessage(EventMessageInterface, metaclass=CombinedEventMessageMeta):
 
         class ExampleEventMessage1(EventMessage):
             ''' Docstring '''
-            attributes = ['attr1', 'attr2']
+            msg_field_names = ['attr1', 'attr2']
 
-    defines the `ExampleEventMessage1` class with a short docstring and two attributes.
+    defines the `ExampleEventMessage1` class with a short docstring and two message fields.
 
     :obj:`EventMessage` subclasses must support the comparison operations `<`, `<=`, etc. This is
-    provided automatically for attributes that support comparison. Subclasses with message attributes
+    provided automatically for message fields that support comparison. Subclasses with message attributes
     that do not support comparison must override `__lt__`, `__le__`, etc.
     """
     pass
