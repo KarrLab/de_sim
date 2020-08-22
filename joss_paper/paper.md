@@ -97,7 +97,7 @@ import de_sim
 
 class RandomStepMessage(de_sim.EventMessage):
     "An event message storing the value of a step of a random walk"
-msg_field_names = ['step_value']
+    msg_field_names = ['step_value']
 
 ```
 
@@ -144,7 +144,7 @@ class RandomWalkSimulationObject(de_sim.SimulationObject):
         # The time between steps is 1 or 2, with equal probability
         delay = random.choice([1, 2])
         # Schedule an event `delay` in the future for this object
-        # The event contains a `RandomStepMessage` with `step_value=step_value`
+        # The event contains a `RandomStepMessage` storing `step_value`
         self.send_event(delay, self, RandomStepMessage(step_value))
 
     def handle_step_event(self, event):
@@ -275,3 +275,4 @@ We thank Yin Hoon Chew for her helpful feedback. This work was supported by the 
 Institutes of Health [R35GM119771 to JRK], and the Icahn Institute for Data Science and Genomic Technology.
 
 # References
+
