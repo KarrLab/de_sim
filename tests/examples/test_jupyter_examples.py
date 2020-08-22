@@ -7,6 +7,7 @@
 :License: MIT
 """
 
+import itertools
 import glob
 import json
 import nbconvert.preprocessors
@@ -21,7 +22,8 @@ class ExamplesTestCase(unittest.TestCase):
 
     def test_jupyter(self):
         failed_notebooks = []
-        for filename in glob.glob('de_sim/examples/jupyter_examples/*.ipynb'):
+        for filename in itertools.chain(glob.glob('de_sim/examples/jupyter_examples/*.ipynb'),
+                                        glob.glob('de_sim/examples/jupyter_examples_for_talk/*.ipynb')):
             with open(filename) as file:
                 version = json.load(file)['nbformat']
             with open(filename) as file:
