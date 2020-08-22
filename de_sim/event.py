@@ -14,7 +14,7 @@ from de_sim.event_message import EventMessage  # noqa: F401
 
 
 class Event(object):
-    """ An object that holds a discrete event simulation (DES) event
+    """ An object that holds a discrete-event simulation (DES) event
 
     Each DES event is scheduled by creating an `Event` instance and storing it in the
     simulator's event queue. To reduce interface errors the `message`

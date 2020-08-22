@@ -98,7 +98,7 @@ class AuthorMetadata(EnhancedDataClass):
 
 @dataclass
 class SimulationMetadata(EnhancedDataClass):
-    """ Represents the metadata of a discrete event simulation run
+    """ Represents the metadata of a discrete-event simulation run
 
     Attributes:
         simulation_config (:obj:`SimulationConfig`): information about the simulation's configuration

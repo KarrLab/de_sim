@@ -1,4 +1,4 @@
-""" Test discrete event simulation metadata object
+""" Test discrete-event simulation metadata object
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Author: Jonathan Karr <karr@mssm.edu>
