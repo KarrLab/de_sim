@@ -7,6 +7,8 @@
 """
 import argparse
 import matplotlib.pyplot as plt
+import matplotlib.ticker as plticker
+import os
 import random
 
 import de_sim
@@ -14,7 +16,7 @@ import de_sim
 
 class RandomStepMessage(de_sim.EventMessage):
     """ An event message class that stores the value of a random walk step """
-    msg_field_names = ['step']
+    msg_field_names = ['step_value']
 
 
 class RandomWalkSimulationObject(de_sim.SimulationObject):
@@ -49,14 +51,13 @@ class RandomWalkSimulationObject(de_sim.SimulationObject):
         # The time between steps is 1 or 2, with equal probability
         delay = random.choice([1, 2])
         # Schedule an event `delay` in the future for this object
-        # The event contains a `RandomStepMessage` with `step=step_value`
+        # The event contains a `RandomStepMessage` with `step_value=step_value`
         self.send_event(delay, self, RandomStepMessage(step_value))
 
     def handle_step_event(self, event):
         """ Handle a step event """
         # Update the position and history
-        step = event.message.step
-        self.position += step
+        self.position += event.message.step_value
         self.history['times'].append(self.time)
         self.history['positions'].append(self.position)
         self.schedule_next_step()
@@ -114,9 +115,16 @@ class RunRandomWalkSimulation(object):
                 print(f"{time:4.0f}{pos:>6}")
 
         # plot the random walk as a step function
-        plt.step(random_walk_sim_obj.history['times'], random_walk_sim_obj.history['positions'])
-        plt.xlabel('time')
-        plt.ylabel('position')
+        fig, ax = plt.subplots()
+        loc = plticker.MultipleLocator(base=1.0)
+        ax.yaxis.set_major_locator(loc)
+        plt.step(random_walk_sim_obj.history['times'], random_walk_sim_obj.history['positions'],
+                 where='post')
+        plt.xlabel('Time')
+        plt.ylabel('Position')
+        # write file
+        random_walk_plot = os.path.join(os.path.dirname(__file__), "random_walk_plot.pdf")
+        fig.savefig(random_walk_plot, bbox_inches='tight', pad_inches=0)
         plt.show()
 
         return num_events
