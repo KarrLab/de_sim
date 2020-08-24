@@ -3,7 +3,7 @@
     "@type": "Code",
     "@id": "https://pypi.org/project/de-sim/",
     "name": "DE-Sim",
-    "description": "An object-oriented discrete-event simulation tool for complex, data-driven modeling",
+    "description": "An object-oriented, discrete-event simulation tool for data-intensive modeling of complex systems in Python",
     "keywords": ["dynamical modeling", "simulation", "discrete-event simulation", "object-oriented simulation", "parallel discrete-event simulation", "biochemical modeling", "whole-cell modeling", "Python"],
     "author": [{
             "@type": "Person",

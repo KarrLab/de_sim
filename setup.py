@@ -1,3 +1,5 @@
+import os
+import pkg_utils
 import re
 import setuptools
 import subprocess
@@ -12,8 +14,6 @@ except (subprocess.CalledProcessError, AssertionError):
     subprocess.run(
         [sys.executable, "-m", "pip", "install", "-U", "pkg_utils"],
         check=True)
-import os
-import pkg_utils
 
 name = 'de_sim'
 dirname = os.path.dirname(__file__)
@@ -22,6 +22,9 @@ package_data = {
         'config/*.cfg',
     ],
 }
+
+# convert README.md to README.rst
+pkg_utils.convert_readme_md_to_rst(dirname)
 
 # get package metadata
 md = pkg_utils.get_package_metadata(dirname, name, package_data_filename_patterns=package_data)

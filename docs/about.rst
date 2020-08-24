@@ -16,7 +16,7 @@ Citing *DE-Sim*
 
 Please use the following reference to cite *DE-Sim*:
 
-Arthur P. Goldberg & Jonathan Karr. DE-Sim: an object-oriented discrete-event simulation tool for complex, data-driven modeling. In preparation.
+Arthur P. Goldberg & Jonathan Karr. DE-Sim: an object-oriented, discrete-event simulation tool for data-intensive modeling of complex systems in Python. In preparation.
 
 ------------------------
 Contributing to *DE-Sim*

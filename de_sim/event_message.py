@@ -236,7 +236,7 @@ class EventMessage(EventMessageInterface, metaclass=CombinedEventMessageMeta):
     defines the `ExampleEventMessage1` class with a short docstring and two message fields.
 
     :obj:`EventMessage` subclasses must support the comparison operations `<`, `<=`, etc. This is
-    provided automatically for message fields that support comparison. Subclasses with message attributes
+    provided automatically for message fields that support comparison. Subclasses with message fields
     that do not support comparison must override `__lt__`, `__le__`, etc.
     """
     pass
