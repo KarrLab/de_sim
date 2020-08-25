@@ -22,8 +22,6 @@ from de_sim.utilities import ConcreteABCMeta, FastLogger
 from wc_utils.util.list import elements_to_str
 from wc_utils.util.misc import most_qual_cls_name, round_direct
 
-config = core.get_config()
-
 
 # TODO(Arthur): move to simulator
 class EventQueue(object):
@@ -280,7 +278,6 @@ class BaseSimulationObject(object):
         simulator (:obj:`Simulator`): the `Simulator` that uses this :class:`BaseSimulationObject`
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
     """
-    LOG_EVENTS = config['de_sim']['log_events']
 
     def __init__(self, name, start_time=0, **kwargs):
         """ Initialize a :class:`BaseSimulationObject`.
@@ -303,6 +300,8 @@ class BaseSimulationObject(object):
             self.event_time_tiebreaker = kwargs['event_time_tiebreaker']
         else:
             self.event_time_tiebreaker = name
+        config = core.get_config()
+        self.log_events = config['de_sim']['log_events']
         self.debug_logs = core.get_debug_logs()
         self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('de_sim.debug.file'), 'debug')
         self.fast_plot_file_logger = FastLogger(self.debug_logs.get_log('de_sim.plot.file'), 'debug')
@@ -495,7 +494,7 @@ class BaseSimulationObject(object):
         """
         self.num_events += 1
 
-        if self.LOG_EVENTS:
+        if self.log_events:
             # write events to a plot log
             # plot logging is controlled by configuration files pointed to by config_constants and by env vars
             for event in event_list:

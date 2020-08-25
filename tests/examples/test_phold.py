@@ -20,10 +20,10 @@ from de_sim.testing.utilities_for_testing import make_args
 # turn off logging by changing config to raise the 'debug.console' 'level' above debug, to error
 # share this with phold by setting a temporary config environ variable & then importing phold which imports debug_logs
 # to avoid any other side effects, run the import in a context that creates a temporary environment
-from wc_utils.util.environ import EnvironUtils, MakeEnvironArgs
-make_environ_args = MakeEnvironArgs()
-make_environ_args.add_to_env(['debug_logs', 'handlers', 'debug.example.console', 'level'], 'debug')
-env = make_environ_args.get_env()
+from wc_utils.util.environ import EnvironUtils, ConfigEnvDict
+config_env_dict = ConfigEnvDict()
+config_env_dict.add_config_value(['debug_logs', 'handlers', 'debug.example.console', 'level'], 'debug')
+print(config_env_dict.get_env_dict())
 
 from de_sim.examples.phold import RunPhold
 
