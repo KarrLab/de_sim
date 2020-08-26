@@ -5,27 +5,16 @@
 :License: MIT
 """
 
-import sys
-import unittest
-import warnings
-import random
 from argparse import Namespace
 from capturer import CaptureOutput
 from copy import copy
-
-from de_sim.testing.utilities_for_testing import make_args
-
-
-# todo: doesn't do anything: fix: see approach in test_simulator.py
-# turn off logging by changing config to raise the 'debug.console' 'level' above debug, to error
-# share this with phold by setting a temporary config environ variable & then importing phold which imports debug_logs
-# to avoid any other side effects, run the import in a context that creates a temporary environment
-from wc_utils.util.environ import EnvironUtils, ConfigEnvDict
-config_env_dict = ConfigEnvDict()
-config_env_dict.add_config_value(['debug_logs', 'handlers', 'debug.example.console', 'level'], 'debug')
-print(config_env_dict.get_env_dict())
+import random
+import sys
+import unittest
+import warnings
 
 from de_sim.examples.phold import RunPhold
+from de_sim.testing.utilities_for_testing import make_args
 
 
 class TestPhold(unittest.TestCase):

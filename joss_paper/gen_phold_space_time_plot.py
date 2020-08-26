@@ -11,7 +11,7 @@ import os
 
 from de_sim.examples.phold import RunPhold
 from de_sim.visualize import SpaceTime
-from wc_utils.util.environ import EnvironUtils, ConfigEnvDict
+from wc_utils.util.environ import EnvironUtils
 import de_sim
 
 
@@ -41,7 +41,6 @@ def create_phold_space_time_diagram():
     space_time.plot_data(space_time_plot)
     print('space-time diagram written to', space_time_plot)
 
-tmp_conf = ConfigEnvDict().prep_tmp_conf(((['de_sim', 'log_events'], 'True'),
-                                          (['debug_logs', 'handlers', 'plot.file', 'level'], 'debug')))
-with EnvironUtils.make_temp_environ(**tmp_conf):
+with EnvironUtils.temp_config_env(((['de_sim', 'log_events'], 'True'),
+                                   (['debug_logs', 'handlers', 'plot.file', 'level'], 'debug'))):
     create_phold_space_time_diagram()
