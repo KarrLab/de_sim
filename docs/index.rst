@@ -25,5 +25,4 @@ Contents
    API documentation <source/de_sim.rst>
    performance.rst
    comparison.rst
-   references.rst
    about.rst
