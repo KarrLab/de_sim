@@ -181,7 +181,7 @@ Object-oriented DES terminology often describes the event message as being sent 
     2. **`messages_sent`**: the types of messages sent by a subclass of `SimulationObject` must be listed in `messages_sent`. It ensures that a simulation object doesn't send messages of the wrong `EventMessage` class.
     3. **`time`**: `time` is a read-only attribute that always equals the current simulation time in every simulation object. For example, a `RandomWalkSimulationObject` saves the value of `time` when recording its history.
 
-3: Use classes created above to simulate a random walk.
+3: Use the classes created above to simulate a random walk.
 
 The `de_sim.Simulator` class simulates models.
 Its `add_object` method adds a simulation object to the simulator.
@@ -277,3 +277,4 @@ We thank Yin Hoon Chew for her helpful feedback. This work was supported by the 
 Institutes of Health [R35GM119771 to JRK], and the Icahn Institute for Data Science and Genomic Technology.
 
 # References
+
