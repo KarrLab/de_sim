@@ -37,9 +37,6 @@ class Simulator(object):
     Attributes:
         time (:obj:`float`): the simulations's current time
         simulation_objects (:obj:`dict` of :obj:`SimulationObject`): all simulation objects, keyed by name
-        shared_state (:obj:`list` of :obj:`object`, optional): the shared state of the simulation, needed to
-            log or checkpoint the entire state of a simulation; all objects in `shared_state` must
-            implement :obj:`SharedStateInterface`
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
         fast_debug_file_logger (:obj:`FastLogger`): a fast logger for debugging messages
         fast_plotting_logger (:obj:`FastLogger`): a fast logger for trajectory data for plotting
@@ -61,11 +58,7 @@ class Simulator(object):
     # number of rows to print in a performance profile
     NUM_PROFILE_ROWS = 50
 
-    def __init__(self, shared_state=None):
-        if shared_state is None:
-            self.shared_state = []
-        else:
-            self.shared_state = shared_state
+    def __init__(self):
         self.debug_logs = core.get_debug_logs()
         self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('de_sim.debug.file'), 'debug')
         self.fast_plotting_logger = FastLogger(self.debug_logs.get_log('de_sim.plot.file'), 'debug')
