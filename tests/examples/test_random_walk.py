@@ -5,6 +5,7 @@
 :License: MIT
 """
 
+import tempfile
 import unittest
 from argparse import Namespace
 from capturer import CaptureOutput
@@ -16,7 +17,9 @@ class TestRandomStateVariableSimulation(unittest.TestCase):
 
     def test_random_walk_simulation(self):
         with CaptureOutput(relay=False):
-            args = Namespace(max_time=10, output=False)
-            self.assertTrue(0 < RunRandomWalkSimulation.main(args))
-            args = Namespace(max_time=10, output=True)
-            self.assertTrue(0 < RunRandomWalkSimulation.main(args))
+            with tempfile.NamedTemporaryFile() as file_like_obj:
+                out_file = file_like_obj.name
+                args = Namespace(max_time=10, plot_file=out_file, output=False)
+                self.assertTrue(0 < RunRandomWalkSimulation.main(args))
+                args = Namespace(max_time=10, plot_file=out_file, output=True)
+                self.assertTrue(0 < RunRandomWalkSimulation.main(args))

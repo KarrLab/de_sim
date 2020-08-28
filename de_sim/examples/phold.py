@@ -1,4 +1,4 @@
-""" Parallel hold (PHOLD) model commonly used to benchmark parallel discrete-event simulators :cite:`fujimoto1990performance`.
+""" Parallel hold (PHOLD) model commonly used to benchmark parallel discrete-event simulators
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2016-06-10
@@ -24,20 +24,16 @@ def obj_index(obj_name):
     return int(obj_name)
 
 
-def exp_delay():
-    return random.expovariate(1.0)
-
-
 class MessageSentToSelf(de_sim.EventMessage):
-    "A message that's sent to self"
+    " A message that's sent to self "
 
 
 class MessageSentToOtherObject(de_sim.EventMessage):
-    "A message that's sent to another PHold simulation object"
+    " A message that's sent to another PHold simulation object "
 
 
 class InitMsg(de_sim.EventMessage):
-    'initialization message'
+    " Initialization message "
 
 
 MESSAGE_TYPES = [MessageSentToSelf, MessageSentToOtherObject, InitMsg]
@@ -50,10 +46,11 @@ class PholdSimulationObject(de_sim.SimulationObject):
         super().__init__(name)
 
     def init_before_run(self):
-        self.send_event(exp_delay(), self, InitMsg())
+        """ Initialize before a simulation run; called by the simulator """
+        self.send_event(random.expovariate(1.0), self, InitMsg())
 
     def handle_simulation_event(self, event):
-        """Handle a single simulation event."""
+        """ Handle a simulation event """
         # schedule event
         if random.random() < self.args.frac_self_events or self.args.num_phold_procs == 1:
             receiver = self
@@ -73,7 +70,7 @@ class PholdSimulationObject(de_sim.SimulationObject):
             message = MessageSentToSelf
         else:
             message = MessageSentToOtherObject
-        self.send_event(exp_delay(), receiver, message())
+        self.send_event(random.expovariate(1.0), receiver, message())
 
     def get_state(self):
         return str(self.args)
@@ -82,6 +79,7 @@ class PholdSimulationObject(de_sim.SimulationObject):
         log = logs.get_log('de_sim.debug.example.console')
         log.debug(msg, sim_time=self.time)
 
+    # declare that any event containing an event message in `MESSAGE_TYPES` is handled by `handle_simulation_event`
     event_handlers = [(sim_msg_type, 'handle_simulation_event') for sim_msg_type in MESSAGE_TYPES]
 
     # register the message types sent

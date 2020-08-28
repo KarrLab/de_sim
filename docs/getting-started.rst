@@ -8,19 +8,19 @@ Examples
 -----------------------------------
 
 * `Minimal simulation <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/minimal_simulation.py>`_: a minimal example of a simulation
-* `Epidemic <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/jupyter_examples/An%20epidemic%20model%20using%20DE-Sim.ipynb>`_: an SIR model of an epidemic of an infectious disease
-* `Parallel hold (PHOLD) <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/phold.py>`_: model developed by Richard Fujimoto to benchmark parallel discrete-event simulators
-* `Random walk <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/random_walk.py>`_: a random one-dimensional walk which increments or decrements a variable with equal probability at each event
+* `Random walk <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/random_walk.py>`_: a one-dimensional random walk model, with random times between steps
+* `Parallel hold (PHOLD) <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/phold.py>`_: a model developed by Richard Fujimoto to benchmark parallel discrete-event simulators
+* `Epidemic <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/sirs.py>`_: two SIR models of an infectious disease epidemic
 
 -----------------------------------
-Tutorials
+Interactive tutorials
 -----------------------------------
 
-Please see `sandbox.karrlab.org <https://sandbox.karrlab.org/tree/de_sim>`_ for interactive tutorials on creating and executing models with *DE-Sim*.
-
+Please see `sandbox.karrlab.org <https://sandbox.karrlab.org/tree/de_sim>`_ for interactive Jupyter notebook tutorials about designing, building and executing models with *DE-Sim*.
+It includes tutorials that use the random walk, PHOLD, and epidemic models examples listed above.
 
 -----------------------------------
 Template for models and simulations
 -----------------------------------
 
-`de_sim/examples/minimal_simulation.py <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/minimal_simulation.py>`_ contains a template for implementing and simulating a model with *DE-Sim*.
+The minimal simulation, located at `de_sim/examples/minimal_simulation.py <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/minimal_simulation.py>`_, can be used as a template for implementing and simulating a model with *DE-Sim*.

@@ -1,4 +1,4 @@
-""" A simulation of a random walk whose position is incremented or decremented with equal probability at each event
+""" Simulate a random walk whose position changes by -1 or +1 at each event, and inter-event delays are 1 or 2 time units
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2018-02-27
@@ -86,6 +86,7 @@ class RunRandomWalkSimulation(object):
         parser = argparse.ArgumentParser(
             description="A random walk on the integer number line with random times between steps")
         parser.add_argument('max_time', type=float, help="End time for the simulation")
+        parser.add_argument('plot_file', type=str, help="Filename for trajectory plot (pdf)")
         parser.add_argument('--no-output', dest='output', action='store_false', help="Don't write walk history to stdout")
         if cli_args is not None:
             args = parser.parse_args(cli_args)
@@ -123,8 +124,9 @@ class RunRandomWalkSimulation(object):
         plt.xlabel('Time')
         plt.ylabel('Position')
         # write file
-        random_walk_plot = os.path.join(os.path.dirname(__file__), "random_walk_plot.pdf")
+        random_walk_plot = os.path.abspath(args.plot_file)
         fig.savefig(random_walk_plot, bbox_inches='tight', pad_inches=0)
+        print(f"wrote plot in '{random_walk_plot}'")
         plt.show()
 
         return num_events

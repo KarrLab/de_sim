@@ -15,23 +15,27 @@ class MessageSentToSelf(de_sim.EventMessage):
 
 
 class MinimalSimulationObject(de_sim.SimulationObject):
+    """ :obj:`SimulationObject` subclasses represent the state of a simulation and the actions that schedule and handle events
+    """
 
     def __init__(self, name, delay):
         self.delay = delay
         super().__init__(name)
 
     def init_before_run(self):
+        """ Initialize before a simulation run; called by the simulator """
         self.send_event(self.delay, self, MessageSentToSelf())
 
     def handle_simulation_event(self, event):
+        """ Handle a simulation event """
+        # Schedule an event `self.delay` in the future
+        # The event will be received by this simulation object, and contain a `MessageSentToSelf` instance
         self.send_event(self.delay, self, MessageSentToSelf())
 
-    def get_state(self):
-        return str(self.delay)
-
+    # declare that events that contain a `MessageSentToSelf` message should be handled by `handle_simulation_event`
     event_handlers = [(MessageSentToSelf, handle_simulation_event)]
 
-    # register the message types sent
+    # register the message types sent by this simulation object
     messages_sent = [MessageSentToSelf]
 
 
@@ -67,13 +71,13 @@ class RunMinimalSimulation(object):
 
         # run the simulation
         simulator.initialize()
-        num_events = simulator.simulate(args.time_max)
-        return(num_events)
+        return simulator.simulate(args.time_max).num_events
 
 
 if __name__ == '__main__':  # pragma: no cover     # reachable only from command line
     try:
         args = RunMinimalSimulation.parse_args()
-        RunMinimalSimulation.main(args)
+        num_events = RunMinimalSimulation.main(args)
+        print(f"Executed {num_events} events")
     except KeyboardInterrupt:
         pass
