@@ -12,7 +12,7 @@ Examples
 * `Parallel hold (PHOLD) <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/phold.py>`_: a model developed by Richard Fujimoto to benchmark parallel discrete-event simulators
 * `Epidemic <https://github.com/KarrLab/de_sim/blob/master/de_sim/examples/sirs.py>`_: two SIR models of an infectious disease epidemic
 
-These examples have corresponding unit tests which run them in the `directory of example unit tests <https://github.com/KarrLab/de_sim/tree/master/tests/examples>_`.
+These examples have corresponding unit tests which run them in the `directory of example unit tests <https://github.com/KarrLab/de_sim/tree/master/tests/examples>`_.
 
 -----------------------------------
 Interactive tutorials

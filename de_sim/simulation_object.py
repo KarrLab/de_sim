@@ -494,11 +494,9 @@ class BaseSimulationObject(object):
         """
         self.num_events += 1
 
-        if self.log_events: # pragma: no cover
-                            # cannot be conveniently unit-tested because doing so requires that config state be changed
+        if self.log_events: # cannot be conveniently unit-tested because doing so requires that config state be changed
                             # before de_sim.plot.file logger is created
-                            # run gen_phold_space_time_plot.py as a separate program to exercise this code
-                            # also see comment LoggerConfigurator().from_dict() regarding shared loggers
+                            # therefore, is tested by tests/joss_paper/test_gen_phold_space_time_plot.py
             # write events to a plot log
             # plot logging is controlled by configuration files pointed to by config_constants and by env vars
             for event in event_list:

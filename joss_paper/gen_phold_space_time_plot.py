@@ -8,6 +8,7 @@
 
 from argparse import Namespace
 import os
+import tempfile
 
 from de_sim.examples.phold import RunPhold
 from de_sim.visualize import SpaceTime
@@ -37,7 +38,8 @@ def create_phold_space_time_diagram():
     run_phold(8)
     space_time = SpaceTime()
     space_time.get_data(plot_log)
-    space_time_plot = os.path.join(os.path.dirname(__file__), "phold_space_time_plot.pdf")
+    temp_dir = tempfile.TemporaryDirectory()
+    space_time_plot = os.path.join(temp_dir.name, "phold_space_time_plot.pdf")
     space_time.plot_data(space_time_plot)
     print('space-time diagram written to', space_time_plot)
 
