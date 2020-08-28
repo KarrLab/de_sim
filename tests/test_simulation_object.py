@@ -36,6 +36,9 @@ class TestEventQueue(unittest.TestCase):
         for i in range(self.num_events):
             self.event_queue.schedule_event(i, i + 1, sender, receiver, InitMsg())
 
+    def test_len(self):
+        self.assertEqual(self.num_events, self.event_queue.len())
+
     def test_reset(self):
         self.event_queue.reset()
         self.assertEqual(float('inf'), self.event_queue.next_event_time())

@@ -189,7 +189,6 @@ class SpaceTime(object):
         Returns:
             :obj:`list` of :obj:`SimulationEventMessage`: list of all event messages in simulation run
         """
-        # todo: get plot filename from config
         # 1. open file
         event_messages = []
         with open(plot_file, 'r') as file:
