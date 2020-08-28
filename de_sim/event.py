@@ -1,4 +1,4 @@
-""" Simulation event structure
+""" Simulation event class
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2016-05-31
@@ -11,33 +11,34 @@ from collections.abc import Iterable
 from wc_utils.util.misc import round_direct
 from wc_utils.util.list import elements_to_str
 from de_sim.event_message import EventMessage  # noqa: F401
-
+import de_sim  # noqa: F401
 
 class Event(object):
     """ An object that holds a discrete-event simulation (DES) event
 
-    Each DES event is scheduled by creating an `Event` instance and storing it in the
-    simulator's event queue. To reduce interface errors the `message`
-    attribute must be structured as specified in the `message_types` module.
+    Each DES event is scheduled by creating an :obj:`Event` instance and storing it in the
+    simulator's event queue.
 
     As per David Jefferson's thinking, the event queue is ordered by data provided by the
-    simulation application, in particular (event time, sub-time), where 'sub-time' determines the
+    simulation application, in particular (event time, sub-time), where `sub-time` determines the
     execution priority among simultaneous messages with the same event time at different simulation
     objects.
-    This is implemented by the comparison operators for Event below. This ordering achieves
-    deterministic and reproducible simulations. (See Jefferson's LLNL course.)
+    In `de_sim`, `sub-time` is a pair: the class priority for the receiving object, and a tie-breaker which
+    is a unique value for each instance of the receiving object's class.
+    This is implemented by the comparison operators for :obj:`Event` below. This ordering achieves
+    deterministic and reproducible simulations. (For more theory, see Jefferson's LLNL course.)
 
     Attributes:
         creation_time (:obj:`float`): simulation time when the event is created (aka `send_time`)
         event_time (:obj:`float`): simulation time when the event must be executed (aka `receive_time`)
-        sending_object (:obj:`SimulationObject`): reference to the object that sends the event
-        receiving_object (:obj:`SimulationObject`): reference to the object that receives
+        sending_object (:obj:`de_sim.SimulationObject`): reference to the object that sent the event
+        receiving_object (:obj:`de_sim.SimulationObject`): reference to the object that receives
             (aka executes) the event
         _order_time (:obj:`tuple`): the event time, sub-time that's used to sort events; cached
             to improve performance
         message (:obj:`EventMessage`): an :obj:`EventMessage` carried by the event; its type
-            provides the simulation application's type for an `Event`; it may also carry a payload
-            for the `Event` in its `msg_field_names`.
+            provides the simulation application's type for an :obj:`Event`; it may also carry a payload
+            for the :obj:`Event` in its attribute(s) identified in its `msg_field_names`.
     """
     # TODO(Arthur): for performance, perhaps pre-allocate and reuse events
 
@@ -51,6 +52,7 @@ class Event(object):
         self.event_time = event_time
         self.sending_object = sending_object
         self.receiving_object = receiving_object
+        # precompute _order_time to speed up simulation
         self._order_time = self._get_order_time()
         self.message = message
 
@@ -64,52 +66,52 @@ class Event(object):
                 self.receiving_object.event_time_tiebreaker)
 
     def __lt__(self, other):
-        """ Does this `Event` occur earlier than `other`?
+        """ Does this :obj:`Event` occur earlier than `other`?
 
         Args:
-            other (:obj:`Event`): another `Event`
+            other (:obj:`Event`): another :obj:`Event`
 
         Returns:
-            :obj:`bool`: `True` if this `Event` occurs earlier than `other`
+            :obj:`bool`: :obj:`True` if this :obj:`Event` occurs earlier than `other`
         """
         return self._order_time < other._order_time
 
     def __le__(self, other):
-        """ Does this `Event` occur earlier or at the same time as `other`?
+        """ Does this :obj:`Event` occur earlier or at the same time as `other`?
 
         Args:
-            other (:obj:`Event`): another `Event`
+            other (:obj:`Event`): another :obj:`Event`
 
         Returns:
-            :obj:`bool`: `True` if this `Event` occurs earlier or at the same time as `other`
+            :obj:`bool`: `True` if this :obj:`Event` occurs earlier or at the same time as `other`
         """
         return not (other < self)
 
     def __gt__(self, other):
-        """ Does this `Event` occur later than `other`?
+        """ Does this :obj:`Event` occur later than `other`?
 
         Args:
-            other (:obj:`Event`): another `Event`
+            other (:obj:`Event`): another :obj:`Event`
 
         Returns:
-            :obj:`bool`: `True` if this `Event` occurs later than `other`
+            :obj:`bool`: `True` if this :obj:`Event` occurs later than `other`
         """
         return self._order_time > other._order_time
 
     def __ge__(self, other):
-        """ Does this `Event` occur later or at the same time as `other`?
+        """ Does this :obj:`Event` occur later or at the same time as `other`?
 
         Args:
-            other (:obj:`Event`): another `Event`
+            other (:obj:`Event`): another :obj:`Event`
 
         Returns:
-            :obj:`bool`: `True` if this `Event` occurs later or at the same time as `other`
+            :obj:`bool`: `True` if this :obj:`Event` occurs later or at the same time as `other`
         """
         return not (self < other)
 
     @staticmethod
     def header(as_list=False, separator='\t'):
-        """ Return a header for an :obj:`Event` table
+        """ Provide a header row for an :obj:`Event` table
 
         Provide generic header suitable for any type of message in an event.
 
@@ -119,7 +121,7 @@ class Event(object):
                 a string
 
         Returns:
-            :obj:`str`: String representation of names of an :obj:`Event`'s fields, or a :obj:`list`
+            :obj:`str` or obj:`str`: a string representation of names of an :obj:`Event`'s fields, or a :obj:`list`
                 representation if `as_list` is set
         """
         MESSAGE_FIELDS_HEADER = 'Message fields...'
@@ -138,8 +140,8 @@ class Event(object):
                 a string
 
         Returns:
-            :obj:`str`: String representation of names of an `Event`'s fields, or a :obj:`list`
-                representation if `as_list` is set
+            :obj:`str` or :obj:`list`: a string representation of the names of an :obj:`Event`'s fields,
+                or a :obj:`list` representation if `as_list` is set
         """
         headers = list(Event.BASE_HEADERS)
         if self.message.header() is not None:
@@ -150,9 +152,9 @@ class Event(object):
             return separator.join(headers)
 
     def render(self, round_w_direction=False, annotated=False, as_list=False, separator='\t'):
-        """ Format the content of an `Event`
+        """ Format the contents of an :obj:`Event`
 
-        Rendering the content assumes that `sending_object` and `receiving_object`
+        Rendering the contents assumes that `sending_object` and `receiving_object`
         have name attributes.
 
         Args:
@@ -160,12 +162,12 @@ class Event(object):
                 the direction of the rounding
             annotated (:obj:`bool`, optional): if set, prefix each message field value with its
                 attribute name
-            as_list (:obj:`bool`, optional): if set, return the `Event`'s values in a :obj:`list`
+            as_list (:obj:`bool`, optional): if set, return the :obj:`Event`'s values in a :obj:`list`
             separator (:obj:`str`, optional): the field separator used if the values are returned as
                 a string
 
         Returns:
-            :obj:`str`: String representation of the values of an `Event`'s fields, or a :obj:`list`
+            :obj:`str` or :obj:`list`: string representation of the values of an :obj:`Event`'s fields, or a :obj:`list`
                 representation if `as_list` is set
         """
         raw_times = [[self.creation_time], [self.event_time, str(self.receiving_object.class_event_priority),
@@ -185,36 +187,10 @@ class Event(object):
             return separator.join(elements_to_str(vals))
 
     def __str__(self):
-        """ Return an `Event` as a string
+        """ Return an :obj:`Event` as a string
 
         Returns:
-            :obj:`str`: String representation of the `Event`'s fields, except `message`,
+            :obj:`str`: String representation of the :obj:`Event`'s fields, except `message`,
                 delimited by tabs
         """
         return self.render()
-
-
-def iterable_not_str(obj):
-    """ Is an object an iterable, but not a string?
-
-    Args:
-        obj (:obj:`object`): an object
-
-    Returns:
-        :obj:`bool`: `True` if `obj` is an iterable, but not a string
-    """
-    return isinstance(obj, Iterable) and not isinstance(obj, str)
-
-
-def nested_elements_to_str(o):
-    """ Obtain `str()` values of all elements of o, recursively, while retaining the same structure
-
-    Args:
-        o (:obj:`obj`): an object
-
-    Returns:
-        :obj:`obj`: stringified instance of `o`
-    """
-    if iterable_not_str(o):
-        return [nested_elements_to_str(e) for e in o]
-    return str(o)

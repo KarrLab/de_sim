@@ -7,7 +7,7 @@
 
 
 class Error(Exception):
-    """ Base class for exceptions in de_sim
+    """ Base class for exceptions in `de_sim`
 
     Attributes:
         message (:obj:`str`): the exception's message
@@ -18,7 +18,7 @@ class Error(Exception):
 
 
 class SimulatorError(Error):
-    """ Exception raised for errors in de_sim
+    """ Exception raised for errors in `de_sim`
 
     Attributes:
         message (:obj:`str`): the exception's message

@@ -17,12 +17,12 @@ class EventMessageInterface(object, metaclass=ABCMeta):
     """ An abstract base class for event messages
 
     The comparison operations (`__gt__`, `__lt__`, etc.) order event message instances by the
-    tuple (class name, instance attribute values). This enables deterministic sorting of messages
-    by their content, so that event messages can be passed in a deterministic order to
-    a simulation object processing them in an event.
+    tuple (class name, instance attribute values). When a simulation object executes multiple
+    events simultaneously, this ensures that a list containing these messages can be sorted in
+    a deterministic order, because the events' messages will have a unique sort order.
 
     Attributes:
-        __slots__ (:obj:`list`): use `__slots__` to save memory because a simulation may contain many messages
+        __slots__ (:obj:`list`): use `__slots__` to save memory because a simulation may contain many event messages
     """
     __slots__ = []
 
@@ -68,7 +68,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
         return vals
 
     def value_map(self):
-        """ Provide a map from attribute to value, cast to strings, for this :obj:`EventMessage`
+        """ Provide a map from each attribute to its value, as a :obj:`str`, for this :obj:`EventMessage`
 
         Uninitialized values are returned as `str(None)`.
 
@@ -86,10 +86,10 @@ class EventMessageInterface(object, metaclass=ABCMeta):
             annotated (:obj:`bool`, optional): if set, prefix each value with its attribute name
             as_list (:obj:`bool`, optional): if set, return the attribute names in a :obj:`list`
             separator (:obj:`str`, optional): the field separator used if the attribute names
-                are returned as a string
+                are returned as a :obj:`str`
 
         Returns:
-            :obj:`obj`: `None` if this message has no `msg_field_names`, or a string representation of
+            :obj:`obj`: `None` if this message has no `msg_field_names`, or a :obj:`str` representation of
                 the attribute names for this :obj:`EventMessage`, or a :obj:`list`
                 representation if `as_list` is set
         """
@@ -145,7 +145,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
             other (:obj:`EventMessage`): another :obj:`EventMessage`
 
         Returns:
-            :obj:`bool`: `True` if this :obj:`EventMessage` sorts before `other`
+            :obj:`bool`: :obj:`True` if this :obj:`EventMessage` sorts before `other`
         """
         return (self.__class__.__name__, self._values()) < (other.__class__.__name__, other._values())
 
@@ -156,7 +156,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
             other (:obj:`EventMessage`): another :obj:`EventMessage`
 
         Returns:
-            :obj:`bool`: `True` if this :obj:`EventMessage` sorts before or equals `other`
+            :obj:`bool`: :obj:`True` if this :obj:`EventMessage` sorts before or equals `other`
         """
         return not (other < self)
 
@@ -167,7 +167,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
             other (:obj:`EventMessage`): another :obj:`EventMessage`
 
         Returns:
-            :obj:`bool`: `True` if this :obj:`EventMessage` sorts after `other`
+            :obj:`bool`: :obj:`True` if this :obj:`EventMessage` sorts after `other`
         """
         return (self.__class__.__name__, self._values()) > (other.__class__.__name__, other._values())
 
@@ -178,12 +178,15 @@ class EventMessageInterface(object, metaclass=ABCMeta):
             other (:obj:`EventMessage`): another :obj:`EventMessage`
 
         Returns:
-            :obj:`bool`: `True` if this :obj:`EventMessage` sorts after or equals `other`
+            :obj:`bool`: :obj:`True` if this :obj:`EventMessage` sorts after or equals `other`
         """
         return not (self < other)
 
 
 class EventMessageMeta(type):
+    """ A custom metaclass that customizes the creation of :obj:`EventMessage` subclasses
+    """
+
     # msg_field_names mapping keyword
     MSG_FIELD_NAMES = 'msg_field_names'
 
@@ -226,17 +229,18 @@ class CombinedEventMessageMeta(ConcreteABCMeta, EventMessageMeta):
 class EventMessage(EventMessageInterface, metaclass=CombinedEventMessageMeta):
     """ The event message base class
 
-    Each simulation event contains an event message. All event messages are objects. This
-    module supports compact declaration of :obj:`EventMessage` types. For example::
+    Each simulation event contains an event message object. This
+    module supports compact declaration of :obj:`EventMessage` subclasses. For example::
 
         class ExampleEventMessage1(EventMessage):
-            ''' Docstring '''
+            " Docstring "
             msg_field_names = ['attr1', 'attr2']
 
-    defines the `ExampleEventMessage1` class with a short docstring and two message fields.
+    defines the `ExampleEventMessage1` class with a short docstring and message fields named
+    `attr1` and `attr2`.
 
     :obj:`EventMessage` subclasses must support the comparison operations `<`, `<=`, etc. This is
-    provided automatically for message fields that support comparison. Subclasses with message fields
-    that do not support comparison must override `__lt__`, `__le__`, etc.
+    provided automatically for message fields that support comparison. :obj:`EventMessage` subclasses with
+    message fields that do not support comparison must override `__lt__`, `__le__`, etc.
     """
     pass

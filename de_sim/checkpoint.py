@@ -50,10 +50,10 @@ class Checkpoint(object):
         Assumes that state objects implement the equality comparison operation `__eq__()`
 
         Args:
-            other (:obj:`checkpoint`): other checkpoint
+            other (:obj:`Checkpoint`): other checkpoint
 
         Returns:
-            :obj:`bool`: true if checkpoints are semantically equal
+            :obj:`bool`: :obj:`True` if checkpoints are semantically equal
         """
         if other.__class__ is not self.__class__:
             return False
@@ -75,10 +75,10 @@ class Checkpoint(object):
         """ Compare two checkpoints
 
         Args:
-            other (:obj:`checkpoint`): other checkpoint
+            other (:obj:`Checkpoint`): other checkpoint
 
         Returns:
-            :obj:`bool`: true if checkpoints are semantically unequal
+            :obj:`bool`: :obj:`True` if checkpoints are semantically unequal
         """
         return not self.__eq__(other)
 
@@ -91,14 +91,15 @@ class AccessCheckpoints(object):
 
     Attributes:
         dir_path (:obj:`str`): a directory containing simulation checkpoints
-        last_dir_mod (:obj:`str`): most recent wall-clock time when `dir_path` was modified
+        _last_dir_mod (:obj:`str`): most recent wall-clock time when the contents of `dir_path` were modified;
+            used to avoid unnecessary updates to `all_checkpoints`
         all_checkpoints (:obj:`list` of :obj:`float`): sorted list of the simulation times of all
             checkpoints in `dir_path`
     """
 
     def __init__(self, dir_path):
         self.dir_path = dir_path
-        self.last_dir_mod = os.stat(self.dir_path).st_mtime_ns
+        self._last_dir_mod = os.stat(self.dir_path).st_mtime_ns
         self.all_checkpoints = None
 
     def set_checkpoint(self, checkpoint):
@@ -113,13 +114,14 @@ class AccessCheckpoints(object):
             pickle.dump(checkpoint, file)
 
     def get_checkpoint(self, time=None):
-        """ Get the latest checkpoint in directory `self.dir_path` with time before or equal to `time`
+        """ Get the latest checkpoint in directory `self.dir_path` whose time is before or equal to `time`
 
+        However, if no checkpoint with time <= `time` exists, then return the first checkpoint.
+        And if `time` is `None`, return the last checkpoint.
         For example, consider checkpoints at 1.0 s, 1.5 s, and 2.0 s. If `time` = 1.5 s, then
         return the checkpoint from 1.5 s. Return the same checkpoint if `time` = 1.9 s.
-        If no checkpoint with time <= `time` exists, then return the first checkpoint. E.g., if
-        `time` = 0.9 s, the checkpoint from 1.0 s would be returned.
-        Finally, if `time` is `None`, return the last checkpoint.
+        But, if `time` = 0.9 s, the checkpoint from 1.0 s would be returned.
+        And if `time` is `None`, return the checkpoint from 2.0 s.
 
         Args:
             time (:obj:`float`, optional): time in simulated time units of desired checkpoint; if not provided,
@@ -153,7 +155,7 @@ class AccessCheckpoints(object):
         reloaded if the directory is updated.
 
         Args:
-            error_if_empty (:obj:`bool`, optional): if set, report an error if no checkpoints found
+            error_if_empty (:obj:`bool`, optional): if set, report an error if no checkpoints are found
 
         Returns:
             :obj:`list` of :obj:`float`: sorted list of times of saved checkpoints
@@ -163,8 +165,8 @@ class AccessCheckpoints(object):
         """
         # reload all_checkpoints if they have not been obtained
         # or self.dir_path has been modified since all_checkpoints was last obtained
-        if self.all_checkpoints is None or self.last_dir_mod < os.stat(self.dir_path).st_mtime_ns:
-            self.last_dir_mod = os.stat(self.dir_path).st_mtime_ns
+        if self.all_checkpoints is None or self._last_dir_mod < os.stat(self.dir_path).st_mtime_ns:
+            self._last_dir_mod = os.stat(self.dir_path).st_mtime_ns
 
             # find checkpoint times
             checkpoint_times = []
@@ -187,7 +189,7 @@ class AccessCheckpoints(object):
         return self.all_checkpoints
 
     def get_file_name(self, time):
-        """ Get file name for checkpoint at time `time`
+        """ Get the file name for the checkpoint at time `time`
 
         Args:
             time (:obj:`float`): time

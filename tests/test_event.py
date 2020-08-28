@@ -7,7 +7,6 @@
 
 import unittest
 
-from de_sim.event import iterable_not_str, nested_elements_to_str
 from de_sim.simulation_object import (SimulationObjMeta, SimObjClassPriority)
 from de_sim.testing.example_simulation_objects import ExampleSimulationObject
 from de_sim.testing.some_message_types import InitMsg, Eg1, MsgWithAttrs
@@ -132,27 +131,3 @@ class TestEvent(unittest.TestCase):
                     NoBodyMessage())
         self.assertIn('\t'.join(de_sim.Event.BASE_HEADERS), ev2.custom_header())
         # self.assertIn('\t'.join([str(t) for t in times]), str(ev2))
-
-
-class TestStrMapFunctions(unittest.TestCase):
-
-    def test_iterable_not_str(self):
-        # some non-string iterables
-        self.assertTrue(iterable_not_str(("f", "f")))   # tuple
-        self.assertTrue(iterable_not_str(["f", "f"]))   # list
-        self.assertTrue(iterable_not_str(iter("ff")))   # iterator
-        self.assertTrue(iterable_not_str(range(4)))     # generator
-        self.assertTrue(iterable_not_str(b"ff"))        # bytes (Python 2 calls this a string)
-
-        # strings or non-iterables
-        self.assertFalse(iterable_not_str(u"ff"))    # string
-        self.assertFalse(iterable_not_str(44))       # integer
-        self.assertFalse(iterable_not_str(iterable_not_str))  # function
-
-    def test_nested_elements_to_str(self):
-        arg_and_expected = (([1, 'x'], ['1', 'x']),
-                            ((1, 'x'), ['1', 'x']),
-                            ((1, [2, 'y']), ['1', ['2', 'y']]),
-                            )
-        for arg, expected in arg_and_expected:
-            self.assertEqual(nested_elements_to_str(arg), expected)
