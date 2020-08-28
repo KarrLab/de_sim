@@ -72,9 +72,6 @@ class PholdSimulationObject(de_sim.SimulationObject):
             message = MessageSentToOtherObject
         self.send_event(random.expovariate(1.0), receiver, message())
 
-    def get_state(self):
-        return str(self.args)
-
     def log_debug_msg(self, msg):
         log = logs.get_log('de_sim.debug.example.console')
         log.debug(msg, sim_time=self.time)

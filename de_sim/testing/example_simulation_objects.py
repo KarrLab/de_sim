@@ -11,7 +11,6 @@ import de_sim
 
 
 ALL_MESSAGE_TYPES = [InitMsg, Eg1]
-TEST_SIM_OBJ_STATE = 'Test SimulationObject state'
 
 
 class ExampleSimulationObject(de_sim.SimulationObject):
@@ -21,9 +20,6 @@ class ExampleSimulationObject(de_sim.SimulationObject):
 
     def init_before_run(self, *args):
         pass  # pragma: no cover
-
-    def get_state(self):
-        return TEST_SIM_OBJ_STATE
 
     def handler(self, event):
         pass  # pragma: no cover
@@ -47,9 +43,6 @@ class ImproperlyRegisteredSimulationObject(de_sim.SimulationObject):
     messages_sent = [InitMsg]
 
     def init_before_run(self, *args):
-        pass  # pragma: no cover
-
-    def get_state(self):
         pass  # pragma: no cover
 
     def handler(self, event):

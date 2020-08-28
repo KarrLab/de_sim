@@ -557,10 +557,6 @@ class SimulationObjectInterface(object, metaclass=ABCMeta):  # pragma: no cover
         """ Perform initialization before a simulation run """
         pass
 
-    @abc.abstractmethod
-    def get_state(self):
-        pass
-
 
 class SimObjClassPriority(IntEnum):
     """ Simultaneous execution priority for simulation object classes, used in `class_priority`
@@ -782,9 +778,6 @@ class SimulationObject(BaseSimulationObject, SimulationObjectInterface, metaclas
         A simulation object that wishes to schedule initial events for itself or for other objects in the simulation
         should do so in `init_before_run`. It can also perform any other initialization in the method.
         """
-        pass  # pragma: no cover
-
-    def get_state(self):
         pass  # pragma: no cover
 
     @classmethod

@@ -473,30 +473,3 @@ class Simulator(object):
         for event_type, count in self.event_counts.most_common():
             rv.append("{}\t{}".format(count, event_type))
         return '\n'.join(rv)
-
-    def get_simulation_state(self):
-        """ Get the simulation's state
-        """
-        # get simulation time
-        state = [self.time]
-        # get the state of all simulation object(s)
-        sim_objects_state = []
-        for simulation_object in self.simulation_objects.values():
-            # get object name, type, current time, state
-            state_entry = (simulation_object.__class__.__name__,
-                           simulation_object.name,
-                           simulation_object.time,
-                           simulation_object.get_state(),
-                           simulation_object.render_event_queue())
-            sim_objects_state.append(state_entry)
-        state.append(sim_objects_state)
-
-        # get the shared state
-        shared_objects_state = []
-        for shared_state_obj in self.shared_state:
-            state_entry = (shared_state_obj.__class__.__name__,
-                           shared_state_obj.get_name(),
-                           shared_state_obj.get_shared_state(self.time))
-            shared_objects_state.append(state_entry)
-        state.append(shared_objects_state)
-        return state

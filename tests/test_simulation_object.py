@@ -14,8 +14,7 @@ from de_sim.errors import SimulatorError
 from de_sim.simulation_object import (EventQueue, SimulationObject,
                                       SimulationObjMeta, SimulationObjectMetadata,
                                       SimObjClassPriority)
-from de_sim.testing.example_simulation_objects import (ALL_MESSAGE_TYPES, TEST_SIM_OBJ_STATE,
-                                                       ExampleSimulationObject,
+from de_sim.testing.example_simulation_objects import (ALL_MESSAGE_TYPES, ExampleSimulationObject,
                                                        ImproperlyRegisteredSimulationObject)
 from de_sim.testing.some_message_types import InitMsg, Eg1, MsgWithAttrs, UnregisteredMsg
 from wc_utils.util.list import is_sorted
@@ -501,6 +500,3 @@ class TestSimulationObject(unittest.TestCase):
 
         with self.assertRaisesRegex(SimulatorError, "delay is 'NaN'"):
             self.o1.send_event(float('nan'), self.o2, Eg1())
-
-    def test_misc(self):
-        self.assertEqual(self.o1.get_state(), TEST_SIM_OBJ_STATE)

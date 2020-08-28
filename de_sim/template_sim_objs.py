@@ -58,9 +58,6 @@ class TemplatePeriodicSimulationObject(de_sim.SimulationObject):
         self.handle_event()
         self.schedule_next_event()
 
-    def get_state(self):
-        return ''    # pragma: no cover
-
     event_handlers = [(NextEvent, handle_simulation_event)]
 
     # register the message type sent

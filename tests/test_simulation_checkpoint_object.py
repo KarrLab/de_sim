@@ -54,9 +54,6 @@ class PeriodicLinearUpdatingSimuObj(de_sim.SimulationObject):
         self.simulation_state.set(self.a * self.time + self.b)
         self.send_event(self.delay, self, MessageSentToSelf())
 
-    def get_state(self):
-        return ''
-
     # register the event handler and message type sent
     event_handlers = [(MessageSentToSelf, handle_simulation_event)]
     messages_sent = [MessageSentToSelf]

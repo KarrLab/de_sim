@@ -16,9 +16,6 @@ class Example(MockSimulationObject):
     def init_before_run(self):
         pass
 
-    def get_state(self):
-        return 'object state to be provided'
-
     def test_handler(self, value):
         self.test_case.assertEqual(value, self.kwargs['expected'])
 

@@ -106,9 +106,6 @@ class CyclicalMessagesSimulationObject(de_sim.SimulationObject):
         # send event to next CyclicalMessagesSimulationObject
         self.send_event(1, self.next_obj(), InitMsg())
 
-    def get_state(self):
-        return "self: obj_num: {} num_msgs: {}".format(self.obj_num, self.num_msgs)
-
     event_handlers = [(sim_msg_type, 'handle_event') for sim_msg_type in ALL_MESSAGE_TYPES]
 
     # register the message types sent
@@ -342,9 +339,6 @@ class TestSimulator(unittest.TestCase):
 
             def __init__(self):
                 super().__init__('inactive')
-
-            def get_state(self):
-                pass
 
             event_handlers = []
 
