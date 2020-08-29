@@ -164,6 +164,7 @@ class TestSimulationConfig(unittest.TestCase):
         self.assertTrue(self.simulation_config.semantically_equal(simulation_config))
         simulation_config.time_max += 1E-12
         self.assertFalse(self.simulation_config.semantically_equal(simulation_config))
+        self.assertFalse(self.simulation_config.semantically_equal('x'))
 
 
 class ExampleClass(object):

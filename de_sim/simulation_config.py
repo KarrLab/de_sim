@@ -16,25 +16,25 @@ from wc_utils.util.misc import EnhancedDataClass
 
 @dataclass
 class SimulationConfig(EnhancedDataClass):
-    """ Configuration information for a simulation run
+    """ A dataclass that holds configuration information for a simulation run
 
-    - Simulation start time
     - Simulation maximum time
+    - Simulation start time
     - Stop condition
-    - Data directory
+    - Directory for storing simulation metadata
     - Progress bar switch
-    - Profiling switch
-    - Control profiling of changes in heap objects
+    - Performance profiling switch
+    - Configure profiling of heap memory use
 
     Attributes:
         time_max (:obj:`float`): maximum simulation time
-        time_init (:obj:`float`, optional): time at which a simulation starts
+        time_init (:obj:`float`, optional): time at which a simulation starts; defaults to 0
         stop_condition (:obj:`function`, optional): if provided, a function that takes one argument,
             the simulation time; a simulation terminates if the function returns `True`
-        output_dir (:obj:`str`, optional): directory for saving metadata; will be created if it does't
+        output_dir (:obj:`str`, optional): directory for saving metadata; `output_dir` will be created if it does't
             exist; if not provided, then metatdata should be saved before another simulation is run
             with the same :obj:`Simulator`
-        progress (:obj:`bool`, optional): if `True`, output a text bar that dynamically reports the
+        progress (:obj:`bool`, optional): if `True`, output a text bar that dynamically reports a
             simulation's progress
         profile (:obj:`bool`, optional): if `True`, output a profile of the simulation's performance
             created by a Python profiler
@@ -53,14 +53,17 @@ class SimulationConfig(EnhancedDataClass):
     DO_NOT_PICKLE = ['stop_condition']
 
     def __setattr__(self, name, value):
-        """ Validate an attribute when it is changed """
+        """ Validate an attribute in this :obj:`SimulationConfig` when it is changed
+
+        Overrides `__setattr__` in :obj:`EnhancedDataClass` to report errors as :obj:`SimulatorError`s
+        """
         try:
             super().__setattr__(name, value)
         except TypeError as e:
             raise SimulatorError(e)
 
     def validate_individual_fields(self):
-        """ Validate constraints other than types in individual fields in a `SimulationConfig` instance
+        """ Validate constraints on individual fields in a :obj:`SimulationConfig` instance
 
         Returns:
             :obj:`None`: if no error is found
@@ -100,8 +103,7 @@ class SimulationConfig(EnhancedDataClass):
     def validate(self):
         """ Validate a `SimulationConfig` instance
 
-        Validation tests that involve multiple fields must be made in this method. Call it after the
-        `SimulationConfig` instance is in a consistent state.
+        Validation tests that involve multiple fields are contained in this method.
 
         Returns:
             :obj:`None`: if no error is found
@@ -132,6 +134,8 @@ class SimulationConfig(EnhancedDataClass):
             other (:obj:`Object`): other object
 
         Returns:
-            :obj:`bool`: :obj:`True` if `other` is semantically equal to `self`, :obj:`False` otherwise
+            :obj:`bool`: :obj:`True` if `other` is a :obj:`SimulationConfig` that is semantically equal to `self`,
+                :obj:`False` otherwise
         """
-        return self.time_max == other.time_max and self.time_init == other.time_init
+        return (isinstance(other, SimulationConfig) and self.time_max == other.time_max and
+                self.time_init == other.time_init)

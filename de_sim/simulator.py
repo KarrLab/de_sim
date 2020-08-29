@@ -16,7 +16,6 @@ import tempfile
 from de_sim.config import core
 from de_sim.simulation_metadata import SimulationMetadata, RunMetadata, AuthorMetadata
 from de_sim.errors import SimulatorError
-from de_sim.shared_state_interface import SharedStateInterface  # noqa: F401
 from de_sim.simulation_config import SimulationConfig
 from de_sim.simulation_object import EventQueue, SimulationObject  # noqa: F401
 from de_sim.utilities import SimulationProgressBar, FastLogger

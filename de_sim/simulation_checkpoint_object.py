@@ -33,7 +33,7 @@ class AbstractCheckpointSimulationObject(TemplatePeriodicSimulationObject):
 
 
 class AccessStateObjectInterface(metaclass=abc.ABCMeta):
-    """ An abstract base class that all access state objects must support
+    """ An abstract base class interface which any object that obtains a simulation's checkpoint must support
     """
 
     @abc.abstractmethod
@@ -56,15 +56,13 @@ class AccessStateObjectInterface(metaclass=abc.ABCMeta):
 
 
 class CheckpointSimulationObject(AbstractCheckpointSimulationObject):
-    """ Create periodic checkpoints to files
+    """ Periodically write a checkpoint to a file
 
     Attributes:
         checkpoint_dir (:obj:`str`): the directory in which to save checkpoints
-        access_state_obj (:obj:`AccessStateObjectInterface`): an object whose `get_checkpoint_state(time)`
-            returns the simulation's state at time `time`; `access_state_obj` objects should be derived from
-            `AccessStateObjectInterface`
+        access_state_obj (:obj:`AccessStateObjectInterface`): an object which obtains the simulation's state for
+            a checkpoint; `access_state_obj` objects should be subclasses of :obj:`AccessStateObjectInterface`
     """
-
     def __init__(self, name, checkpoint_period, checkpoint_dir, access_state_obj):
         self.checkpoint_dir = checkpoint_dir
         self.access_state_obj = access_state_obj

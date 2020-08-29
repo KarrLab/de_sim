@@ -85,10 +85,12 @@ class TestSimulationMetadata(unittest.TestCase):
         self.assertTrue(self.run.semantically_equal(self.run_equal))
         self.assertTrue(self.run_equal.semantically_equal(self.run))
         self.assertTrue(self.run_equal.semantically_equal(self.run_different))
+        self.assertFalse(self.run.semantically_equal(8))
 
         # SimulationMetadata
         self.assertTrue(self.metadata.semantically_equal(self.metadata_equal))
         self.assertTrue(self.metadata_equal.semantically_equal(self.metadata))
+        self.assertFalse(self.metadata.semantically_equal('string'))
 
         # run not used by SimulationMetadata.semantically_equal
         self.metadata_equal.run = self.run_different

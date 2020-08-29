@@ -1,4 +1,4 @@
-""" Classes to represent the metadata of a simulation run
+""" Classes that represent the metadata of a simulation run
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Author: Jonathan Karr <karr@mssm.edu>
@@ -23,9 +23,11 @@ from wc_utils.util.git import RepositoryMetadata
 class RunMetadata(EnhancedDataClass):
     """ Represent a simulation's run
 
+    All :obj:`RunMetadata` attributes ares obtained automatically.
+
     Attributes:
-        ip_address (:obj:`str`): ip address of the machine that ran the simulation
-        start_time (:obj:`datetime`): simulation clock start time
+        ip_address (:obj:`str`): IP address of the machine that ran the simulation
+        start_time (:obj:`datetime`): clock start time when the simulation started
         run_time (:obj:`float`): simulation run time in real seconds
     """
 
@@ -52,27 +54,30 @@ class RunMetadata(EnhancedDataClass):
     def semantically_equal(self, other):
         """ Evaluate whether two instances of :obj:`RunMetadata` are semantically equal
 
-        Always returns :obj:`True`, because none of the attributes in :obj:`RunMetadata` are important
-        to a simulations' results
+        Returns :obj:`False` if `other` is not a :obj:`RunMetadata`.
+        Otherwise, always returns :obj:`True` , because a simulation's results do not depend on the data
+        in its :obj:`RunMetadata`.
 
         Args:
             other (:obj:`Object`): other object
 
         Returns:
-            :obj:`bool`: :obj:`True`
+            :obj:`bool`: :obj:`True` if `other` is a :obj:`RunMetadata`
         """
-        return True
+        return isinstance(other, RunMetadata)
 
 
 @dataclass
 class AuthorMetadata(EnhancedDataClass):
     """ Represents a simulation's author
 
+    If possible, the author's username is obtained automatically. All other attributes must be set manually.
+
     Attributes:
-        name (:obj:`str`): authors' name
-        email (:obj:`str`): author's email address
-        username (:obj:`str`): authors' username
-        organization (:obj:`str`): author's organization
+        name (:obj:`str`): the author's name
+        email (:obj:`str`): the author's email address
+        username (:obj:`str`): the author's username
+        organization (:obj:`str`): the author's organization
     """
 
     name: str = None
@@ -98,7 +103,7 @@ class AuthorMetadata(EnhancedDataClass):
 
 @dataclass
 class SimulationMetadata(EnhancedDataClass):
-    """ Represents the metadata of a discrete-event simulation run
+    """ Represent the metadata of a simulation run; incorporates four types of metadata classes
 
     Attributes:
         simulation_config (:obj:`SimulationConfig`): information about the simulation's configuration
@@ -116,12 +121,21 @@ class SimulationMetadata(EnhancedDataClass):
 
     @staticmethod
     def get_pathname(dirname):
-        """ See docstring in :obj:`EnhancedDataClass`
+        """ Get the pathname for a pickled :obj:`SimulationMetadata` object stored in directory `dirname`
+
+        Args:
+            dirname (:obj:`str`): directory that stores a pickled representation of a :obj:`SimulationMetadata` object
+
+        Returns:
+            :obj:`str`: pathname to a pickled file storing a :obj:`SimulationMetadata` object
         """
         return os.path.join(dirname, 'simulation_metadata.pickle')
 
     def __setattr__(self, name, value):
-        """ Validate an attribute when it is changed """
+        """ Validate an attribute in this :obj:`SimulationMetadata` when it is changed
+
+        Overrides `__setattr__` in :obj:`EnhancedDataClass` to report errors as :obj:`SimulatorError`s
+        """
         try:
             super().__setattr__(name, value)
         except TypeError as e:
@@ -140,7 +154,8 @@ class SimulationMetadata(EnhancedDataClass):
         Returns:
             :obj:`bool`: :obj:`True` if `other` is semantically equal to `self`, :obj:`False` otherwise
         """
-        return self.simulation_config.semantically_equal(other.simulation_config) and \
-            self.author.semantically_equal(other.author) and \
-            self.simulator_repo == other.simulator_repo # RepositoryMetadata not an EnhancedDataClass,
-                                                        # so it doesn't define semantically_equal()
+        return (isinstance(other, SimulationMetadata) and
+                self.simulation_config.semantically_equal(other.simulation_config) and
+                self.author.semantically_equal(other.author) and
+                # RepositoryMetadata doesn't define semantically_equal because it is not an EnhancedDataClass
+                self.simulator_repo == other.simulator_repo)
