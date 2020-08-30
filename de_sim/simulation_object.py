@@ -1,4 +1,4 @@
-""" Base class for simulation objects and their event queues
+""" Base class for simulation objects
 
 :Author: Arthur Goldberg <Arthur.Goldberg@mssm.edu>
 :Date: 2016-06-01
@@ -10,279 +10,39 @@ from abc import ABCMeta
 from copy import deepcopy
 from enum import IntEnum
 import abc
-import heapq
 import math
 import warnings
 
 from de_sim.config import core
 from de_sim.errors import SimulatorError
-from de_sim.event import Event
+from de_sim.event import Event  # noqa: F401
 from de_sim.event_message import EventMessage
 from de_sim.utilities import ConcreteABCMeta, FastLogger
-from wc_utils.util.list import elements_to_str
 from wc_utils.util.misc import most_qual_cls_name, round_direct
-
-
-# TODO(Arthur): move to simulator
-class EventQueue(object):
-    """ A simulation's event queue
-
-    Stores a `Simulator`'s events in a heap (also known as a priority queue).
-    The heap is a 'min heap', which keeps the event with the smallest
-    `(event_time, sending_object.name)` at the root in heap[0].
-    This is implemented via comparison operations in `Event`.
-    Thus, all entries with equal `(event_time, sending_object.name)` will be popped from the heap
-    adjacently. `schedule_event()` costs `O(log(n))`, where `n` is the size of the heap,
-    while `next_events()`, which returns all events with the minimum
-    `(event_time, sending_object.name)`, costs `O(mlog(n))`, where `m` is the number of events
-    returned.
-
-    Attributes:
-        event_heap (:obj:`list`): a `Simulator`'s heap of events
-        debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): a `DebugLogsManager`
-    """
-
-    def __init__(self):
-        self.event_heap = []
-        self.debug_logs = core.get_debug_logs()
-        self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('de_sim.debug.file'), 'debug')
-
-    def reset(self):
-        """ Empty the event queue
-        """
-        self.event_heap = []
-
-    def len(self):
-        """ Size of the event queue
-
-        Returns:
-            :obj:`int`: number of events in the event queue
-        """
-        return len(self.event_heap)
-
-    def schedule_event(self, send_time, receive_time, sending_object, receiving_object, message):
-        """ Create an event and insert in this event queue, scheduled to execute at `receive_time`
-
-        Simulation object `X` can sends an event to simulation object `Y` by invoking
-            `X.send_event(receive_delay, Y, message)`.
-
-        Args:
-            send_time (:obj:`float`): the simulation time at which the event was generated (sent)
-            receive_time (:obj:`float`): the simulation time at which the `receiving_object` will
-                execute the event
-            sending_object (:obj:`SimulationObject`): the object sending the event
-            receiving_object (:obj:`SimulationObject`): the object that will receive the event; when
-                the simulation is parallelized `sending_object` and `receiving_object` will need
-                to be global identifiers.
-            message (:obj:`EventMessage`): an :obj:`EventMessage` carried by the event; its type
-                provides the simulation application's type for an `Event`; it may also carry a payload
-                for the `Event` in its `msg_field_names`.
-
-        Raises:
-            :obj:`SimulatorError`: if `receive_time` < `send_time`, or `receive_time` or `send_time` is NaN
-        """
-
-        if math.isnan(send_time) or math.isnan(receive_time):
-            raise SimulatorError("send_time ({}) and/or receive_time ({}) is NaN".format(
-                receive_time, send_time))
-
-        # Ensure that send_time <= receive_time.
-        # Events with send_time == receive_time can cause loops, but the application programmer
-        # is responsible for avoiding them.
-        if receive_time < send_time:
-            raise SimulatorError("receive_time < send_time in schedule_event(): {} < {}".format(
-                receive_time, send_time))
-
-        if not isinstance(message, EventMessage):
-            raise SimulatorError("message should be an instance of {} but is a '{}'".format(
-                EventMessage.__name__, type(message).__name__))
-
-        event = Event(send_time, receive_time, sending_object, receiving_object, message)
-        # As per David Jefferson's thinking, the event queue is ordered by data provided by the
-        # simulation application, in particular the tuple (event time, receiving object name).
-        # See the comparison operators for Event. This achieves deterministic and reproducible
-        # simulations.
-        heapq.heappush(self.event_heap, event)
-
-    def empty(self):
-        """ Is the event queue empty?
-
-        Returns:
-            :obj:`bool`: return `True` if the event queue is empty
-        """
-        return not self.event_heap
-
-    def next_event_time(self):
-        """ Get the time of the next event
-
-        Returns:
-            :obj:`float`: the time of the next event; return infinity if no event is scheduled
-        """
-        if not self.event_heap:
-            return float('inf')
-
-        next_event = self.event_heap[0]
-        next_event_time = next_event.event_time
-        return next_event_time
-
-    def next_event_obj(self):
-        """ Get the simulation object that receives the next event
-
-        Returns:
-            :obj:`SimulationObject`): the simulation object that will execute the next event, or `None`
-                if no event is scheduled
-        """
-        if not self.event_heap:
-            return None
-
-        next_event = self.event_heap[0]
-        return next_event.receiving_object
-
-    def next_events(self):
-        """ Get all events at the smallest event time destined for the object whose name sorts earliest
-
-        Because multiple events may occur concurrently -- that is, have the same simulation time --
-        they must be provided as a collection to the simulation object that executes them.
-
-        Handle 'ties' properly. That is, since an object may receive multiple events
-        with the same event_time (aka receive_time), pass them all to the object in a list.
-
-        Returns:
-            :obj:`list` of :obj:`Event`: the earliest event(s), sorted by message type priority. If no
-                events are available the list is empty.
-        """
-        if not self.event_heap:
-            return []
-
-        events = []
-        next_event = heapq.heappop(self.event_heap)
-        now = next_event.event_time
-        receiving_obj = next_event.receiving_object
-        events.append(next_event)
-
-        # gather all events with the same event_time and receiving_object
-        while (self.event_heap and now == self.next_event_time() and
-               receiving_obj == self.next_event_obj()):
-            events.append(heapq.heappop(self.event_heap))
-
-        if 1 < len(events):
-            # sort events by message type priority, and within priority by message content
-            # thus, a sim object handles simultaneous messages in priority order;
-            # this costs O(n log(n)) in the number of event messages in events
-            receiver_priority_dict = receiving_obj.get_receiving_priorities_dict()
-            events = sorted(events,
-                            key=lambda event: (receiver_priority_dict[event.message.__class__], event.message))
-
-        for event in events:
-            self.log_event(event)
-
-        return events
-
-    def log_event(self, event):
-        """ Log an event with its simulation time
-
-        Args:
-            event (:obj:`Event`): the Event to log
-        """
-        msg = "Execute: {} {}:{} {} ({})".format(event.event_time,
-                                                 type(event.receiving_object).__name__,
-                                                 event.receiving_object.name,
-                                                 event.message.__class__.__name__,
-                                                 str(event.message))
-        self.fast_debug_file_logger.fast_log(msg, sim_time=event.event_time)
-
-    def render(self, sim_obj=None, as_list=False, separator='\t'):
-        """ Return the content of an :obj:`EventQueue`
-
-        Make a human-readable event queue, sorted by non-decreasing event time.
-        Provide a header row and a row for each event. If all events have the same type of message,
-        the header contains event and message fields. Otherwise, the header has event fields and
-        a message field label, and each event labels message fields with their attribute names.
-
-        Args:
-            sim_obj (:obj:`SimulationObject`, optional): if provided, return only events to be
-                received by `sim_obj`
-            as_list (:obj:`bool`, optional): if set, return the :obj:`EventQueue`'s values in a :obj:`list`
-            separator (:obj:`str`, optional): the field separator used if the values are returned as
-                a string
-
-        Returns:
-            :obj:`str`: String representation of the values of an :obj:`EventQueue`, or a :obj:`list`
-                representation if `as_list` is set
-        """
-        event_heap = self.event_heap
-        if sim_obj is not None:
-            event_heap = list(filter(lambda event: event.receiving_object == sim_obj, event_heap))
-
-        if not event_heap:
-            return None
-
-        # Sort the events in non-decreasing event time (receive_time, receiving_object.name)
-        sorted_events = sorted(event_heap)
-
-        # Does the queue contain multiple message types?
-        message_types = set()
-        for event in event_heap:
-            message_types.add(event.message.__class__)
-            if 1 < len(message_types):
-                break
-        multiple_msg_types = 1 < len(message_types)
-
-        rendered_event_queue = []
-        if multiple_msg_types:
-            # The queue contains multiple message types
-            rendered_event_queue.append(Event.header(as_list=True))
-            for event in sorted_events:
-                rendered_event_queue.append(event.render(annotated=True, as_list=True))
-
-        else:
-            # The queue contain only one message type
-            # message_type = message_types.pop()
-            event = sorted_events[0]
-            rendered_event_queue.append(event.custom_header(as_list=True))
-            for event in sorted_events:
-                rendered_event_queue.append(event.render(as_list=True))
-
-        if as_list:
-            return rendered_event_queue
-        else:
-            table = []
-            for row in rendered_event_queue:
-                table.append(separator.join(elements_to_str(row)))
-            return '\n'.join(table)
-
-    def __str__(self):
-        """ Return event queue members as a table
-        """
-        rv = self.render()
-        if rv is None:
-            return ''
-        return rv
+import de_sim  # noqa: F401
 
 
 class BaseSimulationObject(object):
     """ Base class for simulation objects.
 
-    :class:`BaseSimulationObject` is a base class for all simulations objects. It provides basic functionality:
-    the object's name (which must be unique), its simulation time, a queue of received events,
-    and a send_event() method.
+    :class:`BaseSimulationObject` is a base class for all simulations objects. It provides basic functionality
+    which includes
+    the object's `name` (which must be unique), its simulation time, and a `send_event()` method.
 
     Attributes:
-        name (:obj:`str`): this simulation object's name, which is unique across all simulation objects
-            handled by a `Simulator`
+        name (:obj:`str`): this simulation object's name, which must be unique across all simulation objects
+            handled by a :obj:`de_sim.Simulator`
         time (:obj:`float`): this simulation object's current simulation time
         event_time_tiebreaker (:obj:`str`): the least significant component of an object's 'sub-tme'
             priority, which orders simultaneous events received by different instances of the same
-            :obj:`SimulationObject`
+            :obj:`SimulationObject` class
         num_events (:obj:`int`): number of events processed
-        simulator (:obj:`Simulator`): the `Simulator` that uses this :class:`BaseSimulationObject`
+        simulator (:obj:`de_sim.Simulator`): the :obj:`de_sim.Simulator` that uses this :class:`BaseSimulationObject`
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
     """
 
     def __init__(self, name, start_time=0, **kwargs):
         """ Initialize a :class:`BaseSimulationObject`.
-
-        Create its event queue, initialize its name, and set its start time.
 
         Args:
             name (:obj:`str`): the object's unique name, used as a key in the dict of objects
@@ -310,23 +70,15 @@ class BaseSimulationObject(object):
         """ Add this object to a simulation.
 
         Args:
-            simulator (:obj:`Simulator`): the simulator that will use this :class:`BaseSimulationObject`
+            simulator (:obj:`de_sim.Simulator`): the simulator that will use this :class:`BaseSimulationObject`
 
         Raises:
             :obj:`SimulatorError`: if this :class:`BaseSimulationObject` is already registered with a simulator
         """
         if self.simulator is None:
-            # TODO(Arthur): reference to the simulator is problematic because it means simulator can't be GC'ed
             self.simulator = simulator
             return
         raise SimulatorError("SimulationObject '{}' is already part of a simulator".format(self.name))
-
-    def delete(self):
-        """ Delete this object from a simulation.
-        """
-        # TODO(Arthur): is this an operation that makes sense to support? if not, remove it; if yes,
-        # remove all of this object's state from simulator, and test it properly
-        self.simulator = None
 
     def send_event_absolute(self, event_time, receiving_object, message, copy=False):
         """ Schedule an event containing an event message with an absolute event time.
@@ -336,12 +88,12 @@ class BaseSimulationObject(object):
             receiving_object (:obj:`SimulationObject`): the simulation object that will receive and
                 execute the event
             message (:obj:`EventMessage`): the event message which will be carried by the event
-            copy (:obj:`bool`, optional): if `True`, copy the message before adding it to the event;
-                set `False` by default to optimize performance; set `True` as a safety measure to avoid
+            copy (:obj:`bool`, optional): if :obj:`True`, copy the message before adding it to the event;
+                set :obj:`False` by default to optimize performance; set :obj:`True` as a safety measure to avoid
                 unexpected changes to shared objects
 
         Raises:
-            :obj:`SimulatorError`: if `event_time` < 0, or
+            :obj:`SimulatorError`: if `event_time < 0`, or
                 if the sending object type is not registered to send messages with the type of `message`, or
                 if the receiving simulation object type is not registered to receive
                 messages with the type of `message`
@@ -390,8 +142,8 @@ class BaseSimulationObject(object):
             receiving_object (:obj:`SimulationObject`): the simulation object that will receive and
                 execute the event
             message (:obj:`EventMessage`): the event message which will be carried by the event
-            copy (:obj:`bool`, optional): if `True`, copy the message before adding it to the event;
-                set `False` by default to optimize performance; set `True` as a safety measure to avoid
+            copy (:obj:`bool`, optional): if :obj:`True`, copy the message before adding it to the event;
+                set :obj:`False` by default to optimize performance; set :obj:`True` as a safety measure to avoid
                 unexpected changes to shared objects
 
         Raises:
@@ -421,7 +173,7 @@ class BaseSimulationObject(object):
             subclass (:class:`BaseSimulationObject`): a subclass of :class:`BaseSimulationObject` that is registering
                 the relationships between the event messages it receives and the methods that
                 handle them
-            handlers (:obj:`list` of (`EventMessage`, `function`)): a list of tuples, indicating
+            handlers (:obj:`list` of (:obj:`EventMessage`, `function`)): a list of tuples, indicating
                 which method should handle which type of :obj:`EventMessage` in `subclass`; ordered in
                 decreasing priority for handling event message types
 
@@ -460,9 +212,9 @@ class BaseSimulationObject(object):
 
         Returns:
             :obj:`dict`: mapping from message types handled by this :obj:`SimulationObject` to their
-                execution priorities. The highest priority is 0, and higher values have lower
-                priorities. Execution priorities determine the execution order of concurrent events
-                at a :obj:`SimulationObject`.
+            execution priorities. The highest priority is 0, and higher values have lower
+            priorities. Execution priorities determine the execution order of concurrent events
+            at a :obj:`SimulationObject`.
         """
         return self.__class__.metadata.event_handler_priorities
 
@@ -471,7 +223,7 @@ class BaseSimulationObject(object):
 
         This is a Python 'dunder' method which creates a class-private member,
         reducing the chance that it will be accidentally called or overwritten.
-        `Simulator` refers to this method via `sim_obj._BaseSimulationObject__handle_event_list`,
+        :obj:`de_sim.Simulator` refers to this method via `sim_obj._BaseSimulationObject__handle_event_list`,
         where `sim_obj` is the simulation object that receives the event list.
 
         If multiple event messages are received by a simulation object at the same simulation time,
@@ -482,11 +234,11 @@ class BaseSimulationObject(object):
         The alternative, in which the simulator passes simultaneous event messages in an arbitrary
         order to a simulation object would **not** give the object sufficient information to be deterministic.
         But if the event messages have different handlers then the simulator raises a
-        `SimulatorError` exception which says that superposition requires that the message types have
+        :obj:`SimulatorError` exception which says that superposition requires that the message types have
         the same handler.
 
         Attributes:
-            event_list (:obj:`list` of :obj:`Event`): the `Event` message(s) in the simulation event
+            event_list (:obj:`list` of :obj:`Event`): the :obj:`Event` message(s) in the simulation event
 
         Raises:
             :obj:`SimulatorError`: if a message in `event_list` has an invalid type, or
@@ -537,14 +289,6 @@ class BaseSimulationObject(object):
             :obj:`int`: the event priority of this simulation object's class
         """
         return self.__class__.metadata.class_priority
-
-    def render_event_queue(self):
-        """ Format an event queue as a string
-
-        Returns:
-            :obj:`str`: return a string representation of the simulator's event queue
-        """
-        return self.simulator.event_queue.render()
 
     def log_with_time(self, msg):
         """ Write a debug log message with the simulation time.
@@ -769,7 +513,7 @@ class SimulationObject(BaseSimulationObject, SimulationObjectInterface, metaclas
 
     Attributes:
         metadata (:obj:`SimulationObjectMetadata`): metadata for event message sending and handling,
-            initialized by `SimulationObjectAndABCMeta`
+            initialized by :obj:`SimulationObjectAndABCMeta`
     """
 
     def init_before_run(self):

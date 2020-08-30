@@ -9,10 +9,10 @@
 import enum
 import numpy
 
-import de_sim
 from de_sim.checkpoint import AccessCheckpoints, Checkpoint
 from de_sim.simulation_checkpoint_object import (AccessStateObjectInterface,
                                                  CheckpointSimulationObject)
+import de_sim
 
 
 class SusceptibleToInfectious(de_sim.EventMessage):

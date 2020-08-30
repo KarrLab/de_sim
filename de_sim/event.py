@@ -13,6 +13,7 @@ from wc_utils.util.list import elements_to_str
 from de_sim.event_message import EventMessage  # noqa: F401
 import de_sim  # noqa: F401
 
+
 class Event(object):
     """ An object that holds a discrete-event simulation (DES) event
 
