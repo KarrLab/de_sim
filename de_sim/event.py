@@ -58,10 +58,10 @@ class Event(object):
         self.message = message
 
     def _get_order_time(self):
-        """ Provide the tuple that determines this event's time order
+        """ Provide the tuple that determines this event's execution order
 
         Returns:
-            :obj:`tuple`: the tuple that determines this event's time order
+            :obj:`tuple`: the tuple that determines this event's execution order
         """
         return (self.event_time, self.receiving_object.class_event_priority,
                 self.receiving_object.event_time_tiebreaker)

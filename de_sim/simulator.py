@@ -30,18 +30,16 @@ from wc_utils.util.list import elements_to_str
 class EventQueue(object):
     """ A simulation's event queue
 
-    Stores a `Simulator`'s events in a heap (also known as a priority queue).
-    The heap is a 'min heap', which keeps the event with the smallest
-    `(event_time, sending_object.name)` at the root in heap[0].
-    This is implemented via comparison operations in `Event`.
-    Thus, all entries with equal `(event_time, sending_object.name)` will be popped from the heap
-    adjacently. `schedule_event()` costs `O(log(n))`, where `n` is the size of the heap,
-    while `next_events()`, which returns all events with the minimum
-    `(event_time, sending_object.name)`, costs `O(mlog(n))`, where `m` is the number of events
-    returned.
+    Stores a :obj:`Simulator`'s events in a heap (also known as a priority queue).
+    The heap is a 'min heap', which keeps the event with the smallest sort order at the root in `heap[0]`.
+    :obj:`Event`s are sorted on their `_get_order_time`, which provides a pair, (event time, event 'sub-time'),
+    and is implemented via comparison operations in :obj:`Event`.
+    All entries with equal `(event time, event 'sub-time')` values are popped from the heap by `next_events()`.
+    `schedule_event()` costs `O(log(n))`, where `n` is the size of the heap,
+    while `next_events()`, costs `O(mlog(n))`, where `m` is the number of events returned.
 
     Attributes:
-        event_heap (:obj:`list`): a `Simulator`'s heap of events
+        event_heap (:obj:`list`): a :obj:`Simulator`'s heap of events
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): a `DebugLogsManager`
     """
 
@@ -63,11 +61,8 @@ class EventQueue(object):
         """
         return len(self.event_heap)
 
-    def schedule_event(self, send_time, receive_time, sending_object, receiving_object, message):
-        """ Create an event and insert in this event queue, scheduled to execute at `receive_time`
-
-        Simulation object `X` can sends an event to simulation object `Y` by invoking
-            `X.send_event(receive_delay, Y, message)`.
+    def schedule_event(self, send_time, receive_time, sending_object, receiving_object, event_message):
+        """ Create an event scheduled to execute at `receive_time` and insert in this event queue
 
         Args:
             send_time (:obj:`float`): the simulation time at which the event was generated (sent)
@@ -77,9 +72,9 @@ class EventQueue(object):
             receiving_object (:obj:`SimulationObject`): the object that will receive the event; when
                 the simulation is parallelized `sending_object` and `receiving_object` will need
                 to be global identifiers.
-            message (:obj:`EventMessage`): an :obj:`EventMessage` carried by the event; its type
-                provides the simulation application's type for an `Event`; it may also carry a payload
-                for the `Event` in its `msg_field_names`.
+            event_message (:obj:`EventMessage`): an event message carried by the event; its type
+                provides the simulation application's type for an :obj:`Event`; it may also carry a payload
+                for the :obj:`Event` in its `msg_field_names`.
 
         Raises:
             :obj:`SimulatorError`: if `receive_time` < `send_time`, or `receive_time` or `send_time` is NaN
@@ -96,11 +91,11 @@ class EventQueue(object):
             raise SimulatorError("receive_time < send_time in schedule_event(): {} < {}".format(
                 receive_time, send_time))
 
-        if not isinstance(message, EventMessage):
-            raise SimulatorError("message should be an instance of {} but is a '{}'".format(
-                EventMessage.__name__, type(message).__name__))
+        if not isinstance(event_message, EventMessage):
+            raise SimulatorError("event_message should be an instance of {} but is a '{}'".format(
+                EventMessage.__name__, type(event_message).__name__))
 
-        event = Event(send_time, receive_time, sending_object, receiving_object, message)
+        event = Event(send_time, receive_time, sending_object, receiving_object, event_message)
         # As per David Jefferson's thinking, the event queue is ordered by data provided by the
         # simulation application, in particular the tuple (event time, receiving object name).
         # See the comparison operators for Event. This achieves deterministic and reproducible
@@ -132,7 +127,7 @@ class EventQueue(object):
         """ Get the simulation object that receives the next event
 
         Returns:
-            :obj:`SimulationObject`): the simulation object that will execute the next event, or `None`
+            :obj:`SimulationObject`: the simulation object that will execute the next event, or `None`
             if no event is scheduled
         """
         if not self.event_heap:
@@ -142,17 +137,23 @@ class EventQueue(object):
         return next_event.receiving_object
 
     def next_events(self):
-        """ Get all events at the smallest event time destined for the object whose name sorts earliest
+        """ Get all events at the smallest event time destined for the simulation object with the highest priority
 
-        Because multiple events may occur concurrently -- that is, have the same simulation time --
-        they must be provided as a collection to the simulation object that executes them.
+        If one event has the smallest `event_time`, which occurs often, it is returned in a :obj:`list`.
 
-        Handle 'ties' properly. That is, since an object may receive multiple events
-        with the same event_time (aka receive_time), pass them all to the object in a list.
+        But because multiple events may occur simultaneously -- that is, have the same `event_time` --
+        they are returned in a list that will be passed to the simulation object that will handle them.
+        Specifically, if an :obj:`EventQueue` contains multiple events with the same `event_time` and they
+        will be received by multiple
+        simulation objects, then the event(s) scheduled for the highest priority simulation object will be
+        returned. Subsequent calls to `next_events` will return events schedule for simulation object(s) with lower
+        priority(s).
+
+        If multiple events are returned, they are sorted by the pair (event message type priority,
+        event message field values).
 
         Returns:
-            :obj:`list` of :obj:`Event`: the earliest event(s), sorted by message type priority. If no
-            events are available the list is empty.
+            :obj:`list` of :obj:`Event`: the earliest event(s); if no events are available the list is empty
         """
         if not self.event_heap:
             return []
@@ -182,7 +183,7 @@ class EventQueue(object):
         return events
 
     def log_event(self, event):
-        """ Log an event with its simulation time
+        """ Log an event with its simulation time to the `fast_debug_file_logger`
 
         Args:
             event (:obj:`Event`): the Event to log
@@ -197,7 +198,8 @@ class EventQueue(object):
     def render(self, sim_obj=None, as_list=False, separator='\t'):
         """ Return the content of an :obj:`EventQueue`
 
-        Make a human-readable event queue, sorted by non-decreasing event time.
+        Make a human-readable event queue, sorted by event time.
+        Events are sorted by the event order tuple provided by `Event._get_order_time`.
         Provide a header row and a row for each event. If all events have the same type of message,
         the header contains event and message fields. Otherwise, the header has event fields and
         a message field label, and each event labels message fields with their attribute names.
@@ -220,7 +222,7 @@ class EventQueue(object):
         if not event_heap:
             return None
 
-        # Sort the events in non-decreasing event time (receive_time, receiving_object.name)
+        # Sort the events by the event order tuple, provided by `Event._get_order_time`
         sorted_events = sorted(event_heap)
 
         # Does the queue contain multiple message types?
@@ -264,31 +266,32 @@ class EventQueue(object):
 
 
 class Simulator(object):
-    """ A simulator
+    """ A discrete-event simulator
 
-    General-purpose simulation mechanisms, including the simulation scheduler.
-    Architected as an OO simulation that could be parallelized.
+    A general-purpose discrete-event simulation mechanism, including the simulation scheduler.
+    Architected as an object-oriented simulation that could be parallelized.
 
-    `Simulator` contains and manipulates global simulation data.
-    Simulator registers all simulation objects types and all simulation objects.
-    Following `simulate()` it runs the simulation, scheduling objects to execute events
-    in non-decreasing time order; and generates debugging output.
+    :obj:`Simulator` contains and manipulates global simulation data.
+    :obj:`Simulator` registers all simulation objects classes and all simulation objects.
+    The `simulate()` method runs a simulation, scheduling objects to execute events
+    in non-decreasing time order, and generates debugging output.
 
     Attributes:
-        time (:obj:`float`): the simulations's current time
-        simulation_objects (:obj:`dict` of :obj:`SimulationObject`): all simulation objects, keyed by name
+        time (:obj:`float`): a simulation's current time
+        simulation_objects (:obj:`dict` of :obj:`SimulationObject`): all simulation objects, keyed by their names
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
         fast_debug_file_logger (:obj:`FastLogger`): a fast logger for debugging messages
-        fast_plotting_logger (:obj:`FastLogger`): a fast logger for trajectory data for plotting
-        event_queue (:obj:`EventQueue`): the queue of future events
-        event_counts (:obj:`Counter`): a counter of event types
-        num_events_handled (:obj:`int`): the number of events in a simulation
+        fast_plotting_logger (:obj:`FastLogger`): a fast logger that saves trajectory data for plotting
+        event_queue (:obj:`EventQueue`): the queue of events that will be executed
+        event_counts (:obj:`Counter`): a count of executed events, categorized by the tuple
+            (receiving object class, receiving object name, event message class)
+        num_handlers_called (:obj:`int`): the number of calls a simulation makes to an event handler in a simulation object
         sim_config (:obj:`SimulationConfig`): a simulation run's configuration
         sim_metadata (:obj:`SimulationMetadata`): a simulation run's metadata
         author_metadata (:obj:`AuthorMetadata`): information about the person who runs the simulation,
             if provided by the simulation application
-        measurements_fh (:obj:`_io.TextIOWrapper`, optional): file handle for debugging measurements file
-        mem_tracker (:obj:`pympler.tracker.SummaryTracker`, optional): a memory use tracker for debugging
+        measurements_fh (:obj:`_io.TextIOWrapper`): file handle for debugging measurements file
+        mem_tracker (:obj:`pympler.tracker.SummaryTracker`): a memory use tracker for debugging
     """
     # Termination messages
     NO_EVENTS_REMAIN = " No events remain"
@@ -427,7 +430,7 @@ class Simulator(object):
             SimulationMetadata.write_dataclass(self.sim_metadata, self.sim_config.output_dir)
 
     def reset(self):
-        """ Reset this `Simulator`
+        """ Reset this :obj:`Simulator`
 
         Delete all objects and reset any prior initialization.
         """
@@ -512,6 +515,12 @@ class Simulator(object):
 
     SimulationReturnValue = namedtuple('SimulationReturnValue', 'num_events profile_stats',
                                        defaults=(None, None))
+    SimulationReturnValue.__doc__ += ': the value(s) returned by a simulation run'
+    SimulationReturnValue.num_events.__doc__ += (": the number of times a simulation object handles an event , "
+                                                 "which may be smaller than the number of events sent, because simultaneous "
+                                                 "events at one simulation object are handled together")
+    SimulationReturnValue.profile_stats.__doc__ += (": if performance is being profiled, a :obj:`pstats.Stats` instance "
+                                                    "containing the profiling statistics")
 
     def simulate(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
         """ Run a simulation
@@ -561,7 +570,7 @@ class Simulator(object):
             self._simulate()
         if self.sim_config.output_dir:
             self.measurements_fh.close()
-        return self.SimulationReturnValue(self.num_events_handled, profile)
+        return self.SimulationReturnValue(self.num_handlers_called, profile)
 
     def run(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
         """ Alias for simulate
@@ -614,7 +623,7 @@ class Simulator(object):
         # plot logging is controlled by configuration files pointed to by config_constants and by env vars
         self.fast_plotting_logger.fast_log('# {:%Y-%m-%d %H:%M:%S}'.format(datetime.now()), sim_time=0)
 
-        self.num_events_handled = 0
+        self.num_handlers_called = 0
         self.log_with_time(f"Simulation to {self.sim_config.time_max} starting")
 
         try:
@@ -664,14 +673,14 @@ class Simulator(object):
                     e_name = ' - '.join([next_sim_obj.__class__.__name__, next_sim_obj.name, e.message.__class__.__name__])
                     self.event_counts[e_name] += 1
                 next_sim_obj._BaseSimulationObject__handle_event_list(next_events)
-                self.num_events_handled += 1
+                self.num_handlers_called += 1
                 self.progress.progress(next_time)
 
         except SimulatorError as e:
             raise SimulatorError('Simulation ended with error:\n' + str(e))
 
         self.finish_metadata_collection()
-        return self.num_events_handled
+        return self.num_handlers_called
 
     def track_obj_mem(self):
         """ Write memory use tracking
@@ -680,8 +689,8 @@ class Simulator(object):
             widths_format = "{{:<{}}}{{:>{}}}{{:>{}}}".format(*widths)
             return widths_format.format(*values)
 
-        if self.num_events_handled % self.sim_config.object_memory_change_interval == 0:
-            heading = f"\nMemory use changes by SummaryTracker at event {self.num_events_handled}:"
+        if self.num_handlers_called % self.sim_config.object_memory_change_interval == 0:
+            heading = f"\nMemory use changes by SummaryTracker at event {self.num_handlers_called}:"
             if self.sim_config.output_dir:
                 print(heading, file=self.measurements_fh)
                 data_heading = ('type', '# objects', 'total size (B)')

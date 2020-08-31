@@ -139,29 +139,33 @@ class BaseSimulationObject(object):
                                                                              receiving_object.name, event_time,
                                                                              message.__class__.__name__))
 
-    def send_event(self, delay, receiving_object, message, copy=False):
+    def send_event(self, delay, receiving_object, event_message, copy=False):
         """ Schedule an event containing an event message, specifing the event time as a delay.
+
+        Simulation object `X` sends an event to simulation object `Y` by invoking
+
+            X.send_event(receive_delay, Y, event_message)
 
         Args:
             delay (:obj:`float`): the simulation delay at which `receiving_object` should execute the event
             receiving_object (:obj:`SimulationObject`): the simulation object that will receive and
                 execute the event
-            message (:obj:`EventMessage`): the event message which will be carried by the event
+            event_message (:obj:`EventMessage`): the event message which will be carried by the event
             copy (:obj:`bool`, optional): if :obj:`True`, copy the message before adding it to the event;
                 set :obj:`False` by default to optimize performance; set :obj:`True` as a safety measure to avoid
                 unexpected changes to shared objects
 
         Raises:
             :obj:`SimulatorError`: if `delay` < 0 or `delay` is NaN, or
-                if the sending object type is not registered to send messages with the type of `message`, or
+                if the sending object type is not registered to send messages with the type of `event_message`, or
                 if the receiving simulation object type is not registered to receive messages with
-                the type of `message`
+                the type of `event_message`
         """
         if math.isnan(delay):
             raise SimulatorError("delay is 'NaN'")
         if delay < 0:
             raise SimulatorError("delay < 0 in send_event(): {}".format(str(delay)))
-        self.send_event_absolute(delay + self.time, receiving_object, message, copy=copy)
+        self.send_event_absolute(delay + self.time, receiving_object, event_message, copy=copy)
 
     @staticmethod
     def register_handlers(subclass, handlers):
@@ -310,7 +314,9 @@ class SimulationObjectInterface(object, metaclass=ABCMeta):  # pragma: no cover
 
 
 class SimObjClassPriority(IntEnum):
-    """ Simultaneous execution priority for simulation object classes, used in `class_priority`
+    """ Priorities for simulation object classes
+
+    These are used to order the execution of simultaneous events among objects in different classes
     """
     HIGH = 1
     MEDIUM = 5

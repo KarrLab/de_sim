@@ -15,7 +15,7 @@ class NextEvent(de_sim.EventMessage):
 
 
 class TemplatePeriodicSimulationObject(de_sim.SimulationObject):
-    """ Template self-clocking `SimulationObject`
+    """ Template self-clocking :obj:`SimulationObject`
 
     Events occur at time `start_time`, `start_time + period`, `start_time + 2*period`, ...
 
@@ -46,7 +46,7 @@ class TemplatePeriodicSimulationObject(de_sim.SimulationObject):
     def handle_event(self, event):
         """ Handle the periodic event
 
-        Derived classes must override this method and actually handle the event
+        Derived classes which wish to process the event must override this method
 
         Args:
             event (:obj:`de_sim.Event`): simulation event; not used

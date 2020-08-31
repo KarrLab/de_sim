@@ -21,7 +21,7 @@ class MockSimulationObject(de_sim.SimulationObject):
         Use `self.test_case` and `self.kwargs` to evaluate unit tests
 
         Args:
-            name (:obj:`str`): name for the `SimulationObject`
+            name (:obj:`str`): name for the :obj:`SimulationObject`
             test_case (:obj:`TestCase`): reference to the `TestCase` that launches the simulation
             kwargs (:obj:`dict`): arguments used by a test case
         """
