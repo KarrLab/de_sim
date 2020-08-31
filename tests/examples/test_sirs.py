@@ -36,7 +36,7 @@ class TestSIRs(unittest.TestCase):
                                 gamma=0.15,
                                 recording_period=10)
                 run_sirs = RunSIRs(tmpdirname)
-                run_sirs.simulate(sir_class, time_max=60, **sir_args)
+                run_sirs.simulate(sir_class, max_time=60, **sir_args)
                 run_sirs.print_history()
                 expected_output_strings = ['time', '\ts\t', '60.0\t', 'Executed']
                 for expected_output_string in expected_output_strings:
@@ -46,7 +46,7 @@ class TestSIRs(unittest.TestCase):
             with tempfile.TemporaryDirectory() as tmpdirname:
                 # test lambda_val == 0
                 sir_args['i'] = 0
-                RunSIRs(tmpdirname).simulate(sir_class, time_max=20, **sir_args)
+                RunSIRs(tmpdirname).simulate(sir_class, max_time=20, **sir_args)
 
     def test_run_sir(self):
         self.run_sir_test(SIR)
@@ -67,7 +67,7 @@ class TestSIRs(unittest.TestCase):
                                 recording_period=10)
                 with tempfile.TemporaryDirectory() as tmpdirname:
                     run_sirs = RunSIRs(tmpdirname)
-                    run_sirs.simulate(sir_class, time_max=60, **sir_args)
+                    run_sirs.simulate(sir_class, max_time=60, **sir_args)
 
                     # consider an outbreak to be minor if no infections remain and fewer than 10 people were infected
                     last_checkpoint_state = run_sirs.last_checkpoint().state

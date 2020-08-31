@@ -62,7 +62,7 @@ class TemplatePeriodicSimulationObject(de_sim.SimulationObject):
         """ Handle the periodic event
 
         Args:
-            event (:obj:`de_sim.Event`): simulation event; not used
+            event (:obj:`de_sim.Event`): the simulation event
 
         Call `handle_event` and schedule the next event
         """

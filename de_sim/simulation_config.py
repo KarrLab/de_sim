@@ -27,12 +27,12 @@ class SimulationConfig(EnhancedDataClass):
     - Configure profiling of heap memory use
 
     Attributes:
-        time_max (:obj:`float`): maximum simulation time
+        max_time (:obj:`float`): maximum simulation time
         time_init (:obj:`float`, optional): time at which a simulation starts; defaults to 0
         stop_condition (:obj:`function`, optional): if provided, a function that takes one argument,
             the simulation time; a simulation terminates if the function returns `True`
         output_dir (:obj:`str`, optional): directory for saving metadata; `output_dir` will be created if it does't
-            exist; if not provided, then metatdata should be saved before another simulation is run
+            exist; if not provided, then metadata should be saved before another simulation is run
             with the same :obj:`Simulator`
         progress (:obj:`bool`, optional): if `True`, output a text bar that dynamically reports a
             simulation's progress
@@ -43,7 +43,7 @@ class SimulationConfig(EnhancedDataClass):
             cannot be used with `profile` as they run much too slowly
     """
 
-    time_max: float
+    max_time: float
     time_init: float = 0.0
     stop_condition: object = None   # stop_condition must be callable, which is checked below
     output_dir: str = None
@@ -115,8 +115,8 @@ class SimulationConfig(EnhancedDataClass):
         self.validate_individual_fields()
 
         # other validation
-        if self.time_max <= self.time_init:
-            raise SimulatorError(f'time_max ({self.time_max}) must be greater than time_init ({self.time_init})')
+        if self.max_time <= self.time_init:
+            raise SimulatorError(f'max_time ({self.max_time}) must be greater than time_init ({self.time_init})')
 
         if self.profile and 0 < self.object_memory_change_interval:
             raise SimulatorError('profile and object_memory_change_interval cannot both be active, '
@@ -127,7 +127,7 @@ class SimulationConfig(EnhancedDataClass):
 
         Overrides `semantically_equal` in :obj:`EnhancedDataClass`.
         The only attributes that are semantically meaningful to a simulation's predictions are
-        `time_max` and `time_init`. Although they're floats, they are compared exactly because
+        `max_time` and `time_init`. Although they're floats, they are compared exactly because
         they're simulation inputs, not computed outputs.
 
         Args:
@@ -137,5 +137,5 @@ class SimulationConfig(EnhancedDataClass):
             :obj:`bool`: :obj:`True` if `other` is a :obj:`SimulationConfig` that is semantically equal to `self`,
             :obj:`False` otherwise
         """
-        return (isinstance(other, SimulationConfig) and self.time_max == other.time_max and
+        return (isinstance(other, SimulationConfig) and self.max_time == other.max_time and
                 self.time_init == other.time_init)

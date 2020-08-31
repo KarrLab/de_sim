@@ -206,12 +206,12 @@ class RunSIRs(object):
     def __init__(self, checkpoint_dir):
         self.checkpoint_dir = checkpoint_dir
 
-    def simulate(self, sir_class, time_max, **sir_args):
+    def simulate(self, sir_class, max_time, **sir_args):
         """ Create and run an SIR simulation
 
         Args:
             sir_class (:obj:`type`): a type of SIR class to run
-            time_max (:obj:`float`): simulation end time
+            max_time (:obj:`float`): simulation end time
             sir_args (:obj:`dict`): arguments for an SIR object
         """
 
@@ -232,7 +232,7 @@ class RunSIRs(object):
         simulator.initialize()
 
         # run the simulation
-        event_num = simulator.simulate(time_max).num_events
+        event_num = simulator.simulate(max_time).num_events
         print("Executed {} events.\n".format(event_num))
 
     def print_history(self):

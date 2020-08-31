@@ -105,7 +105,7 @@ class RunPhold(object):
                                          "SIGSIM-PADS '13. Montreal: Association for Computing Machinery; 2013. p. 327-36. ")
         parser.add_argument('num_phold_procs', type=int, help="Number of PHOLD processes to run")
         parser.add_argument('frac_self_events', type=float, help="Fraction of events sent to self")
-        parser.add_argument('time_max', type=float, help="End time for the simulation")
+        parser.add_argument('max_time', type=float, help="End time for the simulation")
         parser.add_argument('--seed', '-s', type=int, help='Random number seed')
         args = parser.parse_args(cli_args)
 
@@ -132,7 +132,7 @@ class RunPhold(object):
 
         # run the simulation
         simulator.initialize()
-        event_num = simulator.simulate(args.time_max).num_events
+        event_num = simulator.simulate(args.max_time).num_events
         sys.stderr.write("Executed {} events.\n".format(event_num))
         return(event_num)
 

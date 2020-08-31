@@ -294,26 +294,26 @@ class TestSimulator(unittest.TestCase):
         self.simulator.initialize()
 
     def test_get_sim_config(self):
-        self.assertEqual(SimulationConfig(5.), de_sim.Simulator._get_sim_config(time_max=5.))
+        self.assertEqual(SimulationConfig(5.), de_sim.Simulator.get_sim_config(max_time=5.))
 
-        config_dict = dict(time_max=5., time_init=2.)
-        self.assertEqual(SimulationConfig(5., 2.), de_sim.Simulator._get_sim_config(config_dict=config_dict))
+        config_dict = dict(max_time=5., time_init=2.)
+        self.assertEqual(SimulationConfig(5., 2.), de_sim.Simulator.get_sim_config(config_dict=config_dict))
 
-        with self.assertRaisesRegex(SimulatorError, 'time_max, sim_config, or config_dict must be provided'):
-            de_sim.Simulator._get_sim_config()
+        with self.assertRaisesRegex(SimulatorError, 'max_time, sim_config, or config_dict must be provided'):
+            de_sim.Simulator.get_sim_config()
 
         config_dict = dict(time_init=2.)
-        with self.assertRaisesRegex(SimulatorError, 'at most 1 of time_max, sim_config, or config_dict'):
-            de_sim.Simulator._get_sim_config(100, config_dict=config_dict)
+        with self.assertRaisesRegex(SimulatorError, 'at most 1 of max_time, sim_config, or config_dict'):
+            de_sim.Simulator.get_sim_config(100, config_dict=config_dict)
 
         simulation_config = SimulationConfig(10)
         with self.assertRaisesRegex(SimulatorError,
                                     'sim_config is not provided, sim_config= is probably needed'):
-            de_sim.Simulator._get_sim_config(simulation_config)
+            de_sim.Simulator.get_sim_config(simulation_config)
 
         config_dict = dict(time_init=2.)
-        with self.assertRaisesRegex(SimulatorError, 'time_max must be provided in config_dict'):
-            de_sim.Simulator._get_sim_config(config_dict=config_dict)
+        with self.assertRaisesRegex(SimulatorError, 'max_time must be provided in config_dict'):
+            de_sim.Simulator.get_sim_config(config_dict=config_dict)
 
     def test_simulate_and_run(self):
         for operation in ['simulate', 'run']:
@@ -325,7 +325,7 @@ class TestSimulator(unittest.TestCase):
         obj = ExampleSimulationObject(obj_name(1))
         self.simulator.add_object(obj)
         self.simulator.initialize()
-        config_dict = dict(time_max=-1, time_init=-2)
+        config_dict = dict(max_time=-1, time_init=-2)
         self.assertEqual(self.simulator.simulate(config_dict=config_dict).num_events, 0)
 
     def test__delete_object(self):
@@ -395,9 +395,9 @@ class TestSimulator(unittest.TestCase):
         # 1 event/sec:
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
-        time_max = 10
-        # execute to time <= time_max, with 1st event at time = 1
-        self.assertEqual(simulator.simulate(time_max).num_events, time_max + 1)
+        max_time = 10
+        # execute to time <= max_time, with 1st event at time = 1
+        self.assertEqual(simulator.simulate(max_time).num_events, max_time + 1)
 
         __stop_cond_end = 3
 
@@ -406,7 +406,7 @@ class TestSimulator(unittest.TestCase):
         simulator = de_sim.Simulator()
         simulator.add_object(PeriodicSimulationObject('name', 1))
         simulator.initialize()
-        sim_config = SimulationConfig(time_max)
+        sim_config = SimulationConfig(max_time)
         sim_config.stop_condition = stop_cond_eg
         # because the simulation is executing one event / sec, the number of events should equal the stop time plus 1
         self.assertEqual(simulator.simulate(sim_config=sim_config).num_events, __stop_cond_end + 1)
@@ -419,11 +419,11 @@ class TestSimulator(unittest.TestCase):
         sys.stderr.flush()
         with CaptureOutput(relay=True) as capturer:
             try:
-                time_max = 10
-                config_dict = dict(time_max=time_max, progress=True)
-                self.assertEqual(simulator.simulate(config_dict=config_dict).num_events, time_max + 1)
-                self.assertTrue(f"/{time_max}" in capturer.get_text())
-                self.assertTrue("time_max" in capturer.get_text())
+                max_time = 10
+                config_dict = dict(max_time=max_time, progress=True)
+                self.assertEqual(simulator.simulate(config_dict=config_dict).num_events, max_time + 1)
+                self.assertTrue(f"/{max_time}" in capturer.get_text())
+                self.assertTrue("max_time" in capturer.get_text())
             except ValueError as e:
                 if str(e) == 'I/O operation on closed file':
                     pass
@@ -470,7 +470,7 @@ class TestSimulator(unittest.TestCase):
 
     def test_cyclical_messaging_network(self):
         # test event times at simulation objects; this test should succeed with any
-        # natural number for num_objs and any non-negative value of time_max
+        # natural number for num_objs and any non-negative value of max_time
         self.make_cyclical_messaging_network_sim(self.simulator, 10)
         self.simulator.initialize()
         self.assertTrue(0 < self.simulator.simulate(20).num_events)
@@ -503,19 +503,19 @@ class TestSimulator(unittest.TestCase):
 
     def test_metadata_collection(self):
         self.make_one_object_simulation()
-        time_max = 5
-        config_dict = dict(time_max=time_max, output_dir=self.out_dir)
+        max_time = 5
+        config_dict = dict(max_time=max_time, output_dir=self.out_dir)
         self.simulator.run(config_dict=config_dict)
         sim_metadata = SimulationMetadata.read_dataclass(self.out_dir)
         self.assertIsInstance(sim_metadata, SimulationMetadata)
-        self.assertEqual(sim_metadata.simulation_config.time_max, time_max)
+        self.assertEqual(sim_metadata.simulation_config.max_time, max_time)
         self.assertGreaterEqual(sim_metadata.run.run_time, 0)
 
         # provide AuthorMetadata
         self.simulator.reset()
         self.make_one_object_simulation()
         output_dir = tempfile.mkdtemp(dir=self.out_dir)
-        config_dict = dict(time_max=time_max, output_dir=output_dir)
+        config_dict = dict(max_time=max_time, output_dir=output_dir)
         author_name = 'Joe'
         author_metadata = AuthorMetadata(name=author_name)
         self.simulator.run(config_dict=config_dict, author_metadata=author_metadata)
@@ -660,7 +660,7 @@ class TestSimulator(unittest.TestCase):
         self.prep_simulation(simulator, num_sim_objs)
         end_sim_time = 200
         expected_text = ['function calls', 'Ordered by: internal time', 'filename:lineno(function)']
-        sim_config_dict = dict(time_max=end_sim_time,
+        sim_config_dict = dict(max_time=end_sim_time,
                                output_dir=self.out_dir,
                                profile=True)
         stats = simulator.simulate(config_dict=sim_config_dict).profile_stats
@@ -669,7 +669,7 @@ class TestSimulator(unittest.TestCase):
         for text in expected_text:
             self.assertIn(text, measurements)
 
-        sim_config_dict = dict(time_max=end_sim_time,
+        sim_config_dict = dict(max_time=end_sim_time,
                                profile=True)
         with CaptureOutput(relay=False) as capturer:
             stats = simulator.simulate(config_dict=sim_config_dict).profile_stats
@@ -680,8 +680,8 @@ class TestSimulator(unittest.TestCase):
 
     def test_mem_use_measurement(self):
         self.make_one_object_simulation()
-        time_max = 20
-        config_dict = dict(time_max=time_max, output_dir=self.out_dir, object_memory_change_interval=10)
+        max_time = 20
+        config_dict = dict(max_time=max_time, output_dir=self.out_dir, object_memory_change_interval=10)
         self.simulator.simulate(config_dict=config_dict)
         expected_text = ['Memory use changes by SummaryTracker', '# objects', 'float']
         measurements = ''.join(open(self.measurements_pathname, 'r').readlines())
@@ -690,7 +690,7 @@ class TestSimulator(unittest.TestCase):
 
         self.make_one_object_simulation()
         with CaptureOutput(relay=False) as capturer:
-            config_dict = dict(time_max=time_max, object_memory_change_interval=10)
+            config_dict = dict(max_time=max_time, object_memory_change_interval=10)
             self.simulator.simulate(config_dict=config_dict)
             for text in expected_text:
                 self.assertIn(text, capturer.get_text())

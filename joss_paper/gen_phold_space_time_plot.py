@@ -16,7 +16,7 @@ from wc_utils.util.environ import EnvironUtils
 import de_sim
 
 
-def run_phold(time_max, num_phold_procs=3, frac_self_events=0.5):
+def run_phold(max_time, num_phold_procs=3, frac_self_events=0.5):
     """ Run PHOLD, and generate a plot log
 
     Args:
@@ -24,7 +24,7 @@ def run_phold(time_max, num_phold_procs=3, frac_self_events=0.5):
         num_phold_procs (:obj:`int`, optional): number of PHOLD processes to run
         frac_self_events (:obj:`float`, optional): fraction of events sent to self
     """
-    args = Namespace(time_max=time_max, num_phold_procs=num_phold_procs,
+    args = Namespace(max_time=max_time, num_phold_procs=num_phold_procs,
                      frac_self_events=frac_self_events)
     RunPhold.main(args)
 

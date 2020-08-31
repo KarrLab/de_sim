@@ -6,7 +6,7 @@
 :License: MIT
 """
 
-# TODO(Arthur): better docstrings, constants out of plot_data, filtering for large traces
+# TODO(Arthur): filtering for large traces
 # TODO(Arthur): plot legend, plot metadata
 
 from collections import namedtuple
@@ -15,9 +15,16 @@ import matplotlib.patches as patches
 
 
 EventCoordinates = namedtuple('EventCoordinates', 'sim_obj_id time',)
+EventCoordinates.__doc__ += ': the coordinates of an event: (simulation object id, simulation time)'
+EventCoordinates.sim_obj_id.__doc__ += ': the unique name of a simulation object'
+EventCoordinates.time.__doc__ += ': the event time of an event'
 
 
 SimulationEventMessage = namedtuple('SimulationEventMessage', 'message_type send_coordinates receive_coordinates')
+SimulationEventMessage.__doc__ += ': a simulation event message; its type, and send and receive coordinates'
+SimulationEventMessage.message_type.__doc__ += ': the classname of a simulation event message'
+SimulationEventMessage.send_coordinates.__doc__ += ': an :obj:`EventCoordinates`: the send coordinates'
+SimulationEventMessage.receive_coordinates.__doc__ += ': an :obj:`EventCoordinates`: the receive coordinates'
 
 
 class SpaceTime(object):
@@ -99,8 +106,11 @@ class SpaceTime(object):
                 other_messages.append(event_msg)
         return self_messages, other_messages
 
-    def plot_data(self, filename):
+    def plot_data(self, plot_filename):
         """ Generate space-time diagram
+
+        Args:
+            plot_filename (:obj:`str`): pdf filename for plot that is produced
         """
         # plot time axes
         fig, ax = plt.subplots()
@@ -180,11 +190,14 @@ class SpaceTime(object):
                 fontsize=10, fontweight='normal')
 
         # write file
-        fig.savefig(filename, bbox_inches='tight', pad_inches=0)
+        fig.savefig(plot_filename, bbox_inches='tight', pad_inches=0)
         plt.show()
 
     def get_data(self, plot_file):
         """ Extract event message data from plot file
+
+        Args:
+            plot_file (:obj:`str`): filename of log with event data
 
         Returns:
             :obj:`list` of :obj:`SimulationEventMessage`: list of all event messages in simulation run

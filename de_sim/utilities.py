@@ -30,37 +30,37 @@ class ConcreteABCMeta(ABCMeta):
 class SimulationProgressBar(object):
     """ Simulation progress bar
 
-    Shows the progress of a simulation towards the time it is scheduled to end, in simulation time
+    Shows the progress of a simulation towards the time it is scheduled to end, in simulation time.
+
+    A `SimulationProgressBar` does nothing by default, so that it can be used without an
+    `if` statement and configured at run-time.
     """
 
     def __init__(self, use=False):
         """ Create a simulation progress bar
-
-        A `SimulationProgressBar` does nothing by default, so that it can be used without an
-        `if` statement and configured at run-time.
 
         Args:
             use (:obj:`bool`): whether to use a progress bar
         """
         self.use = use
 
-    def start(self, time_max):
+    def start(self, max_time):
         """ Start the simulation's progress bar
 
         Args:
-            time_max (:obj:`float`): the simulation's end time
+            max_time (:obj:`float`): the simulation's end time
         """
         if self.use:
             self.bar = ProgressBar(
                 widgets=[
                     widgets.Percentage(),
                     ' ', widgets.SimpleProgress(
-                        format='%(value)d/%(max_value)d (time_max)'),
+                        format='%(value)d/%(max_value)d (max_time)'),
                     ' ', widgets.Bar(),
                     ' ', widgets.Timer(),
                     ' ', widgets.AdaptiveETA(),
                 ],
-                max_value=time_max).start()
+                max_value=max_time).start()
 
     def progress(self, sim_time):
         """ Advance the simulation's progress bar

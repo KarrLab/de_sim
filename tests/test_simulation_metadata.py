@@ -29,7 +29,7 @@ class TestSimulationMetadata(unittest.TestCase):
         simulator_repo_equal, _ = get_repo_metadata(repo_type=RepoMetadataCollectionType.SCHEMA_REPO)
         self.simulator_repo_equal = simulator_repo_equal
 
-        self.simulation_config = simulation_config = SimulationConfig(time_max=100, progress=False)
+        self.simulation_config = simulation_config = SimulationConfig(max_time=100, progress=False)
 
         self.author = author = AuthorMetadata(name='Test user', email='test@test.com',
                                               username='Test username', organization='Test organization')
@@ -97,7 +97,7 @@ class TestSimulationMetadata(unittest.TestCase):
         self.assertTrue(self.metadata_equal.semantically_equal(self.metadata))
 
         # simulation_config used by semantically_equal
-        self.metadata_equal.simulation_config = SimulationConfig(time_max=99)
+        self.metadata_equal.simulation_config = SimulationConfig(max_time=99)
         self.assertFalse(self.metadata_equal.semantically_equal(self.metadata))
         self.assertFalse(self.metadata.semantically_equal(self.metadata_equal))
         self.metadata_equal.simulation_config = self.simulation_config
@@ -119,13 +119,13 @@ class TestSimulationMetadata(unittest.TestCase):
 
     def test_as_dict(self):
         d = dataclasses.asdict(self.metadata)
-        self.assertEqual(d['simulation_config']['time_max'], self.metadata.simulation_config.time_max)
+        self.assertEqual(d['simulation_config']['max_time'], self.metadata.simulation_config.max_time)
         self.assertEqual(d['author']['name'], self.metadata.author.name)
         self.assertEqual(d['run']['start_time'], self.metadata.run.start_time)
         self.assertEqual(d['simulator_repo']['branch'], self.metadata.simulator_repo.branch)
 
     def test_str(self):
-        self.assertIn(str(self.simulation_config.time_max), str(self.metadata))
+        self.assertIn(str(self.simulation_config.max_time), str(self.metadata))
         self.assertIn(self.metadata.run.ip_address, str(self.metadata))
         self.assertIn(self.metadata.author.name, str(self.metadata))
         self.assertIn(self.metadata.simulator_repo.branch, str(self.metadata))

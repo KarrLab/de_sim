@@ -21,7 +21,7 @@ class TestSimulationConfig(unittest.TestCase):
 
     def setUp(self):
         self.tmp_dir = tempfile.mkdtemp()
-        self.time_max = 10.0
+        self.max_time = 10.0
         self.time_init = 3.5
 
         class ExampleClass(object):
@@ -32,90 +32,90 @@ class TestSimulationConfig(unittest.TestCase):
 
         self.progress = True
         self.output_dir = self.tmp_dir
-        self.simulation_config = SimulationConfig(self.time_max, self.time_init,
+        self.simulation_config = SimulationConfig(self.max_time, self.time_init,
                                                   self.stop_condition, self.output_dir, self.progress)
 
     def tearDown(self):
         shutil.rmtree(self.tmp_dir)
 
     def test(self):
-        self.assertEquals(self.simulation_config.time_max, self.time_max)
+        self.assertEquals(self.simulation_config.max_time, self.max_time)
         self.assertEquals(self.simulation_config.time_init, self.time_init)
         self.assertEquals(self.simulation_config.stop_condition, self.stop_condition)
         self.assertEquals(self.simulation_config.progress, self.progress)
         self.assertEquals(self.simulation_config.output_dir, self.output_dir)
 
         # check defaults
-        simulation_config = SimulationConfig(self.time_max)
+        simulation_config = SimulationConfig(self.max_time)
         self.assertEquals(simulation_config.time_init, 0.0)
         self.assertEquals(simulation_config.stop_condition, None)
         self.assertEquals(simulation_config.progress, False)
         self.assertEquals(simulation_config.output_dir, None)
 
         # check keywords
-        simulation_config = SimulationConfig(time_max=self.time_max)
-        self.assertEquals(simulation_config.time_max, self.time_max)
+        simulation_config = SimulationConfig(max_time=self.max_time)
+        self.assertEquals(simulation_config.max_time, self.max_time)
 
     def test_setattr(self):
 
         # accept ints in float fields
-        simulation_config = SimulationConfig(int(self.time_max))
-        self.assertEquals(simulation_config.time_max, self.time_max)
+        simulation_config = SimulationConfig(int(self.max_time))
+        self.assertEquals(simulation_config.max_time, self.max_time)
 
-        time_max = 'no'
-        with self.assertRaisesRegex(SimulatorError, 'time_max .* must be a float'):
-            SimulationConfig(time_max)
+        max_time = 'no'
+        with self.assertRaisesRegex(SimulatorError, 'max_time .* must be a float'):
+            SimulationConfig(max_time)
 
         with self.assertRaisesRegex(SimulatorError, 'time_init .* must be a float'):
-            SimulationConfig(self.time_max, time_init=set())
+            SimulationConfig(self.max_time, time_init=set())
 
     def test_validate_individual_fields(self):
 
         with self.assertRaisesRegex(SimulatorError, "stop_condition .* must be a function"):
-            cfg = SimulationConfig(self.time_max, stop_condition='hi')
+            cfg = SimulationConfig(self.max_time, stop_condition='hi')
             cfg.validate_individual_fields()
 
         # test output_dir
         # test output_dir specified relative to home directory
         usr_tmp = os.path.join('~', 'tmp')
         output_dir = os.path.join(usr_tmp, 'output_dir')
-        cfg = SimulationConfig(self.time_max, output_dir=output_dir)
+        cfg = SimulationConfig(self.max_time, output_dir=output_dir)
         self.assertEquals(cfg.validate_individual_fields(), None)
         self.assertTrue(os.path.isdir(cfg.output_dir))
 
         _, tmp_file = tempfile.mkstemp(dir=self.tmp_dir)
         with self.assertRaisesRegex(SimulatorError, "output_dir .* must be a directory"):
-            cfg = SimulationConfig(self.time_max, output_dir=tmp_file)
+            cfg = SimulationConfig(self.max_time, output_dir=tmp_file)
             cfg.validate_individual_fields()
 
         with self.assertRaisesRegex(SimulatorError, "output_dir .* is not empty"):
-            cfg = SimulationConfig(self.time_max, output_dir=self.tmp_dir)
+            cfg = SimulationConfig(self.max_time, output_dir=self.tmp_dir)
             cfg.validate_individual_fields()
 
         # output_dir gets created because it does not exist
         output_dir = os.path.join(self.tmp_dir, 'no_such_dir', 'no_such_sub_dir')
-        cfg = SimulationConfig(self.time_max, output_dir=output_dir)
+        cfg = SimulationConfig(self.max_time, output_dir=output_dir)
         cfg.validate_individual_fields()
         self.assertTrue(os.path.isdir(cfg.output_dir))
 
         # output_dir already exists
         tmp_dir = tempfile.mkdtemp(dir=self.tmp_dir)
-        cfg = SimulationConfig(self.time_max, output_dir=tmp_dir)
+        cfg = SimulationConfig(self.max_time, output_dir=tmp_dir)
         self.assertEquals(cfg.validate_individual_fields(), None)
 
         with self.assertRaisesRegex(SimulatorError, "object_memory_change_interval .* must be non-negative"):
-            cfg = SimulationConfig(self.time_max, object_memory_change_interval=-3)
+            cfg = SimulationConfig(self.max_time, object_memory_change_interval=-3)
             cfg.validate_individual_fields()
 
     def test_all_fields(self):
         profile = True
-        kwargs = dict(time_max=self.time_max,
+        kwargs = dict(max_time=self.max_time,
                       time_init=self.time_init,
                       stop_condition=self.stop_condition,
                       output_dir=self.output_dir,
                       progress=self.progress,
                       profile=profile)
-        simulation_config = SimulationConfig(self.time_max, self.time_init, self.stop_condition,
+        simulation_config = SimulationConfig(self.max_time, self.time_init, self.stop_condition,
                                              self.output_dir, self.progress, profile)
         simulation_config.validate()
         for attr, value in kwargs.items():
@@ -133,17 +133,17 @@ class TestSimulationConfig(unittest.TestCase):
             self.fail("self.simulation_config.validate() shouldn't raise SimulatorError")
 
         # validate with defaults
-        simulation_config = SimulationConfig(self.time_max)
+        simulation_config = SimulationConfig(self.max_time)
         try:
             simulation_config.validate()
         except SimulatorError:
             self.fail("simulation_config.validate() shouldn't raise SimulatorError")
 
-        self.simulation_config.time_max = self.time_init - 1
-        with self.assertRaisesRegex(SimulatorError, 'time_max .* must be greater than time_init .*'):
+        self.simulation_config.max_time = self.time_init - 1
+        with self.assertRaisesRegex(SimulatorError, 'max_time .* must be greater than time_init .*'):
             self.simulation_config.validate()
 
-        self.simulation_config.time_max = 10
+        self.simulation_config.max_time = 10
         self.simulation_config.profile = True
         self.simulation_config.object_memory_change_interval = 100
         with self.assertRaisesRegex(SimulatorError, 'profile and object_memory_change_interval cannot both be active'):
@@ -156,13 +156,13 @@ class TestSimulationConfig(unittest.TestCase):
         self.assertEquals(self.simulation_config_no_stop_cond, simulation_config_copy)
 
     def test_semantically_equal(self):
-        simulation_config = SimulationConfig(self.time_max, self.time_init,
+        simulation_config = SimulationConfig(self.max_time, self.time_init,
                                              self.stop_condition, self.output_dir, self.progress)
         self.assertTrue(self.simulation_config.semantically_equal(simulation_config))
         simulation_config.progress = not simulation_config.progress
         # progress is not semantically meaningful
         self.assertTrue(self.simulation_config.semantically_equal(simulation_config))
-        simulation_config.time_max += 1E-12
+        simulation_config.max_time += 1E-12
         self.assertFalse(self.simulation_config.semantically_equal(simulation_config))
         self.assertFalse(self.simulation_config.semantically_equal('x'))
 

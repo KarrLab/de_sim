@@ -65,7 +65,7 @@ class TestSimulationProgressBar(unittest.TestCase):
                 self.assertEqual(used_bar.progress(20), None)
                 self.assertEqual(used_bar.end(), None)
                 self.assertTrue("/{}".format(duration) in capturer.get_text())
-                self.assertTrue("time_max".format(duration) in capturer.get_text())
+                self.assertTrue("max_time".format(duration) in capturer.get_text())
 
             except ValueError as e:
                 if str(e) == 'I/O operation on closed file':

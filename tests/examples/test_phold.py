@@ -22,8 +22,8 @@ class TestPhold(unittest.TestCase):
     def setUp(self):
         warnings.simplefilter("ignore")
 
-    def run_phold(self, seed, time_max):
-        args = Namespace(time_max=time_max, frac_self_events=0.3, num_phold_procs=10, seed=seed)
+    def run_phold(self, seed, max_time):
+        args = Namespace(max_time=max_time, frac_self_events=0.3, num_phold_procs=10, seed=seed)
         random.seed(seed)
         with CaptureOutput(relay=False):
             return(RunPhold.main(args))
@@ -39,24 +39,24 @@ class TestPhold(unittest.TestCase):
     def test_phold_parse_args(self):
         num_procs = 3
         frac_self = 0.2
-        time_max = 25.0
+        max_time = 25.0
         seed = 1234
-        cl = "{} {} {}".format(num_procs, frac_self, time_max)
+        cl = "{} {} {}".format(num_procs, frac_self, max_time)
         args = RunPhold.parse_args(cli_args=cl.split())
         self.assertEqual(args.num_phold_procs, num_procs)
         self.assertEqual(args.frac_self_events, frac_self)
-        self.assertEqual(args.time_max, time_max)
-        cl = "{} {} {} --seed {}".format(num_procs, frac_self, time_max, seed)
+        self.assertEqual(args.max_time, max_time)
+        cl = "{} {} {} --seed {}".format(num_procs, frac_self, max_time, seed)
         args = RunPhold.parse_args(cli_args=cl.split())
         self.assertEqual(args.seed, seed)
 
-    required = ['num_phold_procs', 'frac_self_events', 'time_max']
+    required = ['num_phold_procs', 'frac_self_events', 'max_time']
 
     def test_phold_parse_args_errors(self):
         arguments = dict(
             num_phold_procs=2,
             frac_self_events=0.3,
-            time_max=10,
+            max_time=10,
         )
 
         args = make_args(arguments, self.required, [])

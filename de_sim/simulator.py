@@ -329,30 +329,37 @@ class Simulator(object):
         self.simulation_objects[name] = simulation_object
 
     def add_objects(self, simulation_objects):
-        """ Add many simulation objects into the simulation
+        """ Add multiple simulation objects to this simulation
 
         Args:
-            simulation_objects (:obj:`iterator` of :obj:`SimulationObject`): an iterator of simulation objects
+            simulation_objects (:obj:`iterator` of :obj:`SimulationObject`): an iterator over simulation objects
         """
         for simulation_object in simulation_objects:
             self.add_object(simulation_object)
 
     def get_object(self, simulation_object_name):
-        """ Get a simulation object instance
+        """ Get a simulation object used by this simulation
 
         Args:
-            simulation_object_name (:obj:`str`): get a simulation object instance that is
-                part of this simulation
+            simulation_object_name (:obj:`str`): the name of a simulation object
+
+        Returns:
+            :obj:`SimulationObject`: the simulation object whose name is `simulation_object_name`
 
         Raises:
-            :obj:`SimulatorError`: if the simulation object is not part of this simulation
+            :obj:`SimulatorError`: if the simulation object whose name is `simulation_object_name`
+                is not used by this simulation
         """
         if simulation_object_name not in self.simulation_objects:
             raise SimulatorError("cannot get simulation object '{}'".format(simulation_object_name))
         return self.simulation_objects[simulation_object_name]
 
     def get_objects(self):
-        """ Get all simulation object instances in the simulation
+        """ Get all simulation object instances in this simulation
+
+        Returns:
+            :obj:`iterator` over :obj:`SimulationObject`: an iterator over all simulation object instances
+            in this simulation
         """
         # This is reproducible for Python 3.7 and later (see https://docs.python.org/3/whatsnew/3.7.html)
         # TODO(Arthur): eliminate external calls to self.simulator.simulation_objects
@@ -397,12 +404,12 @@ class Simulator(object):
         self.__initialized = True
 
     def init_metadata_collection(self, sim_config):
-        """ Initialize a simulation metatdata object
+        """ Initialize this simulation's metadata object
 
-        Call just before a simulation starts, so that correct clock time of start is recorded
+        Call just before a simulation runs, so that the correct start time of the simulation is recorded
 
         Args:
-            sim_config (:obj:`SimulationConfig`): information about the simulation's configuration
+            sim_config (:obj:`SimulationConfig`): metadata about the simulation's configuration
                 (start time, maximum time, etc.)
         """
         if self.author_metadata is None:
@@ -423,7 +430,7 @@ class Simulator(object):
                                                simulator_repo=simulator_repo)
 
     def finish_metadata_collection(self):
-        """ Finish metatdata collection
+        """ Finish metadata collection: record a simulation's run-time, and write all metadata to disk
         """
         self.sim_metadata.run.record_run_time()
         if self.sim_config.output_dir:
@@ -432,15 +439,16 @@ class Simulator(object):
     def reset(self):
         """ Reset this :obj:`Simulator`
 
-        Delete all objects and reset any prior initialization.
+        Delete all objects, and empty the event queue.
         """
         self.__initialized = False
         for simulation_object in list(self.simulation_objects.values()):
             self._delete_object(simulation_object)
         self.event_queue.reset()
+        self.time = None
 
     def message_queues(self):
-        """ Return a string listing all message queues in the simulation
+        """ Return a string listing all message queues in the simulation, organized by simulation object
 
         Returns:
             :obj:`str`: a list of all message queues in the simulation and their messages
@@ -461,19 +469,19 @@ class Simulator(object):
         return '\n'.join(data)
 
     @staticmethod
-    def _get_sim_config(time_max=None, sim_config=None, config_dict=None):
+    def get_sim_config(max_time=None, sim_config=None, config_dict=None):
         """ External simulate interface
 
         Legal combinations of the three parameters:
 
-        1. Just `time_max`
-        2. Just `sim_config`, which will contain an entry for `time_max`
-        3. Just `config_dict`, which must contain an entry for `time_max`
+        1. Just `max_time`
+        2. Just `sim_config`, which will contain an entry for `max_time`
+        3. Just `config_dict`, which must contain an entry for `max_time`
 
         Other combinations are illegal.
 
         Args:
-            time_max (:obj:`float`, optional): the time of the end of the simulation
+            max_time (:obj:`float`, optional): the time of the end of the simulation
             sim_config (:obj:`SimulationConfig`, optional): the simulation run's configuration
             config_dict (:obj:`dict`, optional): a dictionary with keys chosen from the field names
                 in :obj:`SimulationConfig`; note that `config_dict` is not a `kwargs` argument
@@ -483,31 +491,31 @@ class Simulator(object):
 
         Raises:
             :obj:`SimulatorError`: if no arguments are provided, or multiple arguments are provided,
-                or `time_max` is missing from `config_dict`
+                or `max_time` is missing from `config_dict`
         """
         num_args = 0
-        if time_max is not None:
+        if max_time is not None:
             num_args += 1
         if sim_config is not None:
             num_args += 1
         if config_dict:
             num_args += 1
         if num_args == 0:
-            raise SimulatorError('time_max, sim_config, or config_dict must be provided')
+            raise SimulatorError('max_time, sim_config, or config_dict must be provided')
         if 1 < num_args:
-            raise SimulatorError('at most 1 of time_max, sim_config, or config_dict may be provided')
+            raise SimulatorError('at most 1 of max_time, sim_config, or config_dict may be provided')
 
         # catch common error generated when sim_config= is not used by Simulator.simulate(sim_config)
-        if isinstance(time_max, SimulationConfig):
+        if isinstance(max_time, SimulationConfig):
             raise SimulatorError(f"sim_config is not provided, sim_config= is probably needed")
 
         # initialize sim_config if it is not provided
         if sim_config is None:
-            if time_max is not None:
-                sim_config = SimulationConfig(time_max)
+            if max_time is not None:
+                sim_config = SimulationConfig(max_time)
             else:   # config_dict must be initialized
-                if 'time_max' not in config_dict:
-                    raise SimulatorError('time_max must be provided in config_dict')
+                if 'max_time' not in config_dict:
+                    raise SimulatorError('max_time must be provided in config_dict')
                 sim_config = SimulationConfig(**config_dict)
 
         sim_config.validate()
@@ -516,37 +524,35 @@ class Simulator(object):
     SimulationReturnValue = namedtuple('SimulationReturnValue', 'num_events profile_stats',
                                        defaults=(None, None))
     SimulationReturnValue.__doc__ += ': the value(s) returned by a simulation run'
-    SimulationReturnValue.num_events.__doc__ += (": the number of times a simulation object handles an event , "
+    SimulationReturnValue.num_events.__doc__ += (": the number of times a simulation object handles an event, "
                                                  "which may be smaller than the number of events sent, because simultaneous "
-                                                 "events at one simulation object are handled together")
+                                                 "events at a simulation object are handled together")
     SimulationReturnValue.profile_stats.__doc__ += (": if performance is being profiled, a :obj:`pstats.Stats` instance "
                                                     "containing the profiling statistics")
 
-    def simulate(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
+    def simulate(self, max_time=None, sim_config=None, config_dict=None, author_metadata=None):
         """ Run a simulation
 
-        See `_get_sim_config` for constraints on arguments
+        Exactly one of the arguments `max_time`, `sim_config`, and `config_dict` must be provided.
+        See `get_sim_config` for additional constraints on these arguments.
 
         Args:
-            time_max (:obj:`float`, optional): the time of the end of the simulation
-            sim_config (:obj:`SimulationConfig`, optional): the simulation run's configuration
+            max_time (:obj:`float`, optional): the maximum time of the end of the simulation
+            sim_config (:obj:`SimulationConfig`, optional): a simulation run's configuration
             config_dict (:obj:`dict`, optional): a dictionary with keys chosen from
                 the field names in :obj:`SimulationConfig`
-            author_metadata (:obj:`AuthorMetadata`, optional): information about the person who runs the simulation
+            author_metadata (:obj:`AuthorMetadata`, optional): information about the person who runs the simulation;
+                if not provided, then the their username will be obtained automatically
 
         Returns:
-            :obj:`SimulationReturnValue`: a :obj:`namedtuple` which contains a) the number of times any
-            simulation object executes `_handle_event()`, which may
-            be smaller than the number of events sent, because simultaneous events at one
-            simulation object are handled together, and b), if `sim_config.profile` is set,
-            a :obj:`pstats.Stats` instance containing the profiling statistics
+            :obj:`SimulationReturnValue`: a :obj:`namedtuple` whose fields are documented with its definition
 
         Raises:
             :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
                 or has no initial events, or attempts to execute an event that violates non-decreasing time
                 order
         """
-        self.sim_config = self._get_sim_config(time_max=time_max, sim_config=sim_config,
+        self.sim_config = self.get_sim_config(max_time=max_time, sim_config=sim_config,
                                                config_dict=config_dict)
         self.author_metadata = author_metadata
         if self.sim_config.output_dir:
@@ -572,10 +578,10 @@ class Simulator(object):
             self.measurements_fh.close()
         return self.SimulationReturnValue(self.num_handlers_called, profile)
 
-    def run(self, time_max=None, sim_config=None, config_dict=None, author_metadata=None):
-        """ Alias for simulate
+    def run(self, max_time=None, sim_config=None, config_dict=None, author_metadata=None):
+        """ Alias for `simulate`
         """
-        return self.simulate(time_max=time_max, sim_config=sim_config, config_dict=config_dict,
+        return self.simulate(max_time=max_time, sim_config=sim_config, config_dict=config_dict,
                              author_metadata=author_metadata)
 
     def _simulate(self):
@@ -624,10 +630,10 @@ class Simulator(object):
         self.fast_plotting_logger.fast_log('# {:%Y-%m-%d %H:%M:%S}'.format(datetime.now()), sim_time=0)
 
         self.num_handlers_called = 0
-        self.log_with_time(f"Simulation to {self.sim_config.time_max} starting")
+        self.log_with_time(f"Simulation to {self.sim_config.max_time} starting")
 
         try:
-            self.progress.start(self.sim_config.time_max)
+            self.progress.start(self.sim_config.max_time)
             self.init_metadata_collection(self.sim_config)
 
             while True:
@@ -652,7 +658,7 @@ class Simulator(object):
                     self.progress.end()
                     break
 
-                if self.sim_config.time_max < next_time:
+                if self.sim_config.max_time < next_time:
                     self.log_with_time(self.END_TIME_EXCEEDED)
                     self.progress.end()
                     break
@@ -683,7 +689,7 @@ class Simulator(object):
         return self.num_handlers_called
 
     def track_obj_mem(self):
-        """ Write memory use tracking
+        """ Write memory use tracking data to the measurements file in `measurements_fh`
         """
         def format_row(values, widths=(60, 10, 16)):
             widths_format = "{{:<{}}}{{:>{}}}{{:>{}}}".format(*widths)
@@ -711,7 +717,7 @@ class Simulator(object):
         self.fast_debug_file_logger.fast_log(msg, sim_time=self.time)
 
     def provide_event_counts(self):
-        """ Provide the simulation's categorized event counts
+        """ Provide the simulation's event counts, categorized by object type, object name, event type
 
         Returns:
             :obj:`str`: the simulation's categorized event counts, in a tab-separated table

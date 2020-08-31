@@ -30,22 +30,22 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
     def test_TemplatePeriodicSimulationObject(self):
 
         simulator = de_sim.Simulator()
-        time_max = 5
+        max_time = 5
         expected = []
 
         # int period
         period = 1
         pso_1 = SpecialPeriodicSimulationObject('pso_1', period)
-        expected.append(np.linspace(0, time_max, time_max + 1))
+        expected.append(np.linspace(0, max_time, max_time + 1))
 
         period = .1
         pso_2 = SpecialPeriodicSimulationObject('pso_2', period)
-        expected.append([t / 10 for t in range(time_max * 10 + 1)])
+        expected.append([t / 10 for t in range(max_time * 10 + 1)])
 
         psos = [pso_1, pso_2]
         simulator.add_objects(psos)
         simulator.initialize()
-        simulator.simulate(time_max)
+        simulator.simulate(max_time)
 
         for pso, expect in zip(psos, expected):
             for pso_time, expect_time in zip(pso.times, expect):
@@ -59,12 +59,12 @@ class TestTemplatePeriodicSimulationObject(unittest.TestCase):
 
         for time_init in [-3, 2]:
             simulator = de_sim.Simulator()
-            time_max = 5
+            max_time = 5
             period = 1
             pso = SpecialPeriodicSimulationObject('pso', period, time_init)
-            expected_times = list(np.linspace(time_init, time_max, time_max - time_init + 1))
+            expected_times = list(np.linspace(time_init, max_time, max_time - time_init + 1))
             simulator.add_objects([pso])
             simulator.initialize()
-            simulation_config = SimulationConfig(time_max, time_init)
+            simulation_config = SimulationConfig(max_time, time_init)
             simulator.simulate(sim_config=simulation_config)
             self.assertEqual(expected_times, pso.times)

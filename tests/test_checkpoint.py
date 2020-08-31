@@ -100,7 +100,7 @@ class TestAccessCheckpointsLog(unittest.TestCase):
 
         # full simulation and check no checkpoints
         final_time_max = 20
-        metadata = dict(time_max=final_time_max)
+        metadata = dict(max_time=final_time_max)
         final_time, final_state, final_random_state = mock_simulate(metadata=metadata,
                                                                     checkpoint_step=checkpoint_step)
 
@@ -111,18 +111,18 @@ class TestAccessCheckpointsLog(unittest.TestCase):
         self.assertGreaterEqual(final_time, final_time_max)
 
         # run simulation to check checkpointing
-        time_max = 10
-        metadata = dict(time_max=time_max)
+        max_time = 10
+        metadata = dict(max_time=max_time)
         time, _, _ = mock_simulate(metadata=metadata, checkpoint_dir=self.checkpoint_dir,
                                    checkpoint_step=checkpoint_step)
-        self.assertGreaterEqual(time, time_max)
+        self.assertGreaterEqual(time, max_time)
 
         # check that checkpoints created and
         # list_checkpoints() reloads from updated self.checkpoint_dir
         self.assertTrue(sorted(access_checkpoints.list_checkpoints()))
         numpy.testing.assert_array_almost_equal(
             access_checkpoints.list_checkpoints(),
-            numpy.linspace(0, time_max, int(1 + time_max / checkpoint_step)),
+            numpy.linspace(0, max_time, int(1 + max_time / checkpoint_step)),
             decimal=1)
 
         # check that checkpoints have correct data
@@ -133,10 +133,10 @@ class TestAccessCheckpointsLog(unittest.TestCase):
         self.assertLessEqual(chkpt.time, checkpoint_time)
 
         chkpt = access_checkpoints.get_checkpoint()
-        self.assertLessEqual(chkpt.time, time_max)
+        self.assertLessEqual(chkpt.time, max_time)
 
         # check that resumed simulation reproduces earlier run
-        metadata = dict(time_max=final_time_max)
+        metadata = dict(max_time=final_time_max)
         time, state, random_state = mock_simulate(metadata=metadata,
                                                   init_time=chkpt.state.time,
                                                   init_state=chkpt.state.local_state,
@@ -212,7 +212,7 @@ def mock_simulate(metadata, init_time=0, init_state=None, init_random_state=None
                   init_checkpoint_time=0, checkpoint_step=None):
     """ Run a mock simulation
 
-    Advance time randomly, and checkpoint periodically. Allowed to run one iteration past `time_max`.
+    Advance time randomly, and checkpoint periodically. Allowed to run one iteration past `max_time`.
 
     Args:
         metadata (:obj:`dict`): metadata about the mock simulation
@@ -239,7 +239,7 @@ def mock_simulate(metadata, init_time=0, init_state=None, init_random_state=None
     if checkpoint_dir:
         logger = MockAccessCheckpointsLogger(checkpoint_dir, checkpoint_step, init_checkpoint_time)
 
-    while time < metadata['time_max']:
+    while time < metadata['max_time']:
         # randomly advance time
         dt = random_state.exponential(1. / 100.)
         time += dt
@@ -248,7 +248,7 @@ def mock_simulate(metadata, init_time=0, init_state=None, init_random_state=None
         if checkpoint_dir:
             logger.checkpoint_periodically(time, state, random_state)
 
-        if metadata['time_max'] <= time:
+        if metadata['max_time'] <= time:
             break
 
     return (time, state, random_state.get_state())
