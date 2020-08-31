@@ -267,7 +267,7 @@ html_show_copyright = True
 #
 # html_use_opensearch = ''
 
-# This is the file name suffix for HTML files (e.g. ".xhtml").
+# This is the filename suffix for HTML files (e.g. ".xhtml").
 # html_file_suffix = None
 
 # Language to be used for generating the HTML full-text search index.

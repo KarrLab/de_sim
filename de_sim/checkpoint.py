@@ -103,12 +103,12 @@ class AccessCheckpoints(object):
         self.all_checkpoints = None
 
     def set_checkpoint(self, checkpoint):
-        """ Save a checkpoint in the directory `self.dir_path`
+        """ Save a checkpoint in the directory `dir_path`
 
         Args:
             checkpoint (:obj:`Checkpoint`): checkpoint
         """
-        file_name = self.get_file_name(checkpoint.time)
+        file_name = self.get_filename(checkpoint.time)
 
         with open(file_name, 'wb') as file:
             pickle.dump(checkpoint, file)
@@ -143,7 +143,7 @@ class AccessCheckpoints(object):
             index = max(index, 0)
             nearest_time = checkpoint_times[index]
 
-        file_name = self.get_file_name(nearest_time)
+        file_name = self.get_filename(nearest_time)
 
         # load and return this checkpoint
         with open(file_name, 'rb') as file:
@@ -189,14 +189,14 @@ class AccessCheckpoints(object):
         # return list of checkpoint times
         return self.all_checkpoints
 
-    def get_file_name(self, time):
-        """ Get the file name for the checkpoint at time `time`
+    def get_filename(self, time):
+        """ Get the filename for the checkpoint at time `time`
 
         Args:
             time (:obj:`float`): time
 
         Returns:
-            :obj:`str`: file name for checkpoint at time `time`
+            :obj:`str`: filename for the checkpoint at time `time`
         """
         filename_time = f'{time:.{MAX_TIME_PRECISION}f}'
         if not math.isclose(float(filename_time), time):

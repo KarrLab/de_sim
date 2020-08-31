@@ -72,10 +72,10 @@ class TestAccessCheckpoints(unittest.TestCase):
 
     def test_get_file_name(self):
         access_checkpoints = AccessCheckpoints('.')
-        self.assertIn(f'{3.0:.{MAX_TIME_PRECISION}f}', access_checkpoints.get_file_name(3))
+        self.assertIn(f'{3.0:.{MAX_TIME_PRECISION}f}', access_checkpoints.get_filename(3))
         for time in [1.00000001, 1E-7]:
             with self.assertRaises(SimulatorError):
-                access_checkpoints.get_file_name(time)
+                access_checkpoints.get_filename(time)
 
 
 class TestAccessCheckpointsLog(unittest.TestCase):
