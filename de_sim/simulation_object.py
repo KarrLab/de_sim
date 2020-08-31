@@ -66,19 +66,24 @@ class BaseSimulationObject(object):
         self.fast_debug_file_logger = FastLogger(self.debug_logs.get_log('de_sim.debug.file'), 'debug')
         self.fast_plot_file_logger = FastLogger(self.debug_logs.get_log('de_sim.plot.file'), 'debug')
 
-    def add(self, simulator):
-        """ Add this object to a simulation.
+    def set_simulator(self, simulator):
+        """ Set this object's simulator reference
 
         Args:
-            simulator (:obj:`de_sim.Simulator`): the simulator that will use this :class:`BaseSimulationObject`
+            simulator (:obj:`de_sim.Simulator`): the simulator that will use this :obj:`BaseSimulationObject`
 
         Raises:
-            :obj:`SimulatorError`: if this :class:`BaseSimulationObject` is already registered with a simulator
+            :obj:`SimulatorError`: if this :obj:`BaseSimulationObject` is already registered with a simulator
         """
         if self.simulator is None:
             self.simulator = simulator
             return
         raise SimulatorError("SimulationObject '{}' is already part of a simulator".format(self.name))
+
+    def del_simulator(self):
+        """ Delete this object's simulator reference
+        """
+        self.simulator = None
 
     def send_event_absolute(self, event_time, receiving_object, message, copy=False):
         """ Schedule an event containing an event message with an absolute event time.

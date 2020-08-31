@@ -332,6 +332,8 @@ class TestSimulator(unittest.TestCase):
         obj = ExampleSimulationObject(obj_name(1))
         self.simulator.add_object(obj)
         self.simulator._delete_object(obj)
+        self.assertNotIn(obj.name, self.simulator.simulation_objects)
+        self.assertEqual(obj.simulator, None)
         self.assertEqual(self.simulator.add_object(obj), None)
 
     def test_simulator_exceptions(self):

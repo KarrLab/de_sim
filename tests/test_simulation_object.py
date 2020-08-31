@@ -255,6 +255,12 @@ class TestSimulationObject(unittest.TestCase):
         self.assertEqual(0, self.eso1.num_events)
         self.assertEqual(None, self.eso1.simulator)
 
+    def test_set_simulator(self):
+        simulator = de_sim.Simulator()
+        o1 = ExampleSimulationObject('o1')
+        o1.set_simulator(simulator)
+        self.assertEqual(o1.simulator, simulator)
+
     def test_exceptions(self):
         expected = "'{}' simulation objects not registered to send '{}' messages".format(
             most_qual_cls_name(self.eso1), UnregisteredMsg().__class__.__name__)
@@ -349,7 +355,7 @@ class TestSimulationObject(unittest.TestCase):
 
         with self.assertRaisesRegex(SimulatorError,
                                     "SimulationObject '{}' is already part of a simulator".format(self.o1.name)):
-            self.o1.add(self.simulator)
+            self.o1.set_simulator(self.simulator)
 
         with self.assertRaisesRegex(SimulatorError, "delay is 'NaN'"):
             self.o1.send_event(float('nan'), self.o2, Eg1())

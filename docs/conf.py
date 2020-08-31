@@ -52,7 +52,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'de_sim'
 copyright = u'{}, Karr Lab'.format(datetime.datetime.now().year)
-author = u'Karr Lab'
+author = u'Arthur Goldberg'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -403,3 +403,6 @@ googleanalytics_id = 'UA-86340737-1'
 
 addmetahtml_content = '<meta http-equiv="refresh" content="0; url=https://docs.karrlab.org/de_sim" />'
 addmetahtml_enabled = os.getenv('READTHEDOCS', '') == 'True'
+
+# Skip modules that don't need to be documented
+autodoc_mock_imports = ['_version']

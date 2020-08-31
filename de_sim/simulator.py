@@ -322,7 +322,7 @@ class Simulator(object):
         name = simulation_object.name
         if name in self.simulation_objects:
             raise SimulatorError("cannot add simulation object '{}', name already in use".format(name))
-        simulation_object.add(self)
+        simulation_object.set_simulator(self)
         self.simulation_objects[name] = simulation_object
 
     def add_objects(self, simulation_objects):
@@ -375,7 +375,7 @@ class Simulator(object):
         name = simulation_object.name
         if name not in self.simulation_objects:
             raise SimulatorError(f"cannot delete simulation object '{name}', it has not been added")
-        simulation_object.simulator = None
+        simulation_object.del_simulator()
         del self.simulation_objects[name]
 
     def initialize(self):
