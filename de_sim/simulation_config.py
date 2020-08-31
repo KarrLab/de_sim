@@ -135,7 +135,7 @@ class SimulationConfig(EnhancedDataClass):
 
         Returns:
             :obj:`bool`: :obj:`True` if `other` is a :obj:`SimulationConfig` that is semantically equal to `self`,
-                :obj:`False` otherwise
+            :obj:`False` otherwise
         """
         return (isinstance(other, SimulationConfig) and self.time_max == other.time_max and
                 self.time_init == other.time_init)

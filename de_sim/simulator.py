@@ -133,7 +133,7 @@ class EventQueue(object):
 
         Returns:
             :obj:`SimulationObject`): the simulation object that will execute the next event, or `None`
-                if no event is scheduled
+            if no event is scheduled
         """
         if not self.event_heap:
             return None
@@ -152,7 +152,7 @@ class EventQueue(object):
 
         Returns:
             :obj:`list` of :obj:`Event`: the earliest event(s), sorted by message type priority. If no
-                events are available the list is empty.
+            events are available the list is empty.
         """
         if not self.event_heap:
             return []
@@ -211,7 +211,7 @@ class EventQueue(object):
 
         Returns:
             :obj:`str`: String representation of the values of an :obj:`EventQueue`, or a :obj:`list`
-                representation if `as_list` is set
+            representation if `as_list` is set
         """
         event_heap = self.event_heap
         if sim_obj is not None:
@@ -527,10 +527,10 @@ class Simulator(object):
 
         Returns:
             :obj:`SimulationReturnValue`: a :obj:`namedtuple` which contains a) the number of times any
-                simulation object executes `_handle_event()`, which may
-                be smaller than the number of events sent, because simultaneous events at one
-                simulation object are handled together, and b), if `sim_config.profile` is set,
-                a :obj:`pstats.Stats` instance containing the profiling statistics
+            simulation object executes `_handle_event()`, which may
+            be smaller than the number of events sent, because simultaneous events at one
+            simulation object are handled together, and b), if `sim_config.profile` is set,
+            a :obj:`pstats.Stats` instance containing the profiling statistics
 
         Raises:
             :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
@@ -574,8 +574,8 @@ class Simulator(object):
 
         Returns:
             :obj:`int`: the number of times a simulation object executes `_handle_event()`. This may
-                be smaller than the number of events sent, because simultaneous events at one
-                simulation object are handled together.
+            be smaller than the number of events sent, because simultaneous events at one
+            simulation object are handled together.
 
         Raises:
             :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,

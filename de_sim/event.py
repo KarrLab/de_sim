@@ -123,7 +123,7 @@ class Event(object):
 
         Returns:
             :obj:`str` or obj:`str`: a string representation of names of an :obj:`Event`'s fields, or a :obj:`list`
-                representation if `as_list` is set
+            representation if `as_list` is set
         """
         MESSAGE_FIELDS_HEADER = 'Message fields...'
         list_repr = Event.BASE_HEADERS + [MESSAGE_FIELDS_HEADER]
@@ -142,7 +142,7 @@ class Event(object):
 
         Returns:
             :obj:`str` or :obj:`list`: a string representation of the names of an :obj:`Event`'s fields,
-                or a :obj:`list` representation if `as_list` is set
+            or a :obj:`list` representation if `as_list` is set
         """
         headers = list(Event.BASE_HEADERS)
         if self.message.header() is not None:
@@ -168,8 +168,8 @@ class Event(object):
                 a string
 
         Returns:
-            :obj:`str` or :obj:`list`: string representation of the values of an :obj:`Event`'s fields, or a :obj:`list`
-                representation if `as_list` is set
+            :obj:`str` or :obj:`list`: string representation of the values of an :obj:`Event`'s fields,
+            or a :obj:`list` representation if `as_list` is set
         """
         raw_times = [[self.creation_time], [self.event_time, str(self.receiving_object.class_event_priority),
                                             self.receiving_object.event_time_tiebreaker]]
@@ -192,6 +192,6 @@ class Event(object):
 
         Returns:
             :obj:`str`: String representation of the :obj:`Event`'s fields, except `message`,
-                delimited by tabs
+            delimited by tabs
         """
         return self.render()

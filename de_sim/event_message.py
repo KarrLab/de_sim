@@ -90,8 +90,8 @@ class EventMessageInterface(object, metaclass=ABCMeta):
 
         Returns:
             :obj:`obj`: `None` if this message has no `msg_field_names`, or a :obj:`str` representation of
-                the attribute names for this :obj:`EventMessage`, or a :obj:`list`
-                representation if `as_list` is set
+            the attribute names for this :obj:`EventMessage`, or a :obj:`list`
+            representation if `as_list` is set
         """
         if not self.attrs():
             return None
@@ -128,8 +128,8 @@ class EventMessageInterface(object, metaclass=ABCMeta):
 
         Returns:
             :obj:`obj`: `None` if this message has no `msg_field_names`, or a string representation of
-                the attribute names for this :obj:`EventMessage`, or a :obj:`list`
-                representation if `as_list` is set
+            the attribute names for this :obj:`EventMessage`, or a :obj:`list`
+            representation if `as_list` is set
         """
         if not self.attrs():
             return None

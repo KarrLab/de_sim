@@ -150,10 +150,10 @@ class AccessCheckpoints(object):
             return pickle.load(file)
 
     def list_checkpoints(self, error_if_empty=True):
-        """ Get sorted list of times of saved checkpoints in checkpoint directory `self.dir_path`
+        """ Get sorted list of times of saved checkpoints in checkpoint directory `dir_path`
 
         To enhance performance the list of times is cached in attribute `all_checkpoints` and
-        reloaded if the directory is updated.
+        refreshed from the contents of directory `dir_path` if it has been updated.
 
         Args:
             error_if_empty (:obj:`bool`, optional): if set, report an error if no checkpoints are found
