@@ -128,8 +128,8 @@ MESSAGE_TYPES = [TransitionMessage]
 class StateTransitionType(enum.Enum):
     """ State transition types
     """
-    s_to_i = enum.auto()    # Transition from Susceptible to Infectious
-    i_to_r = enum.auto()    # Transition from Infectious to Recovered
+    s_to_i = 'Transition from Susceptible to Infectious'
+    i_to_r = 'Transition from Infectious to Recovered'
 
 
 class SIR2(SIR):
