@@ -336,7 +336,8 @@ class TestSimulator(unittest.TestCase):
 
     def test_simulator_exceptions(self):
         obj = ExampleSimulationObject(obj_name(1))
-        with self.assertRaisesRegex(SimulatorError, f"cannot delete simulation object '{obj.name}'"):
+        with self.assertRaisesRegex(SimulatorError,
+                                    f"cannot delete simulation object '{obj.name}', it has not been added"):
             self.simulator._delete_object(obj)
 
         no_such_obj_name = 'no such object'
@@ -347,6 +348,9 @@ class TestSimulator(unittest.TestCase):
             self.simulator.simulate(5.0)
 
         self.simulator.initialize()
+        with self.assertRaisesRegex(SimulatorError, f"cannot delete simulation object: simulator is between"):
+            self.simulator._delete_object(obj)
+
         with self.assertRaisesRegex(SimulatorError, 'Simulation has no objects'):
             self.simulator.simulate(5.0)
 

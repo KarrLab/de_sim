@@ -370,11 +370,11 @@ class Simulator(object):
         # prohibit calls to _delete_object while a simulation is running
         # more precisely, prohibit between a simulation's initialization & reset
         if self.__initialized:
-            raise SimulatorError(f"cannot delete simulation object '{name}': simulator is between "
-                                 f"initialization and reset")
+            raise SimulatorError(f"cannot delete simulation object: simulator is between "
+                                 f"initialize and reset")
         name = simulation_object.name
         if name not in self.simulation_objects:
-            raise SimulatorError(f"cannot delete simulation object '{name}', has not been added")
+            raise SimulatorError(f"cannot delete simulation object '{name}', it has not been added")
         simulation_object.simulator = None
         del self.simulation_objects[name]
 
