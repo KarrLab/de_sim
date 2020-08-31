@@ -90,7 +90,7 @@ class AccessCheckpoints(object):
     of the checkpoint.
 
     Attributes:
-        dir_path (:obj:`str`): a directory containing simulation checkpoints
+        dir_path (:obj:`str`): the directory containing simulation checkpoints
         _last_dir_mod (:obj:`str`): most recent wall-clock time when the contents of `dir_path` were modified;
             used to avoid unnecessary updates to `all_checkpoints`
         all_checkpoints (:obj:`list` of :obj:`float`): sorted list of the simulation times of all
@@ -114,10 +114,11 @@ class AccessCheckpoints(object):
             pickle.dump(checkpoint, file)
 
     def get_checkpoint(self, time=None):
-        """ Get the latest checkpoint in directory `self.dir_path` whose time is before or equal to `time`
+        """ Get the latest checkpoint in directory `dir_path` whose time is before or equal to `time`
 
         However, if no checkpoint with time <= `time` exists, then return the first checkpoint.
-        And if `time` is `None`, return the last checkpoint.
+        If `time` is `None`, return the last checkpoint.
+
         For example, consider checkpoints at 1.0 s, 1.5 s, and 2.0 s. If `time` = 1.5 s, then
         return the checkpoint from 1.5 s. Return the same checkpoint if `time` = 1.9 s.
         But, if `time` = 0.9 s, the checkpoint from 1.0 s would be returned.
@@ -129,7 +130,7 @@ class AccessCheckpoints(object):
 
         Returns:
             :obj:`Checkpoint`: the most recent checkpoint before time `time`, or the most recent
-                checkpoint if `time` is not provided
+            checkpoint if `time` is not provided
         """
         # get list of checkpoints
         checkpoint_times = self.list_checkpoints()
