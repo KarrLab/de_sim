@@ -260,7 +260,7 @@ class PeriodicSimulationObject(TemplatePeriodicSimulationObject):
     def __init__(self, name, period):
         super().__init__(name, period)
 
-    def handle_event(self):
+    def handle_event(self, event):
         """ Handle the periodic event
         """
         return

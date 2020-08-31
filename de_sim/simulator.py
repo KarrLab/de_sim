@@ -351,7 +351,7 @@ class Simulator(object):
     def get_objects(self):
         """ Get all simulation object instances in the simulation
         """
-        # TODO(Arthur): make this reproducible
+        # This is reproducible for Python 3.7 and later (see https://docs.python.org/3/whatsnew/3.7.html)
         # TODO(Arthur): eliminate external calls to self.simulator.simulation_objects
         return self.simulation_objects.values()
 

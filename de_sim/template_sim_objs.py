@@ -43,19 +43,30 @@ class TemplatePeriodicSimulationObject(de_sim.SimulationObject):
         self.num_periods += 1
         self.send_event_absolute(next_event_time, self, NextEvent())
 
-    def handle_event(self):
+    def handle_event(self, event):
         """ Handle the periodic event
 
         Derived classes must override this method and actually handle the event
+
+        Args:
+            event (:obj:`de_sim.Event`): simulation event; not used
         """
         pass    # pragma: no cover     # must be overridden
 
     def init_before_run(self):
-        # create the initial event
+        """ Schedule the initial event
+        """
         self.schedule_next_event()
 
     def handle_simulation_event(self, event):
-        self.handle_event()
+        """ Handle the periodic event
+
+        Args:
+            event (:obj:`de_sim.Event`): simulation event; not used
+
+        Call `handle_event` and schedule the next event
+        """
+        self.handle_event(event)
         self.schedule_next_event()
 
     event_handlers = [(NextEvent, handle_simulation_event)]

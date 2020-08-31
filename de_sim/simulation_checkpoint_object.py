@@ -21,7 +21,7 @@ class AbstractCheckpointSimulationObject(TemplatePeriodicSimulationObject):
     def __init__(self, name, period):
         super().__init__(name, period)
 
-    def handle_event(self):
+    def handle_event(self, event):
         self.create_checkpoint()
 
     def create_checkpoint(self):

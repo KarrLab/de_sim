@@ -20,7 +20,7 @@ class SpecialPeriodicSimulationObject(TemplatePeriodicSimulationObject):
         self.times = []
         super().__init__(name, period, start_time=start_time)
 
-    def handle_event(self):
+    def handle_event(self, event):
         """Handle the periodic event"""
         self.times.append(self.time)
 
