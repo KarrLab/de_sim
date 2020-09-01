@@ -16,22 +16,22 @@ class foo3(object):
         """
         pass
 
-'''
 from de_sim.event_message import EventMessage
 from de_sim.event_message import EventMessageNormalBottom
 from de_sim.event_message import EventMessageNormalTop
 
 
 class foo(object):
-    """ hello mom :obj:`EventMessage` event message
-        :obj:`EventMessageNormalBottom` event message normal
-        :obj:`EventMessageNormalTop` event message normal
+    """ hello mom :obj:`de_sim.event_message.EventMessage` event message
+        :obj:`de_sim.event_message.EventMessageNormalBottom` event message normal
+        :obj:`de_sim.event_message.EventMessageNormalTop` event message normal
     """
-    
-    def __init__(self):
+    def x(self):
         """ :obj:`EventMessage` event message; :obj:`EventMessageNormalBottom`; :obj:`EventMessageNormalTop`
         """
         pass
+
+'''
 
 from de_sim.event_message2 import EventMessage2
 from de_sim.event_message2 import EventMessageNormalBottom2
