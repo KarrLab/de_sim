@@ -191,6 +191,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
         return not (self < other)
 
 
+from de_sim.event_message import EventMessageInterface, CombinedEventMessageMeta
 
 class EventMessage2(EventMessageInterface, metaclass=CombinedEventMessageMeta):
     """ The event message base class
