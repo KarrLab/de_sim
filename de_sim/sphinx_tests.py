@@ -2,11 +2,25 @@ from de_sim.event_message import EventMessage
 from de_sim.event_message import EventMessageNormalBottom
 from de_sim.event_message import EventMessageNormalTop
 
+
 class foo(object):
     """ hello mom :obj:`EventMessage` event message
-        hello dad :obj:`EventMessageNormalBottom` event message normal
-        hello dad :obj:`EventMessageNormalTop` event message normal
+        :obj:`EventMessageNormalBottom` event message normal
+        :obj:`EventMessageNormalTop` event message normal
     """
     
     def __init__(self):
+        """ :obj:`EventMessage` event message; :obj:`EventMessageNormalBottom`; :obj:`EventMessageNormalTop`
+        """
         pass
+
+from de_sim.event_message2 import EventMessage2
+from de_sim.event_message2 import EventMessageNormalBottom2
+from de_sim.event_message2 import EventMessageNormalTop2
+
+
+class foo2(object):
+    """ hello mom :obj:`EventMessage2` event message
+        :obj:`EventMessageNormalBottom2` event message normal
+        :obj:`EventMessageNormalTop2` event message normal
+    """
