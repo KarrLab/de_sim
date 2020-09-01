@@ -2,7 +2,6 @@ from de_sim.event_message3 import EventMessage3
 from de_sim.event_message3 import EventMessageNormalBottom3
 from de_sim.event_message3 import EventMessageNormalTop3
 
-
 class foo3(object):
     """ hello mom :obj:`EventMessage3` event message
         :obj:`EventMessageNormalBottom3` event message normal
@@ -46,9 +45,6 @@ class foo2(object):
         """ :obj:`EventMessage2` event message; :obj:`EventMessageNormalBottom2`; :obj:`EventMessageNormalTop2`
         """
         pass
-'''
-
-
 
 from de_sim.event_message3 import EventMessage3
 from de_sim.event_message3 import EventMessageNormalBottom3
@@ -65,4 +61,4 @@ class foo3(object):
         """ :obj:`EventMessage3` event message; :obj:`EventMessageNormalBottom3`; :obj:`EventMessageNormalTop3`
         """
         pass
-
+'''
