@@ -23,7 +23,7 @@ from de_sim.event_message import EventMessageNormalTop
 
 class foo(object):
     """ hello mom :obj:`de_sim.event_message.EventMessage` event message
-        :obj:`de_sim.event_message.EventMessageNormalBottom` event message normal
+        :obj:`~de_sim.event_message.EventMessageNormalBottom` event message normal
         :obj:`de_sim.event_message.EventMessageNormalTop` event message normal
     """
     def x(self):
