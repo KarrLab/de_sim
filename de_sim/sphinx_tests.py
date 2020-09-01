@@ -7,7 +7,12 @@ class foo3(object):
     """
 
     def __init__(self):
-        """ :obj:`EventMessage3` event message; :obj:`EventMessageNormalBottom3`; :obj:`EventMessageNormalTop3`
+        """ :obj:`de_sim.event_message3.EventMessageNormalBottom3`; :obj:`de_sim.event_message3.EventMessageNormalTop3`
+        """
+        pass
+
+    def f(self):
+        """ :obj:`de_sim.event_message3.EventMessageNormalBottom3`; :obj:`de_sim.event_message3.EventMessageNormalTop3`
         """
         pass
 
