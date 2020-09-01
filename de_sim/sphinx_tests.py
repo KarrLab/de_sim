@@ -18,12 +18,11 @@ class foo3(object):
 
 from de_sim.event_message import EventMessage
 from de_sim.event_message import EventMessageNormalBottom
-from de_sim.event_message import EventMessageNormalTop
 
 class foo(object):
     """ hello mom :obj:`de_sim.event_message.EventMessage` event message
         :obj:`~de_sim.event_message.EventMessageNormalBottom` event message normal
-        :obj:`de_sim.event_message.EventMessageNormalTop` event message normal
+        :obj:`~de_sim.event_message.EventMessageNormalTop` event message normal
     """
     def x(self):
         """ :obj:`EventMessage` event message; :obj:`EventMessageNormalBottom`; :obj:`EventMessageNormalTop`
