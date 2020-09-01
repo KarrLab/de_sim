@@ -134,7 +134,7 @@ class SimulationMetadata(EnhancedDataClass):
     def __setattr__(self, name, value):
         """ Validate an attribute in this :obj:`SimulationMetadata` when it is changed
 
-        Overrides `__setattr__` in :obj:`EnhancedDataClass` to report errors as :obj:`SimulatorError`s
+        Overrides `__setattr__` in :obj:`EnhancedDataClass` to report errors as :obj:`SimulatorError`\ s
         """
         try:
             super().__setattr__(name, value)

@@ -395,7 +395,7 @@ class SimulationObjMeta(type):
                 or if handlers in `event_handlers` don't refer to methods in the
                     :obj:`SimulationObject`,
                 or if `event_handlers` isn't an iterator over pairs,
-                or if a message type sent isn't a subclass of EventMessage,
+                or if a message type sent isn't a subclass of :obj:`EventMessage`,
                 or if `messages_sent` isn't an iterator over pairs.
         """
         # Short circuit when SimulationObject is defined

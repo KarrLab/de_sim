@@ -36,10 +36,10 @@ class Checkpoint(object):
         self.random_state = random_state
 
     def __str__(self):
-        """ Provide a human readable representation of this `Checkpoint`
+        """ Provide a human readable representation of this :obj:`Checkpoint`
 
         Returns:
-            :obj:`str`: a human readable representation of this `Checkpoint`
+            :obj:`str`: a human readable representation of this :obj:`Checkpoint`
         """
 
         return obj_to_str(self, ['time', 'state', 'random_state'])

@@ -32,7 +32,7 @@ class EventQueue(object):
 
     Stores a :obj:`Simulator`'s events in a heap (also known as a priority queue).
     The heap is a 'min heap', which keeps the event with the smallest sort order at the root in `heap[0]`.
-    :obj:`Event`s are sorted on their `_get_order_time`, which provides a pair, (event time, event 'sub-time'),
+    :obj:`Event`\ s are sorted on their `_get_order_time`, which provides a pair, (event time, event 'sub-time'),
     and is implemented via comparison operations in :obj:`Event`.
     All entries with equal `(event time, event 'sub-time')` values are popped from the heap by `next_events()`.
     `schedule_event()` costs `O(log(n))`, where `n` is the size of the heap,
@@ -368,7 +368,7 @@ class Simulator(object):
     def _delete_object(self, simulation_object):
         """ Delete a simulation object instance from this simulation
 
-        This method should not be called by :obj:`SimulationObject`s.
+        This method should not be called by :obj:`SimulationObject`\ s.
 
         Args:
             simulation_object (:obj:`SimulationObject`): a simulation object instance that is
