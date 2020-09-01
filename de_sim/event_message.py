@@ -233,7 +233,7 @@ class EventMessage(EventMessageInterface, metaclass=CombinedEventMessageMeta):
     module supports compact declaration of :obj:`EventMessage` subclasses. For example::
 
         class ExampleEventMessage1(EventMessage):
-            " Docstring "
+            " Docstring for ExampleEventMessage1 "
             msg_field_names = ['attr1', 'attr2']
 
     defines the `ExampleEventMessage1` class with a short docstring and message fields named
@@ -242,5 +242,12 @@ class EventMessage(EventMessageInterface, metaclass=CombinedEventMessageMeta):
     :obj:`EventMessage` subclasses must support the comparison operations `<`, `<=`, etc. This is
     provided automatically for message fields that support comparison. :obj:`EventMessage` subclasses with
     message fields that do not support comparison must override `__lt__`, `__le__`, etc.
+    """
+    pass
+
+
+class EventMessageNormal(object):
+    """ A 'normal' event message base class
+
     """
     pass
