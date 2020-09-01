@@ -13,6 +13,14 @@ from de_sim.errors import SimulatorError
 from de_sim.utilities import ConcreteABCMeta
 
 
+class EventMessageNormalTop(object):
+    """ A 'normal' event message base class
+
+    """
+    def __init__(self):
+        pass
+
+
 class EventMessageInterface(object, metaclass=ABCMeta):
     """ An abstract base class for event messages
 
@@ -246,8 +254,11 @@ class EventMessage(EventMessageInterface, metaclass=CombinedEventMessageMeta):
     pass
 
 
-class EventMessageNormal(object):
+class EventMessageNormalBottom(object):
     """ A 'normal' event message base class
 
     """
-    pass
+    def __init__(self):
+        pass
+
+
