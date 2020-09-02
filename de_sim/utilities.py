@@ -33,7 +33,7 @@ class SimulationProgressBar(object):
     Shows the progress of a simulation towards the time it is scheduled to end, in simulation time.
 
     A `SimulationProgressBar` does nothing by default, so that it can be used without an
-    `if` statement and configured at run-time.
+    `if` statement and configured at runtime.
     """
 
     def __init__(self, use=False):

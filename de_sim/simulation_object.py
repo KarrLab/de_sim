@@ -113,7 +113,7 @@ class BaseSimulationObject(object):
 
         # Do not put a class reference in a message, as the message might not be received in the
         # same address space.
-        # To eliminate the risk of name collisions use the fully qualified classname.
+        # To eliminate the risk of name collisions use the fully qualified class name.
         # TODO(Arthur): wait until after MVP
         # event_type_name = most_qual_cls_name(message)
         event_type_name = message.__class__.__name__
@@ -142,7 +142,7 @@ class BaseSimulationObject(object):
                                                                              message.__class__.__name__))
 
     def send_event(self, delay, receiving_object, event_message, copy=False):
-        """ Schedule an event containing an event message, specifing the event time as a delay.
+        """ Schedule an event containing an event message, specifying the event time as a delay.
 
         Simulation object `X` sends an event to simulation object `Y` by invoking
 
@@ -179,7 +179,7 @@ class BaseSimulationObject(object):
         is determined by the sequence of tuples in `handlers`.
         These relationships are stored in a :obj:`SimulationObject`'s
         `metadata.event_handlers_dict`.
-        Each call to `register_handlers` re-initializes all event handler methods.
+        Each call to `register_handlers` reinitializes all event handler methods.
 
         Args:
             subclass (:class:`BaseSimulationObject`): a subclass of :class:`BaseSimulationObject` that is registering
@@ -208,7 +208,7 @@ class BaseSimulationObject(object):
     def register_sent_messages(subclass, sent_messages):
         """ Register the messages sent by a :class:`BaseSimulationObject` subclass
 
-        Calling `register_sent_messages` re-initializes all registered sent message types.
+        Calling `register_sent_messages` reinitializes all registered sent message types.
 
         Args:
             subclass (:class:`BaseSimulationObject`): a subclass of :class:`BaseSimulationObject` that is registering

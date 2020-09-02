@@ -16,7 +16,7 @@ def make_args(args_dict, required, options):
         options (:obj:`list`): optional command line arguments
 
     Returns:
-        :obj:`list`: list of strings in command line arguements, as would appear in `sys.argv[1:]`
+        :obj:`list`: list of strings in command line arguments, as would appear in `sys.argv[1:]`
     """
     args = []
     for opt in options:

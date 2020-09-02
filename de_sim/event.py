@@ -21,7 +21,7 @@ class Event(object):
     simulation application, in particular (event time, sub-time), where `sub-time` determines the
     execution priority among simultaneous messages with the same event time at different simulation
     objects.
-    In `de_sim`, `sub-time` is a pair: the class priority for the receiving object, and a tie-breaker which
+    In `de_sim`, `sub-time` is a pair: the class priority for the receiving object, and a tiebreaker which
     is a unique value for each instance of the receiving object's class.
     This is implemented by the comparison operators for :obj:`Event` below. This ordering achieves
     deterministic and reproducible simulations. (For more theory, see Jefferson's LLNL course.)

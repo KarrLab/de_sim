@@ -93,7 +93,7 @@ class RunPhold(object):
             cli_args (:obj:`list`): command line arguments
 
         Returns:
-            :obj:`argparse.Namespace`: parsed command line arguements
+            :obj:`argparse.Namespace`: parsed command line arguments
         """
         parser = argparse.ArgumentParser(description="Run PHOLD simulation. "
                                          "Each PHOLD event either schedules an event for 'self' or for some other randomly selected LP, "

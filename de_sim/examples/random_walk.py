@@ -81,7 +81,7 @@ class RunRandomWalkSimulation(object):
             cli_args (:obj:`list`, optional): if provided, use to test command line parsing
 
         Returns:
-            :obj:`argparse.Namespace`: parsed command line arguements
+            :obj:`argparse.Namespace`: parsed command line arguments
         """
         parser = argparse.ArgumentParser(
             description="A random walk on the integer number line with random times between steps")

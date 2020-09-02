@@ -435,7 +435,7 @@ class Simulator(object):
                                                simulator_repo=simulator_repo)
 
     def finish_metadata_collection(self):
-        """ Finish metadata collection: record a simulation's run-time, and write all metadata to disk
+        """ Finish metadata collection: record a simulation's runtime, and write all metadata to disk
         """
         self.sim_metadata.run.record_run_time()
         if self.sim_config.output_dir:

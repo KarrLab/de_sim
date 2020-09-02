@@ -22,7 +22,7 @@ EventCoordinates.time.__doc__ += ': the event time of an event'
 
 SimulationEventMessage = namedtuple('SimulationEventMessage', 'message_type send_coordinates receive_coordinates')
 SimulationEventMessage.__doc__ += ': a simulation event message; its type, and send and receive coordinates'
-SimulationEventMessage.message_type.__doc__ += ': the classname of a simulation event message'
+SimulationEventMessage.message_type.__doc__ += ': the class name of a simulation event message'
 SimulationEventMessage.send_coordinates.__doc__ += ': an :obj:`EventCoordinates`: the send coordinates'
 SimulationEventMessage.receive_coordinates.__doc__ += ': an :obj:`EventCoordinates`: the receive coordinates'
 
