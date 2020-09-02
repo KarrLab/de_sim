@@ -81,6 +81,7 @@ jobs:
               echo "0" > TEST_EXIT_CODE
               exit 1
             fi
+            karr_lab_build_utils make-documentation --spell-check
 
       # Generate reports, archive results, and send notifications
       - run:
