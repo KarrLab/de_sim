@@ -32,8 +32,8 @@ class EventQueue(object):
 
     Stores a :obj:`Simulator`'s events in a heap (also known as a priority queue).
     The heap is a 'min heap', which keeps the event with the smallest sort order at the root in `heap[0]`.
-    :obj:`Event`\ s are sorted on their `_get_order_time`, which provides a pair, (event time, event 'sub-time'),
-    and is implemented via comparison operations in :obj:`Event`.
+    :obj:`~de_sim.event.Event`\ s are sorted on their `_get_order_time`, which provides a pair, (event time, event 'sub-time'),
+    and is implemented via comparison operations in :obj:`~de_sim.event.Event`.
     All entries with equal `(event time, event 'sub-time')` values are popped from the heap by `next_events()`.
     `schedule_event()` costs `O(log(n))`, where `n` is the size of the heap,
     while `next_events()`, costs `O(mlog(n))`, where `m` is the number of events returned.
@@ -68,16 +68,16 @@ class EventQueue(object):
             send_time (:obj:`float`): the simulation time at which the event was generated (sent)
             receive_time (:obj:`float`): the simulation time at which the `receiving_object` will
                 execute the event
-            sending_object (:obj:`SimulationObject`): the object sending the event
-            receiving_object (:obj:`SimulationObject`): the object that will receive the event; when
+            sending_object (:obj:`~de_sim.simulation_object.SimulationObject`): the object sending the event
+            receiving_object (:obj:`~de_sim.simulation_object.SimulationObject`): the object that will receive the event; when
                 the simulation is parallelized `sending_object` and `receiving_object` will need
                 to be global identifiers.
-            event_message (:obj:`EventMessage`): an event message carried by the event; its type
-                provides the simulation application's type for an :obj:`Event`; it may also carry a payload
-                for the :obj:`Event` in its `msg_field_names`.
+            event_message (:obj:`~de_sim.event_message.EventMessage`): an event message carried by the event; its type
+                provides the simulation application's type for an :obj:`~de_sim.event.Event`; it may also carry a payload
+                for the :obj:`~de_sim.event.Event` in its `msg_field_names`.
 
         Raises:
-            :obj:`SimulatorError`: if `receive_time` < `send_time`, or `receive_time` or `send_time` is NaN
+            :obj:`~de_sim.errors.SimulatorError`: if `receive_time` < `send_time`, or `receive_time` or `send_time` is NaN
         """
 
         if math.isnan(send_time) or math.isnan(receive_time):
@@ -127,7 +127,7 @@ class EventQueue(object):
         """ Get the simulation object that receives the next event
 
         Returns:
-            :obj:`SimulationObject`: the simulation object that will execute the next event, or `None`
+            :obj:`~de_sim.simulation_object.SimulationObject`: the simulation object that will execute the next event, or `None`
             if no event is scheduled
         """
         if not self.event_heap:
@@ -153,7 +153,7 @@ class EventQueue(object):
         event message field values).
 
         Returns:
-            :obj:`list` of :obj:`Event`: the earliest event(s); if no events are available the list is empty
+            :obj:`list` of :obj:`~de_sim.event.Event`: the earliest event(s); if no events are available the list is empty
         """
         if not self.event_heap:
             return []
@@ -186,7 +186,7 @@ class EventQueue(object):
         """ Log an event with its simulation time to the `fast_debug_file_logger`
 
         Args:
-            event (:obj:`Event`): the Event to log
+            event (:obj:`~de_sim.event.Event`): the Event to log
         """
         msg = "Execute: {} {}:{} {} ({})".format(event.event_time,
                                                  type(event.receiving_object).__name__,
@@ -205,7 +205,7 @@ class EventQueue(object):
         a message field label, and each event labels message fields with their attribute names.
 
         Args:
-            sim_obj (:obj:`SimulationObject`, optional): if provided, return only events to be
+            sim_obj (:obj:`~de_sim.simulation_object.SimulationObject`, optional): if provided, return only events to be
                 received by `sim_obj`
             as_list (:obj:`bool`, optional): if set, return the :obj:`EventQueue`'s values in a :obj:`list`
             separator (:obj:`str`, optional): the field separator used if the values are returned as
@@ -278,7 +278,7 @@ class Simulator(object):
 
     Attributes:
         time (:obj:`float`): a simulation's current time
-        simulation_objects (:obj:`dict` of :obj:`SimulationObject`): all simulation objects, keyed by their names
+        simulation_objects (:obj:`dict` of :obj:`~de_sim.simulation_object.SimulationObject`): all simulation objects, keyed by their names
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
         fast_debug_file_logger (:obj:`FastLogger`): a fast logger for debugging messages
         fast_plotting_logger (:obj:`FastLogger`): a fast logger that saves trajectory data for plotting
@@ -286,9 +286,9 @@ class Simulator(object):
         event_counts (:obj:`Counter`): a count of executed events, categorized by the tuple
             (receiving object class, receiving object name, event message class)
         num_handlers_called (:obj:`int`): the number of calls a simulation makes to an event handler in a simulation object
-        sim_config (:obj:`SimulationConfig`): a simulation run's configuration
-        sim_metadata (:obj:`SimulationMetadata`): a simulation run's metadata
-        author_metadata (:obj:`AuthorMetadata`): information about the person who runs the simulation,
+        sim_config (:obj:`~de_sim.simulation_config.SimulationConfig`): a simulation run's configuration
+        sim_metadata (:obj:`~de_sim.simulation_metadata.SimulationMetadata`): a simulation run's metadata
+        author_metadata (:obj:`:obj:`~de_sim.simulation_metadata.AuthorMetadata`): information about the person who runs the simulation,
             if provided by the simulation application
         measurements_fh (:obj:`_io.TextIOWrapper`): file handle for debugging measurements file
         mem_tracker (:obj:`pympler.tracker.SummaryTracker`): a memory use tracker for debugging
@@ -316,11 +316,11 @@ class Simulator(object):
         """ Add a simulation object instance to this simulation
 
         Args:
-            simulation_object (:obj:`SimulationObject`): a simulation object instance that
+            simulation_object (:obj:`~de_sim.simulation_object.SimulationObject`): a simulation object instance that
                 will be used by this simulation
 
         Raises:
-            :obj:`SimulatorError`: if the simulation object's name is already in use
+            :obj:`~de_sim.errors.SimulatorError`: if the simulation object's name is already in use
         """
         name = simulation_object.name
         if name in self.simulation_objects:
@@ -332,7 +332,7 @@ class Simulator(object):
         """ Add multiple simulation objects to this simulation
 
         Args:
-            simulation_objects (:obj:`iterator` of :obj:`SimulationObject`): an iterator over simulation objects
+            simulation_objects (:obj:`iterator` of :obj:`~de_sim.simulation_object.SimulationObject`): an iterator over simulation objects
         """
         for simulation_object in simulation_objects:
             self.add_object(simulation_object)
@@ -344,10 +344,10 @@ class Simulator(object):
             simulation_object_name (:obj:`str`): the name of a simulation object
 
         Returns:
-            :obj:`SimulationObject`: the simulation object whose name is `simulation_object_name`
+            :obj:`~de_sim.simulation_object.SimulationObject`: the simulation object whose name is `simulation_object_name`
 
         Raises:
-            :obj:`SimulatorError`: if the simulation object whose name is `simulation_object_name`
+            :obj:`~de_sim.errors.SimulatorError`: if the simulation object whose name is `simulation_object_name`
                 is not used by this simulation
         """
         if simulation_object_name not in self.simulation_objects:
@@ -358,7 +358,7 @@ class Simulator(object):
         """ Get all simulation object instances in this simulation
 
         Returns:
-            :obj:`iterator` over :obj:`SimulationObject`: an iterator over all simulation object instances
+            :obj:`iterator` over :obj:`~de_sim.simulation_object.SimulationObject`: an iterator over all simulation object instances
             in this simulation
         """
         # This is reproducible for Python 3.7 and later (see https://docs.python.org/3/whatsnew/3.7.html)
@@ -368,14 +368,14 @@ class Simulator(object):
     def _delete_object(self, simulation_object):
         """ Delete a simulation object instance from this simulation
 
-        This method should not be called by :obj:`SimulationObject`\ s.
+        This method should not be called by :obj:`~de_sim.simulation_object.SimulationObject`\ s.
 
         Args:
-            simulation_object (:obj:`SimulationObject`): a simulation object instance that is
+            simulation_object (:obj:`~de_sim.simulation_object.SimulationObject`): a simulation object instance that is
                 part of this simulation
 
         Raises:
-            :obj:`SimulatorError`: if the simulation object is not part of this simulation
+            :obj:`~de_sim.errors.SimulatorError`: if the simulation object is not part of this simulation
         """
         # prohibit calls to _delete_object while a simulation is running
         # more precisely, prohibit between a simulation's initialization & reset
@@ -394,7 +394,7 @@ class Simulator(object):
         Call `init_before_run()` in each simulation object that has been loaded.
 
         Raises:
-            :obj:`SimulatorError`:  if the simulation has already been initialized
+            :obj:`~de_sim.errors.SimulatorError`:  if the simulation has already been initialized
         """
         if self.__initialized:
             raise SimulatorError('Simulation has already been initialized')
@@ -409,7 +409,7 @@ class Simulator(object):
         Call just before a simulation runs, so that the correct start time of the simulation is recorded
 
         Args:
-            sim_config (:obj:`SimulationConfig`): metadata about the simulation's configuration
+            sim_config (:obj:`~de_sim.simulation_config.SimulationConfig`): metadata about the simulation's configuration
                 (start time, maximum time, etc.)
         """
         if self.author_metadata is None:
@@ -482,15 +482,15 @@ class Simulator(object):
 
         Args:
             max_time (:obj:`float`, optional): the time of the end of the simulation
-            sim_config (:obj:`SimulationConfig`, optional): the simulation run's configuration
+            sim_config (:obj:`~de_sim.simulation_config.SimulationConfig`, optional): the simulation run's configuration
             config_dict (:obj:`dict`, optional): a dictionary with keys chosen from the field names
-                in :obj:`SimulationConfig`; note that `config_dict` is not a `kwargs` argument
+                in :obj:`~de_sim.simulation_config.SimulationConfig`; note that `config_dict` is not a `kwargs` argument
 
         Returns:
-            :obj:`SimulationConfig`: a validated simulation configuration
+            :obj:`~de_sim.simulation_config.SimulationConfig`: a validated simulation configuration
 
         Raises:
-            :obj:`SimulatorError`: if no arguments are provided, or multiple arguments are provided,
+            :obj:`~de_sim.errors.SimulatorError`: if no arguments are provided, or multiple arguments are provided,
                 or `max_time` is missing from `config_dict`
         """
         num_args = 0
@@ -538,17 +538,17 @@ class Simulator(object):
 
         Args:
             max_time (:obj:`float`, optional): the maximum time of the end of the simulation
-            sim_config (:obj:`SimulationConfig`, optional): a simulation run's configuration
+            sim_config (:obj:`~de_sim.simulation_config.SimulationConfig`, optional): a simulation run's configuration
             config_dict (:obj:`dict`, optional): a dictionary with keys chosen from
-                the field names in :obj:`SimulationConfig`
-            author_metadata (:obj:`AuthorMetadata`, optional): information about the person who runs the simulation;
+                the field names in :obj:`~de_sim.simulation_config.SimulationConfig`
+            author_metadata (:obj:`~de_sim.simulation_metadata.AuthorMetadata`, optional): information about the person who runs the simulation;
                 if not provided, then the their username will be obtained automatically
 
         Returns:
             :obj:`SimulationReturnValue`: a :obj:`namedtuple` whose fields are documented with its definition
 
         Raises:
-            :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
+            :obj:`~de_sim.errors.SimulatorError`: if the simulation has not been initialized, or has no objects,
                 or has no initial events, or attempts to execute an event that violates non-decreasing time
                 order
         """
@@ -593,7 +593,7 @@ class Simulator(object):
             simulation object are handled together.
 
         Raises:
-            :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
+            :obj:`~de_sim.errors.SimulatorError`: if the simulation has not been initialized, or has no objects,
                 or has no initial events, or attempts to start before the start time in `time_init`,
                 or attempts to execute an event that violates non-decreasing time order
         """

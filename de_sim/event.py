@@ -9,7 +9,6 @@
 from wc_utils.util.misc import round_direct
 from wc_utils.util.list import elements_to_str
 from de_sim.event_message import EventMessage  # noqa: F401
-import de_sim  # noqa: F401
 
 
 class Event(object):
@@ -30,12 +29,12 @@ class Event(object):
     Attributes:
         creation_time (:obj:`float`): simulation time when the event is created (aka `send_time`)
         event_time (:obj:`float`): simulation time when the event must be executed (aka `receive_time`)
-        sending_object (:obj:`de_sim.SimulationObject`): reference to the object that sent the event
-        receiving_object (:obj:`de_sim.SimulationObject`): reference to the object that receives
+        sending_object (:obj:`~de_sim.simulation_object.SimulationObject`): reference to the object that sent the event
+        receiving_object (:obj:`~de_sim.simulation_object.SimulationObject`): reference to the object that receives
             (aka executes) the event
         _order_time (:obj:`tuple`): the event time, sub-time that's used to sort events; cached
             to improve performance
-        message (:obj:`EventMessage`): an :obj:`EventMessage` carried by the event; its type
+        message (:obj:`~de_sim.event_message.EventMessage`): an :obj:`~de_sim.event_message.EventMessage` carried by the event; its type
             provides the simulation application's type for an :obj:`Event`; it may also carry a payload
             for the :obj:`Event` in its attribute(s) identified in its `msg_field_names`.
     """

@@ -15,7 +15,7 @@ class MessageSentToSelf(de_sim.EventMessage):
 
 
 class MinimalSimulationObject(de_sim.SimulationObject):
-    """ :obj:`SimulationObject` subclasses represent the state of a simulation and the actions that schedule and handle events
+    """ :obj:`~de_sim.simulation_object.SimulationObject` subclasses represent the state of a simulation and the actions that schedule and handle events
     """
 
     def __init__(self, name, delay):

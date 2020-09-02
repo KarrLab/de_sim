@@ -94,7 +94,7 @@ class SIR(de_sim.SimulationObject):
         """ Handle a susceptible to infectious event
 
         Args:
-            event (:obj:`de_sim.Event`): simulation event; not used
+            event (:obj:`~de_sim.event.Event`): simulation event; not used
         """
         self.s -= 1
         self.i += 1
@@ -104,7 +104,7 @@ class SIR(de_sim.SimulationObject):
         """ Handle an infectious to recovered event
 
         Args:
-            event (:obj:`de_sim.Event`): simulation event; not used
+            event (:obj:`~de_sim.event.Event`): simulation event; not used
         """
         self.i -= 1
         self.schedule_next_event()
@@ -158,7 +158,7 @@ class SIR2(SIR):
         """ Handle an infectious state transition
 
         Args:
-            event (:obj:`de_sim.Event`): simulation event that contains the type of transition
+            event (:obj:`~de_sim.event.Event`): simulation event that contains the type of transition
         """
         transition_type = event.message.transition_type
         if transition_type is StateTransitionType.s_to_i:
@@ -253,7 +253,7 @@ class RunSIRs(object):
         """ Get the last checkpoint of the last simulation run
 
         Returns:
-            :obj:`Checkpoint`: the last checkpoint of the last simulation run
+            :obj:`~de_sim.checkpoint.Checkpoint`: the last checkpoint of the last simulation run
         """
         access_checkpoints = AccessCheckpoints(self.checkpoint_dir)
         last_checkpoint_time = access_checkpoints.list_checkpoints()[-1]

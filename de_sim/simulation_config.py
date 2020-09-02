@@ -33,7 +33,7 @@ class SimulationConfig(EnhancedDataClass):
             the simulation time; a simulation terminates if the function returns `True`
         output_dir (:obj:`str`, optional): directory for saving metadata; `output_dir` will be created if it does't
             exist; if not provided, then metadata should be saved before another simulation is run
-            with the same :obj:`Simulator`
+            with the same :obj:`~de_sim.simulator.Simulator`
         progress (:obj:`bool`, optional): if `True`, output a text bar that dynamically reports a
             simulation's progress
         profile (:obj:`bool`, optional): if `True`, output a profile of the simulation's performance
@@ -55,7 +55,7 @@ class SimulationConfig(EnhancedDataClass):
     def __setattr__(self, name, value):
         """ Validate an attribute in this :obj:`SimulationConfig` when it is changed
 
-        Overrides `__setattr__` in :obj:`EnhancedDataClass` to report errors as :obj:`SimulatorError`\ s
+        Overrides `__setattr__` in :obj:`EnhancedDataClass` to report errors as :obj:`~de_sim.errors.SimulatorError`\ s
         """
         try:
             super().__setattr__(name, value)
@@ -69,7 +69,7 @@ class SimulationConfig(EnhancedDataClass):
             :obj:`None`: if no error is found
 
         Raises:
-            :obj:`SimulatorError`: if an attribute of `self` fails validation
+            :obj:`~de_sim.errors.SimulatorError`: if an attribute of `self` fails validation
         """
 
         # make sure stop_condition is callable
@@ -109,7 +109,7 @@ class SimulationConfig(EnhancedDataClass):
             :obj:`None`: if no error is found
 
         Raises:
-            :obj:`SimulatorError`: if `self` fails validation
+            :obj:`~de_sim.errors.SimulatorError`: if `self` fails validation
         """
 
         self.validate_individual_fields()

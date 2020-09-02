@@ -13,14 +13,6 @@ from de_sim.errors import SimulatorError
 from de_sim.utilities import ConcreteABCMeta
 
 
-class EventMessageNormalTop(object):
-    """ A 'normal' event message base class
-
-    """
-    def __init__(self):
-        pass
-
-
 class EventMessageInterface(object, metaclass=ABCMeta):
     """ An abstract base class for event messages
 
@@ -41,7 +33,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
             args (:obj:`tuple`): argument list for initializing a subclass instance
 
         Raises:
-            :obj:`SimulatorError`: if `args` does not contain an argument for each entry in `__slots__`
+            :obj:`~de_sim.errors.SimulatorError`: if `args` does not contain an argument for each entry in `__slots__`
         """
         if len(args) != len(self.__slots__):
             raise SimulatorError("Constructor for EventMessage '{}' expects {} argument(s), but "
@@ -135,7 +127,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
                 as a string
 
         Returns:
-            :obj:`obj`: `None` if this message has no `msg_field_names`, or a string representation of
+            :obj:`obj`: :obj:`None` if this message has no `msg_field_names`, or a string representation of
             the attribute names for this :obj:`EventMessage`, or a :obj:`list`
             representation if `as_list` is set
         """
@@ -252,13 +244,3 @@ class EventMessage(EventMessageInterface, metaclass=CombinedEventMessageMeta):
     message fields that do not support comparison must override `__lt__`, `__le__`, etc.
     """
     pass
-
-
-class EventMessageNormalBottom(object):
-    """ A 'normal' event message base class
-
-    """
-    def __init__(self):
-        pass
-
-

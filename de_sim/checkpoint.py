@@ -162,7 +162,7 @@ class AccessCheckpoints(object):
             :obj:`list` of :obj:`float`: sorted list of times of saved checkpoints
 
         Raises:
-            :obj:`SimulatorError`: if `dirname` doesn't contain any checkpoints
+            :obj:`~de_sim.errors.SimulatorError`: if `dirname` doesn't contain any checkpoints
         """
         # reload all_checkpoints if they have not been obtained
         # or self.dir_path has been modified since all_checkpoints was last obtained

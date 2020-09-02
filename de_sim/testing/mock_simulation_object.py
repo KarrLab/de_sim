@@ -16,12 +16,12 @@ class MockSimulationObject(de_sim.SimulationObject):
     """
 
     def __init__(self, name, test_case, **kwargs):
-        """ Init a MockSimulationObject that can unittest a :obj:`SimulationObject`\ s behavior
+        """ Init a MockSimulationObject that can unittest a :obj:`~de_sim.simulation_object.SimulationObject`\ s behavior
 
         Use `self.test_case` and `self.kwargs` to evaluate unit tests
 
         Args:
-            name (:obj:`str`): name for the :obj:`SimulationObject`
+            name (:obj:`str`): name for the :obj:`~de_sim.simulation_object.SimulationObject`
             test_case (:obj:`TestCase`): reference to the `TestCase` that launches the simulation
             kwargs (:obj:`dict`): arguments used by a test case
         """

@@ -41,7 +41,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
             args (:obj:`tuple`): argument list for initializing a subclass instance
 
         Raises:
-            :obj:`SimulatorError`: if `args` does not contain an argument for each entry in `__slots__`
+            :obj:`~de_sim.errors.SimulatorError`: if `args` does not contain an argument for each entry in `__slots__`
         """
         if len(args) != len(self.__slots__):
             raise SimulatorError("Constructor for EventMessage '{}' expects {} argument(s), but "

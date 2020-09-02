@@ -23,7 +23,7 @@ from wc_utils.util.git import RepositoryMetadata
 class RunMetadata(EnhancedDataClass):
     """ Represent a simulation's run
 
-    All :obj:`RunMetadata` attributes ares obtained automatically.
+    All :obj:`RunMetadata` attributes are obtained automatically.
 
     Attributes:
         ip_address (:obj:`str`): IP address of the machine that ran the simulation
@@ -106,7 +106,7 @@ class SimulationMetadata(EnhancedDataClass):
     """ Represent the metadata of a simulation run; incorporates four types of metadata classes
 
     Attributes:
-        simulation_config (:obj:`SimulationConfig`): information about the simulation's configuration
+        simulation_config (:obj:`~de_sim.simulation_config.SimulationConfig`): information about the simulation's configuration
             (e.g. start time, maximum time)
         run (:obj:`RunMetadata`): information about the simulation's run (e.g. start time, duration)
         author (:obj:`AuthorMetadata`): information about the person who ran the simulation
@@ -134,7 +134,7 @@ class SimulationMetadata(EnhancedDataClass):
     def __setattr__(self, name, value):
         """ Validate an attribute in this :obj:`SimulationMetadata` when it is changed
 
-        Overrides `__setattr__` in :obj:`EnhancedDataClass` to report errors as :obj:`SimulatorError`\ s
+        Overrides `__setattr__` in :obj:`EnhancedDataClass` to report errors as :obj:`~de_sim.errors.SimulatorError`\ s
         """
         try:
             super().__setattr__(name, value)
