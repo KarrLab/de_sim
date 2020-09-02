@@ -37,7 +37,8 @@ class BaseSimulationObject(object):
             priority, which orders simultaneous events received by different instances of the same
             :obj:`SimulationObject` class
         num_events (:obj:`int`): number of events processed
-        simulator (:obj:`~de_sim.simulator.Simulator`): the :obj:`~de_sim.simulator.Simulator` that uses this :class:`BaseSimulationObject`
+        simulator (:obj:`~de_sim.simulator.Simulator`): the :obj:`~de_sim.simulator.Simulator` that uses
+            this :class:`BaseSimulationObject`
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
     """
 
@@ -70,7 +71,8 @@ class BaseSimulationObject(object):
         """ Set this object's simulator reference
 
         Args:
-            simulator (:obj:`~de_sim.simulator.Simulator`): the simulator that will use this :obj:`BaseSimulationObject`
+            simulator (:obj:`~de_sim.simulator.Simulator`): the simulator that will use
+                this :obj:`BaseSimulationObject`
 
         Raises:
             :obj:`SimulatorError`: if this :obj:`BaseSimulationObject` is already registered with a simulator
@@ -150,7 +152,8 @@ class BaseSimulationObject(object):
             delay (:obj:`float`): the simulation delay at which `receiving_object` should execute the event
             receiving_object (:obj:`SimulationObject`): the simulation object that will receive and
                 execute the event
-            event_message (:obj:`~de_sim.event_message.EventMessage`): the event message which will be carried by the event
+            event_message (:obj:`~de_sim.event_message.EventMessage`): the event message which will be
+                carried by the event
             copy (:obj:`bool`, optional): if :obj:`True`, copy the message before adding it to the event;
                 set :obj:`False` by default to optimize performance; set :obj:`True` as a safety measure to avoid
                 unexpected changes to shared objects
@@ -182,9 +185,9 @@ class BaseSimulationObject(object):
             subclass (:class:`BaseSimulationObject`): a subclass of :class:`BaseSimulationObject` that is registering
                 the relationships between the event messages it receives and the methods that
                 handle them
-            handlers (:obj:`list` of (:obj:`~de_sim.event_message.EventMessage`, `method`)): a list of tuples, indicating
-                which method should handle which type of :class:`~de_sim.event_message.EventMessage` in `subclass`; ordered in
-                decreasing priority for handling event message types
+            handlers (:obj:`list` of (:obj:`~de_sim.event_message.EventMessage`, `method`)): a list of tuples,
+                indicating which method should handle which type of :class:`~de_sim.event_message.EventMessage`
+                in `subclass`; ordered in decreasing priority for handling event message types
 
         Raises:
             :obj:`SimulatorError`: if an :obj:`~de_sim.event_message.EventMessage` appears repeatedly in `handlers`, or
@@ -210,8 +213,9 @@ class BaseSimulationObject(object):
         Args:
             subclass (:class:`BaseSimulationObject`): a subclass of :class:`BaseSimulationObject` that is registering
                 the types of event messages it sends
-            sent_messages (:obj:`list` of :obj:`~de_sim.event_message.EventMessage`): a list of the :class:`~de_sim.event_message.EventMessage`
-                classes which can be sent by :class:`BaseSimulationObject`'s of type `subclass`
+            sent_messages (:obj:`list` of :obj:`~de_sim.event_message.EventMessage`): a list of the
+                :class:`~de_sim.event_message.EventMessage` classes which can be sent by
+                :class:`BaseSimulationObject`'s of type `subclass`
         """
         for sent_message_type in sent_messages:
             subclass.metadata.message_types_sent.add(sent_message_type)
@@ -243,15 +247,16 @@ class BaseSimulationObject(object):
         The alternative, in which the simulator passes simultaneous event messages in an arbitrary
         order to a simulation object would **not** give the object sufficient information to be deterministic.
         But if the event messages have different handlers then the simulator raises a
-        :obj:`~de_sim.errors.SimulatorError` exception which says that superposition requires that the message types have
-        the same handler.
+        :obj:`~de_sim.errors.SimulatorError` exception which says that superposition requires that the message types
+        have the same handler.
 
         Attributes:
-            event_list (:obj:`list` of :obj:`~de_sim.event.Event`): the :obj:`~de_sim.event.Event` message(s) in the simulation event
+            event_list (:obj:`list` of :obj:`~de_sim.event.Event`): the :obj:`~de_sim.event.Event`
+                message(s) in the simulation event
 
         Raises:
             :obj:`SimulatorError`: if a message in `event_list` has an invalid type, or
-                if superposed event messages have different handlers
+            if superposed event messages have different handlers
         """
         self.num_events += 1
 

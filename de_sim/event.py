@@ -34,9 +34,9 @@ class Event(object):
             (aka executes) the event
         _order_time (:obj:`tuple`): the event time, sub-time that's used to sort events; cached
             to improve performance
-        message (:obj:`~de_sim.event_message.EventMessage`): an :obj:`~de_sim.event_message.EventMessage` carried by the event; its type
-            provides the simulation application's type for an :obj:`Event`; it may also carry a payload
-            for the :obj:`Event` in its attribute(s) identified in its `msg_field_names`.
+        message (:obj:`~de_sim.event_message.EventMessage`): an :obj:`~de_sim.event_message.EventMessage` carried by
+            the event; its type provides the simulation application's type for an :obj:`Event`; it may also carry a
+            payload for the :obj:`Event` in its attribute(s) identified in its `msg_field_names`.
     """
     # TODO(Arthur): for performance, perhaps pre-allocate and reuse events
 

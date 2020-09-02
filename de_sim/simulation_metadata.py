@@ -106,8 +106,8 @@ class SimulationMetadata(EnhancedDataClass):
     """ Represent the metadata of a simulation run; incorporates four types of metadata classes
 
     Attributes:
-        simulation_config (:obj:`~de_sim.simulation_config.SimulationConfig`): information about the simulation's configuration
-            (e.g. start time, maximum time)
+        simulation_config (:obj:`~de_sim.simulation_config.SimulationConfig`): information about the
+            simulation's configuration (e.g. start time, maximum time)
         run (:obj:`RunMetadata`): information about the simulation's run (e.g. start time, duration)
         author (:obj:`AuthorMetadata`): information about the person who ran the simulation
             (e.g. name, email)
