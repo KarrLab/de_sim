@@ -73,7 +73,7 @@ class BaseSimulationObject(object):
             simulator (:obj:`~de_sim.simulator.Simulator`): the simulator that will use this :obj:`BaseSimulationObject`
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if this :obj:`BaseSimulationObject` is already registered with a simulator
+            :obj:`SimulatorError`: if this :obj:`BaseSimulationObject` is already registered with a simulator
         """
         if self.simulator is None:
             self.simulator = simulator
@@ -98,7 +98,7 @@ class BaseSimulationObject(object):
                 unexpected changes to shared objects
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if `event_time < 0`, or
+            :obj:`SimulatorError`: if `event_time < 0`, or
                 if the sending object type is not registered to send messages with the type of `message`, or
                 if the receiving simulation object type is not registered to receive
                 messages with the type of `message`
@@ -156,7 +156,7 @@ class BaseSimulationObject(object):
                 unexpected changes to shared objects
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if `delay` < 0 or `delay` is NaN, or
+            :obj:`SimulatorError`: if `delay` < 0 or `delay` is NaN, or
                 if the sending object type is not registered to send messages with the type of `event_message`, or
                 if the receiving simulation object type is not registered to receive messages with
                 the type of `event_message`
@@ -182,12 +182,12 @@ class BaseSimulationObject(object):
             subclass (:class:`BaseSimulationObject`): a subclass of :class:`BaseSimulationObject` that is registering
                 the relationships between the event messages it receives and the methods that
                 handle them
-            handlers (:obj:`list` of (:obj:`~de_sim.event_message.EventMessage`, `function`)): a list of tuples, indicating
+            handlers (:obj:`list` of (:obj:`~de_sim.event_message.EventMessage`, `method`)): a list of tuples, indicating
                 which method should handle which type of :class:`~de_sim.event_message.EventMessage` in `subclass`; ordered in
                 decreasing priority for handling event message types
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if an :obj:`~de_sim.event_message.EventMessage` appears repeatedly in `handlers`, or
+            :obj:`SimulatorError`: if an :obj:`~de_sim.event_message.EventMessage` appears repeatedly in `handlers`, or
                 if a method in `handlers` is not callable
         """
         for message_type, handler in handlers:
@@ -250,7 +250,7 @@ class BaseSimulationObject(object):
             event_list (:obj:`list` of :obj:`~de_sim.event.Event`): the :obj:`~de_sim.event.Event` message(s) in the simulation event
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if a message in `event_list` has an invalid type, or
+            :obj:`SimulatorError`: if a message in `event_list` has an invalid type, or
                 if superposed event messages have different handlers
         """
         self.num_events += 1
@@ -340,7 +340,7 @@ class SimObjClassPriority(IntEnum):
                 simulation object classes
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if too many :obj:`SimulationObject`\ s are given
+            :obj:`SimulatorError`: if too many :obj:`SimulationObject`\ s are given
         """
         if cls.LOW < len(so_classes):
             raise SimulatorError(f"Too many SimulationObjects: {len(so_classes)}")
@@ -390,7 +390,7 @@ class SimulationObjMeta(type):
             :obj:`SimulationObject`: a new instance of a subclass of :class:`BaseSimulationObject`
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if class priority is not an `int`,
+            :obj:`SimulatorError`: if class priority is not an `int`,
                 or if the :obj:`SimulationObject` doesn't define `messages_sent` or `event_handlers`,
                 or if handlers in `event_handlers` don't refer to methods in the
                     :obj:`SimulationObject`,
@@ -542,7 +542,7 @@ class SimulationObject(BaseSimulationObject, SimulationObjectInterface, metaclas
         """ Set the execution priority for a simulation object class, `class_priority`
 
         Use this to set the `class_priority` of a subclass of :class:`BaseSimulationObject` after it
-            has been constructed.
+        has been constructed.
 
         Args:
             priority (:obj:`SimObjClassPriority`): the desired `class_priority` for a subclass

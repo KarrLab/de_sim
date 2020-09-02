@@ -105,11 +105,11 @@ class FastLogger(object):
             logger (:obj:`logging2.Logger`): a logger
             level_used (:obj:`str`): the logging level for this logger
 
-        Raises:
-            :obj:`ValueError`: if `level_used` is not a valid logging level
-
         Returns:
             :obj:`bool`: return `True` if the `logger` is active, `False` otherwise
+
+        Raises:
+            :obj:`ValueError`: if `level_used` is not a valid logging level
         """
         if level_used not in FastLogger.LOG_LEVELS:
             raise ValueError("bad level '{}'".format(level_used))

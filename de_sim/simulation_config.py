@@ -69,7 +69,7 @@ class SimulationConfig(EnhancedDataClass):
             :obj:`None`: if no error is found
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if an attribute of `self` fails validation
+            :obj:`SimulatorError`: if an attribute of `self` fails validation
         """
 
         # make sure stop_condition is callable
@@ -106,10 +106,10 @@ class SimulationConfig(EnhancedDataClass):
         Validation tests that involve multiple fields are contained in this method.
 
         Returns:
-            :obj:`None`: if no error is found
+            :obj:`None`: :obj:`None` if no error is found
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if `self` fails validation
+            :obj:`SimulatorError`: if `self` fails validation
         """
 
         self.validate_individual_fields()

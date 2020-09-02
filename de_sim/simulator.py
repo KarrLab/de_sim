@@ -77,7 +77,7 @@ class EventQueue(object):
                 for the :obj:`~de_sim.event.Event` in its `msg_field_names`.
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if `receive_time` < `send_time`, or `receive_time` or `send_time` is NaN
+            :obj:`SimulatorError`: if `receive_time` < `send_time`, or `receive_time` or `send_time` is NaN
         """
 
         if math.isnan(send_time) or math.isnan(receive_time):
@@ -280,15 +280,15 @@ class Simulator(object):
         time (:obj:`float`): a simulation's current time
         simulation_objects (:obj:`dict` of :obj:`~de_sim.simulation_object.SimulationObject`): all simulation objects, keyed by their names
         debug_logs (:obj:`wc_utils.debug_logs.core.DebugLogsManager`): the debug logs
-        fast_debug_file_logger (:obj:`FastLogger`): a fast logger for debugging messages
-        fast_plotting_logger (:obj:`FastLogger`): a fast logger that saves trajectory data for plotting
+        fast_debug_file_logger (:obj:`~de_sim.utilities.FastLogger`): a fast logger for debugging messages
+        fast_plotting_logger (:obj:`~de_sim.utilities.FastLogger`): a fast logger that saves trajectory data for plotting
         event_queue (:obj:`EventQueue`): the queue of events that will be executed
         event_counts (:obj:`Counter`): a count of executed events, categorized by the tuple
             (receiving object class, receiving object name, event message class)
         num_handlers_called (:obj:`int`): the number of calls a simulation makes to an event handler in a simulation object
         sim_config (:obj:`~de_sim.simulation_config.SimulationConfig`): a simulation run's configuration
         sim_metadata (:obj:`~de_sim.simulation_metadata.SimulationMetadata`): a simulation run's metadata
-        author_metadata (:obj:`:obj:`~de_sim.simulation_metadata.AuthorMetadata`): information about the person who runs the simulation,
+        author_metadata (:obj:`~de_sim.simulation_metadata.AuthorMetadata`): information about the person who runs the simulation,
             if provided by the simulation application
         measurements_fh (:obj:`_io.TextIOWrapper`): file handle for debugging measurements file
         mem_tracker (:obj:`pympler.tracker.SummaryTracker`): a memory use tracker for debugging
@@ -320,7 +320,7 @@ class Simulator(object):
                 will be used by this simulation
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if the simulation object's name is already in use
+            :obj:`SimulatorError`: if the simulation object's name is already in use
         """
         name = simulation_object.name
         if name in self.simulation_objects:
@@ -347,7 +347,7 @@ class Simulator(object):
             :obj:`~de_sim.simulation_object.SimulationObject`: the simulation object whose name is `simulation_object_name`
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if the simulation object whose name is `simulation_object_name`
+            :obj:`SimulatorError`: if the simulation object whose name is `simulation_object_name`
                 is not used by this simulation
         """
         if simulation_object_name not in self.simulation_objects:
@@ -375,7 +375,7 @@ class Simulator(object):
                 part of this simulation
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if the simulation object is not part of this simulation
+            :obj:`SimulatorError`: if the simulation object is not part of this simulation
         """
         # prohibit calls to _delete_object while a simulation is running
         # more precisely, prohibit between a simulation's initialization & reset
@@ -394,7 +394,7 @@ class Simulator(object):
         Call `init_before_run()` in each simulation object that has been loaded.
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`:  if the simulation has already been initialized
+            :obj:`SimulatorError`:  if the simulation has already been initialized
         """
         if self.__initialized:
             raise SimulatorError('Simulation has already been initialized')
@@ -490,7 +490,7 @@ class Simulator(object):
             :obj:`~de_sim.simulation_config.SimulationConfig`: a validated simulation configuration
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if no arguments are provided, or multiple arguments are provided,
+            :obj:`SimulatorError`: if no arguments are provided, or multiple arguments are provided,
                 or `max_time` is missing from `config_dict`
         """
         num_args = 0
@@ -548,7 +548,7 @@ class Simulator(object):
             :obj:`SimulationReturnValue`: a :obj:`namedtuple` whose fields are documented with its definition
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if the simulation has not been initialized, or has no objects,
+            :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
                 or has no initial events, or attempts to execute an event that violates non-decreasing time
                 order
         """
@@ -593,7 +593,7 @@ class Simulator(object):
             simulation object are handled together.
 
         Raises:
-            :obj:`~de_sim.errors.SimulatorError`: if the simulation has not been initialized, or has no objects,
+            :obj:`SimulatorError`: if the simulation has not been initialized, or has no objects,
                 or has no initial events, or attempts to start before the start time in `time_init`,
                 or attempts to execute an event that violates non-decreasing time order
         """
