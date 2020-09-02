@@ -258,7 +258,7 @@ class BaseSimulationObject(object):
             :obj:`SimulatorError`: if a message in `event_list` has an invalid type, or
             if superposed event messages have different handlers
         """
-        self.num_events += 1
+        self.num_events += len(event_list)
 
         if self.log_events: # cannot be conveniently unit-tested because doing so requires that config state be changed
                             # before de_sim.plot.file logger is created
