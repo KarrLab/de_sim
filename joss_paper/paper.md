@@ -61,7 +61,7 @@ DE-Sim also provides several features to help users execute, analyze, and debug 
 * **Reproducible simulations:** To help researchers debug simulations, repeated executions of the same simulation with the same configuration and same random number generator seed produce the same results.
 
 ![**DE-Sim can generate space-time visualizations of simulation trajectories.** 
-This figure illustrates a space-time visualization of all of the events and messages in a simulation of the parallel hold (PHOLD) DES benchmark model [@fujimoto1990performance] with three simulation objects. The timeline (grey line) for each object shows its events (grey dots). The blue and purple arrows illustrate events scheduled by simulation objects for themselves and other objects, respectively. The code for this simulation is available in the DE-Sim Git repository. 
+This figure illustrates a space-time visualization of all of the events and messages in a simulation of the parallel hold (PHOLD) DES benchmark model [@fujimoto1990performance] with three simulation objects. The timeline (black line) for each object shows its events (grey dots). The blue and purple arrows illustrate events scheduled by simulation objects for themselves and other objects, respectively. The code for this simulation is available in the DE-Sim Git repository. 
 \label{fig:phold_space_time_plot}](phold_space_time_plot.pdf)
 
 Together, we believe that these features can simplify and accelerate the development of complex, data-intensive models.
@@ -86,11 +86,11 @@ SIMSCRIPT III [@rice2005simscript] and SIMUL8 [@concannon2003dynamic] are commer
 # Tutorial: Building and simulating models with DE-Sim
 
 Users can define and execute a DE-Sim model of a system in three steps: (1) implement event message classes that represent the interactions between the components of the system, (2) implement simulation object classes that represent the states of the components of the system and their actions that initiate and respond to interactions, and (3) use instances of these classes to build and simulate the model.
-Here, we illustrate these steps with a model of a random walk on the integer number line. The random walk steps forward or backward with equal probability. The walk takes steps every one or two time units with equal likelihood. This tutorial and additional tutorials are also available as interactive Jupyter notebooks at [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim)).
+Here, we illustrate these steps with a model of a random walk on the integer number line. The random walk steps forward or backward with equal probability, and takes steps every one or two time units with equal likelihood. This tutorial and additional tutorials are available as interactive Jupyter notebooks at [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim)).
 
-1: Create an event message class to represent steps.
+1: Create an event message class to represent steps in a random walk.
 
-Create a subclass of `de_sim.EventMessage` to represent steps. Use the instance attribute `step_value` to capture the magnitude and direction of a step. Declare that the `step_value` instance attribute represents the data carried by the message by setting the class attribute `msg_field_names` to a list with the single element `step_value`. The `msg_field_names` attribute is similar to the `field_names` parameter used by Python’s `namedtuple` factory function. Arguments to an `EventMessage`’s constructor are assigned in order to the attributes listed in `msg_field_names`. The simulation objects which execute steps will use this `step_value` attribute to change the position of the random walk.
+Create a subclass of `de_sim.EventMessage` to represent steps. Use the instance attribute `step_value` to capture the magnitude and direction of a step. Declare that the `step_value` instance attribute represents the data carried by the message by setting the class attribute `msg_field_names` to a list with the single element `step_value`. The simulation objects which execute steps will use this `step_value` attribute to change the position of the random walk.
 
 ```python
 import de_sim
@@ -101,19 +101,21 @@ class RandomStepMessage(de_sim.EventMessage):
 
 ```
 
+The `msg_field_names` attribute is similar to the `field_names` parameter used by Python’s `namedtuple` factory function. The parameters to an `EventMessage`’s constructor correspond, in order, to the attributes listed in `msg_field_names`.
+
 2: Define a simulation object class that represents the position of the random walk and schedules and executes random steps.
 
 Simulation objects are like threads, in that a simulation's scheduler decides when to execute them, and their execution is suspended when they have no work to do.
 But DES simulation objects and threads are scheduled by different algorithms.
 Whereas a traditional scheduler executes threads whenever they have work to do,
-a DES scheduler executes simulation objects to ensure that events occur in simulation time order, as summarized by the fundamental invariant of discrete-event simulation: all events in a simulation are executed in non-decreasing time order.
+a DES scheduler executes simulation objects to ensure that events occur in simulation time order, as stated by the fundamental invariant of discrete-event simulation: all events in a simulation are executed in non-decreasing time order.
 
 By guaranteeing this behavior, the DE-Sim scheduler ensures that causality relationships between events are respected.
 (The invariant says *non-decreasing* time order, and not *increasing* time order, because events can occur simultaneously, as discussed in DE-Sim’s Jupyter notebooks.)
 
 This invariant has two consequences:
 
-* All synchronization between simulation objects is controlled by the simulation times of events.
+* All synchronization between simulation objects is controlled by the simulation times of events, and the execution order rules for simultaneous events.
 * Each simulation object executes its events in non-decreasing time order. 
 
 The Python classes that generate and handle simulation events are simulation object classes, which are defined as subclasses of `de_sim.SimulationObject`.
@@ -165,28 +167,27 @@ class RandomWalkSimulationObject(de_sim.SimulationObject):
     messages_sent = [RandomStepMessage]
 ```
 
-Subclasses of `SimulationObject` must use the following methods and attributes to initialize themselves, schedule and handle events, and access the simulation's time.
+Subclasses of `SimulationObject` use the following methods and attributes to initialize themselves, schedule and handle events, and access the simulation's time.
 
 * Methods:
     1. **`init_before_run`** (optional): immediately before a simulation run, after all of the simulation objects have been added to a simulator, the simulator calls each simulation object's `init_before_run` method. In this method, simulation objects can send initial events and perform other initializations. For example, in `RandomWalkSimulationObject`, `init_before_run` schedules the object's first event and initializes its position and history attributes.
     2. **`send_event`**: `send_event(delay, receiving_object, event_message)` schedules an event to occur `delay` time units in the future at simulation object `receiving_object`. `event_message` must be an `EventMessage` instance. An event can be scheduled for any simulation object in a simulation, including the object scheduling the event, as `RandomWalkSimulationObject` does.
 The event will be executed at its scheduled simulation time by an event handler in the simulation object `receiving_object`.
-The handler defines an `event` parameter. 
-Its value will be the scheduled event, which contains `event_message` in its `message` attribute.
+The value of the handler’s `event` parameter will be the scheduled event, which contains `event_message` in its `message` attribute.
 Object-oriented DES terminology often describes the event message as being sent by the sending object at the message's send time (the simulation time when the sending object schedules the event) and being received by the receiving object at the event's receive time (the simulation time when the event is executed). An event message can thus be viewed as a directed edge in simulation space-time from the pair (sending object, send time) to (receiving object, receive time), as illustrated in \autoref{fig:phold_space_time_plot}.
     3. **event handlers**: an event handler is a method that handles and executes a simulation event. Event handlers have the signature `event_handler(self, event)`, where `self` is the simulation object that handles (receives) the event, and `event` is a simulation event. A subclass of `SimulationObject` must define at least one event handler, as illustrated by `handle_step_event` in the example above.
 
 * Attributes:
-    1. **`event_handlers`**: a simulation object can receive arbitrarily many types of event messages, and implement arbitrarily many event handlers. The attribute `event_handlers` must contain an iterator over pairs that map each event message class received by a `SimulationObject` subclass to the event handler that handles the event message class. In the example above, `event_handlers` associates `RandomStepMessage` event messages with the `handle_step_event` event handler.
-    2. **`messages_sent`**: the types of messages sent by a subclass of `SimulationObject` must be listed in `messages_sent`. It ensures that a simulation object doesn't send messages of the wrong `EventMessage` class.
-    3. **`time`**: `time` is a read-only attribute that always equals the current simulation time in every simulation object. For example, a `RandomWalkSimulationObject` saves the value of `time` when recording its history.
+    1. **`event_handlers`**: a simulation object can receive arbitrarily many types of event messages, and implement arbitrarily many event handlers. The attribute `event_handlers` maps event message classes to event handlers. It must contain an iterator over pairs that map each event message class received by a `SimulationObject` subclass to the event handler that handles the event message class. In the example above, `event_handlers` associates `RandomStepMessage` event messages with the `handle_step_event` event handler.
+    2. **`messages_sent`**: the types of messages sent by a subclass of `SimulationObject` must be listed in `messages_sent`. It ensures that a simulation object doesn't send messages from the wrong `EventMessage` class.
+    3. **`time`**: `time` is a read-only attribute that always equals the current simulation time in a simulation object. For example, a `RandomWalkSimulationObject` saves the value of `time` when recording its history.
 
 3: Use the classes created above to simulate a random walk.
 
 The `de_sim.Simulator` class simulates models.
 Its `add_object` method adds a simulation object to the simulator.
 The `initialize` method, which calls each simulation object's `init_before_run` method, must be executed before a simulation starts.
-At least one simulation object in a simulation must schedule an initial event--otherwise, the simulation cannot start.
+At least one simulation object in a simulation must schedule an initial event---otherwise, the simulation cannot start.
 More generally, a simulation with no events to execute will terminate.
 A simulator’s `run` method simulates a model. It takes the maximum time of a simulation run, and several optional configuration arguments. More information is available in the DE-Sim API documentation at [https://docs.karrlab.org/de_sim](https://docs.karrlab.org/de_sim/source/de_sim.html#de_sim.simulator.Simulator.simulate).
 
@@ -227,7 +228,7 @@ The source code for this simulation is available in the DE-Sim Git repository.
 \autoref{fig:performance} illustrates the performance of DE-Sim simulating cyclic messaging networks over a range of network sizes. Each messaging network consists of a ring of nodes. 
 When a node handles an event, it schedules the same type of event for its forward neighbor with a one time-unit delay.
 Each simulation is initialized by sending a message to each node at the first time-unit. 
-The code for this performance test is available in the DE-Sim Git repository. A Jupyter notebook that runs the test is also available at [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim/4.%20DE-Sim%20performance%20test.ipynb).
+The code for this performance test is available in the DE-Sim Git repository, and a Jupyter notebook that runs the test is available at [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim/4.%20DE-Sim%20performance%20test.ipynb).
 
 ![**Performance of DE-Sim simulating a range of sizes of a cyclic messaging network.** 
 We executed each simulation for 100 time-units. Each statistic represents the average of three simulation runs in a Docker container running on a 2.9 GHz Intel Core i5 processor. 
@@ -249,7 +250,7 @@ We anticipate that WC-Sim will help researchers conduct unprecedented simulation
 
 # Conclusion
 
-In summary, DE-Sim is an open-source, object-oriented, discrete-event simulation tool implemented in Python that makes it easier for modelers to create and simulate complex, data-intensive models. First, DE-Sim enables researchers to conveniently use Python's OO features to manage multiple types of model components and their interactions. Second, DE-Sim enables researchers to directly use Python data science tools, such as pandas and SciPy, and large, heterogeneous datasets to calibrate models. Together, we anticipate that DE-Sim will accelerate the construction and simulation of unprecedented models of complex systems, leading to new scientific discoveries and engineering innovations.
+In summary, DE-Sim is an open-source, object-oriented, discrete-event simulation tool implemented in Python that makes it easier for modelers to create and simulate complex, data-intensive models. First, DE-Sim enables researchers to conveniently use Python's OO features to manage multiple types of model components and their interactions. Second, DE-Sim enables researchers to directly use Python data science tools, such as pandas and SciPy, and large, heterogeneous datasets to construct models. Together, we anticipate that DE-Sim will accelerate the construction and simulation of unprecedented models of complex systems, leading to new scientific discoveries and engineering innovations.
 
 To further advance the simulation of data-intensive models, we aim to improve the simulation performance of DE-Sim. One potential direction is to use DE-Sim as a specification language for a parallel DES system such as ROSS [@carothers2000ross]. This combination of DE-Sim and ROSS would enable modelers to both create models with DE-Sim's high-level model specification semantics and quickly simulate models with ROSS.
 
@@ -277,4 +278,3 @@ We thank Yin Hoon Chew for her helpful feedback. This work was supported by the 
 Institutes of Health [R35GM119771 to JRK], and the Icahn Institute for Data Science and Genomic Technology.
 
 # References
-
