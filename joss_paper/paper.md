@@ -187,7 +187,7 @@ Object-oriented DES terminology often describes the event message as being sent 
 The `de_sim.Simulator` class simulates models.
 Its `add_object` method adds a simulation object to the simulator.
 The `initialize` method, which calls each simulation object's `init_before_run` method, must be executed before a simulation starts.
-At least one simulation object in a simulation must schedule an initial event---otherwise, the simulation cannot start.
+At least one simulation object in a simulation must schedule an initial event--otherwise, the simulation cannot start.
 More generally, a simulation with no events to execute will terminate.
 A simulator’s `run` method simulates a model. It takes the maximum time of a simulation run, and several optional configuration arguments. More information is available in the DE-Sim API documentation at [https://docs.karrlab.org/de_sim](https://docs.karrlab.org/de_sim/source/de_sim.html#de_sim.simulator.Simulator.simulate).
 
@@ -278,3 +278,4 @@ We thank Yin Hoon Chew for her helpful feedback. This work was supported by the 
 Institutes of Health [R35GM119771 to JRK], and the Icahn Institute for Data Science and Genomic Technology.
 
 # References
+
