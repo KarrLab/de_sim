@@ -98,7 +98,7 @@ We executed each simulation for 100 time-units. Each statistic represents the av
 # Case study: a multi-algorithmic simulator for whole-cell models implemented using DE-Sim
 
 We are using DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a multi-algorithmic simulator for whole-cell models [@karr2015principles; @goldberg2018emerging; @karr2012whole]. 
-Whole-cell models that predict phenotype from genotype by representing all of the biochemical activity in a cell have great potential to help scientists elucidate the basis of cellular behavior, help bioengineers rationally design biosensors and biomachines, and help physicians personalize medicine.
+Whole-cell models that predict phenotype from genotype by representing all of the biochemical activity in a cell have great potential to help scientists elucidate the basis of cellular behavior, help bioengineers rationally design biosensors and biomachines, and help physicians personalize medicine [@goldberg2016toward].
 
 Due to the diverse timescales of the subsystems inside cells, one promising way to simulate whole-cell models is to co-simulate slow subsystems with fined-grained algorithms and fast subsystems with coarse-grained algorithms. For example, slow subsystems, such as transcription, could be simulated with the Stochastic Simulation Algorithm (SSA, @gillespie1977exact), while faster subsystems, such as signal transduction, could be simulated with ordinary differential equations (ODEs). Metabolism, another fast process, could be simulated with dynamic Flux-Balance Analysis (dFBA, @mahadevan2002dynamic). However, there are no tools for co-simulating these algorithms beyond ad hoc implementations for specific models.
 
@@ -120,8 +120,8 @@ To further advance the simulation of data-intensive models, we aim to improve th
 DE-Sim is freely and openly available under the MIT license at the locations below.
 
 * Python package: [PyPI: de-sim](https://pypi.org/project/de-sim/)
-* Docker image: [Docker Hub: karrlab/de_sim](https://hub.docker.com/r/karrlab/de_sim)
 * Tutorials: Jupyter notebooks at [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim)
+* Docker image: [Docker Hub: karrlab/de_sim](https://hub.docker.com/r/karrlab/de_sim)
 * Installation instructions and documentation of DE-Sim's API: [docs.karrlab.org](https://docs.karrlab.org/de_sim/)
 * Issue tracker: [GitHub: KarrLab/de_sim](https://github.com/KarrLab/de_sim/issues/)
 * Source code: [GitHub: KarrLab/de_sim](https://github.com/KarrLab/de_sim/)
