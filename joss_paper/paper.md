@@ -37,10 +37,10 @@ To address this problem, we developed DE-Sim ([https://github.com/KarrLab/de_sim
 DE-Sim helps researchers model complex systems by enabling them to use Python's powerful OO features to manage multiple types of components and multiple types of interactions.
 By building upon Python, DE-Sim also makes it easy for researchers to use Python's powerful data science tools, such as pandas [@mckinney2010data] and SciPy [@virtanen2020scipy], to incorporate large, heterogeneous datasets into comprehensive and detailed models.
 We anticipate that DE-Sim will enable a new generation of models that capture systems with unprecedented breadth and depth.
-For example, we are using DE-Sim to develop a multi-algorithmic simulation tool for whole-cell models [@karr2015principles; @goldberg2018emerging; @karr2012whole] that predict phenotype from genotype by capturing all of the biochemical activity in a cell.
+For example, we are using DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a multi-algorithmic simulation tool for whole-cell models [@karr2015principles; @goldberg2018emerging; @karr2012whole] that predict phenotype from genotype by capturing all of the biochemical activity in a cell.
 
-Here, we describe the need for new tools for building and simulating more comprehensive and more detailed models, outline how DE-Sim addresses this need. In addition, we summarize the strengths of DE-Sim over existing DES tools, we report the simulation performance of DE-Sim, and we present a case study of how we are using DE-Sim to develop a tool for simulating whole-cell models. Finally, we outline our plans to increase the performance of simulations executed by DE-Sim. 
-A tutorial that describes how to build and simulate models with DE-Sim, additional examples, and documentation are available online, as described in the 'Availability of DE-Sim' section below.
+Here, we describe the need for new tools for building and simulating more comprehensive and more detailed models, and outline how DE-Sim addresses this need. In addition, we summarize the strengths of DE-Sim over existing DES tools, and we report the simulation performance of DE-Sim. Finally, we outline our plans to increase the performance of simulations executed by DE-Sim. 
+A tutorial that describes how to build and simulate models with DE-Sim, examples, and documentation are available online, as described in the 'Availability of DE-Sim' section below.
 
 # Statement of Need
 
@@ -52,7 +52,7 @@ Achieving such comprehensive and detailed models will likely require integrating
 
 DE-Sim simplifies the construction and simulation of *discrete-event models* through several features. First, DE-Sim structures discrete-event models as OO programs [@zeigler1987hierarchical]. This structure enables researchers to use classes of *simulation objects* to encapsulate the complex logic required to represent each *model component*, and use classes of *event messages* to encapsulate the logic required to describe their *interactions*. With DE-Sim, users define classes of simulation objects by creating subclasses of DE-Sim's simulation object class. DE-Sim simulation object classes can exploit all the features of Python classes. For example, users can encode relationships between the types of components in a model into hierarchies of subclasses of simulation objects. As a concrete example, a model of the biochemistry of RNA transcription and protein translation could be implemented using a superclass that captures the behavior of polymers and three subclasses that represent the specific properties of DNAs, RNAs, and proteins. DE-Sim makes it easy to model complex systems that contain multiple types of components through multiple classes of simulation objects. Users can model arbitrarily many instances of each type of component by creating multiple instances of the corresponding simulation object class. 
 
-Second, by building on top of Python, DE-Sim makes it easy for researchers to use Python's extensive suite of data science tools to build models from heterogeneous, multidimensional datasets. For example, researchers can use tools such as H5py, ObjTables [@karr2020objtables], pandas, requests, and SQLAlchemy to retrieve diverse data from spreadsheets, HDF5 files, REST APIs, databases, and other sources; use tools such as NumPy [@oliphant2006guide] to integrate this data into a unified model; and use tools such as LMFIT, Pyomo [@hart2011pyomo], and SciPy to calibrate models. DE-Sim also makes it easy to use many of these same tools to analyze simulation results.
+Second, by building on top of Python, DE-Sim makes it easy for researchers to use Python's extensive suite of data science tools to build models from heterogeneous, multidimensional datasets. For example, researchers can use tools such as H5py, ObjTables [@karr2020objtables], pandas, requests, and SQLAlchemy to retrieve diverse data from spreadsheets, HDF5 files, REST APIs, databases, and other sources; use tools such as NumPy [@oliphant2006guide] to integrate this data into a unified model; and use tools such as SciPy to perform calculations during simulations of models. DE-Sim also facilitates use of Python tools to analyze simulation results.
 
 DE-Sim also provides several features to help users execute, analyze, and debug simulations:
 
@@ -89,25 +89,11 @@ SIMSCRIPT III [@rice2005simscript] and SIMUL8 [@concannon2003dynamic] are commer
 \autoref{fig:performance} illustrates the performance of DE-Sim simulating cyclic messaging networks over a range of network sizes. Each messaging network consists of a ring of nodes. 
 When a node handles an event, it schedules the same type of event for its forward neighbor with a one time-unit delay.
 Each simulation is initialized by sending a message to each node at the first time-unit. 
-The code for this performance test is available in the DE-Sim Git repository, and a Jupyter notebook that runs the test is available at [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim/4.%20DE-Sim%20performance%20test.ipynb).
+The code for this performance test is available in the DE-Sim Git repository, and in a Jupyter notebook at [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim/4.%20DE-Sim%20performance%20test.ipynb).
 
 ![**Performance of DE-Sim simulating a range of sizes of a cyclic messaging network.** 
 We executed each simulation for 100 time-units. Each statistic represents the average of three simulation runs in a Docker container running on a 2.9 GHz Intel Core i5 processor. 
 \label{fig:performance}](performance.pdf)
-
-# Case study: a multi-algorithmic simulator for whole-cell models implemented using DE-Sim
-
-We are using DE-Sim to develop WC-Sim [@goldberg2020wc_sim], a multi-algorithmic simulator for whole-cell models [@karr2015principles; @goldberg2018emerging; @karr2012whole]. 
-Whole-cell models that predict phenotype from genotype by representing all of the biochemical activity in a cell have great potential to help scientists elucidate the basis of cellular behavior, help bioengineers rationally design biosensors and biomachines, and help physicians personalize medicine [@goldberg2016toward].
-
-Due to the diverse timescales of the subsystems inside cells, one promising way to simulate whole-cell models is to co-simulate slow subsystems with fined-grained algorithms and fast subsystems with coarse-grained algorithms. For example, slow subsystems, such as transcription, could be simulated with the Stochastic Simulation Algorithm (SSA, @gillespie1977exact), while faster subsystems, such as signal transduction, could be simulated with ordinary differential equations (ODEs). Metabolism, another fast process, could be simulated with dynamic Flux-Balance Analysis (dFBA, @mahadevan2002dynamic). However, there are no tools for co-simulating these algorithms beyond ad hoc implementations for specific models.
-
-To accelerate whole-cell modeling, we are using DE-Sim to create WC-Sim.
-First, we implemented a Python class that tracks the populations of the molecular species represented by a model. Second, we used pandas, NumPy, and ODES scikit [@malengier2018odes] to implement simulation object subclasses for dFBA, ODE, and SSA simulations. Third, we used event messages to schedule the execution of these simulation algorithms and coordinate their reading and updating of the species populations.
-
-DE-Sim's OO functionality facilitated the implementation of classes for dFBA, ODE, and SSA, and DE-Sim's event messages streamlined the co-simulation these algorithms.
-In addition, the ability to use NumPy made it easy to generate the random numbers needed to implement SSA, and the ability to use ODES scikit expedited the use of CVODE (@hindmarsh2005sundials) to implement the ODE simulation object class.
-We anticipate that WC-Sim will help researchers conduct unprecedented simulations of cells.
 
 # Conclusion
 
@@ -119,19 +105,11 @@ To further advance the simulation of data-intensive models, we aim to improve th
 
 DE-Sim is freely and openly available under the MIT license at the locations below.
 
-* Python package: [PyPI: de-sim](https://pypi.org/project/de-sim/)
-* Tutorials: Jupyter notebooks at [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim)
-* Docker image: [Docker Hub: karrlab/de_sim](https://hub.docker.com/r/karrlab/de_sim)
-* Installation instructions and documentation of DE-Sim's API: [docs.karrlab.org](https://docs.karrlab.org/de_sim/)
-* Issue tracker: [GitHub: KarrLab/de_sim](https://github.com/KarrLab/de_sim/issues/)
-* Source code: [GitHub: KarrLab/de_sim](https://github.com/KarrLab/de_sim/)
-* Guide to contributing to DE-Sim developers: [GitHub: KarrLab/de_sim](https://github.com/KarrLab/de_sim/blob/master/CONTRIBUTING.md/)
-* Code of conduct for developers: [GitHub: KarrLab/de_sim](https://github.com/KarrLab/de_sim/blob/master/CODE_OF_CONDUCT.md)
-* Continuous integration: [CircleCI: gh/KarrLab/de_sim](https://circleci.com/gh/KarrLab/de_sim/)
+* Repository: [GitHub: KarrLab/de_sim](https://github.com/KarrLab/de_sim/)
+* Jupyter notebook tutorials: [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim)
+* Documentation: [docs.karrlab.org](https://docs.karrlab.org/de_sim/)
 
-DE-Sim requires [Python](https://www.python.org/) 3.7 or higher and [pip](https://pip.pypa.io/).
-
-This article discusses version 0.1.1 of DE-Sim.
+DE-Sim requires [Python](https://www.python.org/) 3.7 or higher and [pip](https://pip.pypa.io/). This article discusses version 0.1.1 of DE-Sim.
 
 # Acknowledgements
 
