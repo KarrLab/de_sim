@@ -37,6 +37,12 @@ Before getting started, please contact the lead developers at [info@karrlab.org]
 
 We strive to have complete test coverage of `DE-Sim`. As such, all contributions to `DE-Sim` should be tested. 
 
+The tests require additional dependencies. These can be installed by running one of the following commands:
+```
+pip install /path/to/de_sim[tests]
+pip install -r /path/to/de_sim/tests/requirements.txt
+```
+
 The tests are located in the `tests`  directory. The tests can be executed by running the following command.
 ```
 pip install pytest
