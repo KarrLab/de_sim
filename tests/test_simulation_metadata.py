@@ -58,10 +58,7 @@ class TestSimulationMetadata(unittest.TestCase):
         self.assertGreaterEqual(run.run_time, 0)
 
         simulator_repo = self.metadata.simulator_repo
-        urls = ['https://github.com/KarrLab/de_sim.git',
-                'git@github.com:KarrLab/de_sim.git',
-                'ssh://git@github.com/KarrLab/de_sim.git']
-        self.assertIn(simulator_repo.url.lower(), [url.lower() for url in urls])
+        self.assertIn('KarrLab/de_sim'.lower(), simulator_repo.url.lower())
         self.assertEqual(simulator_repo.branch, 'master')
 
     def test_author_metadata(self):
