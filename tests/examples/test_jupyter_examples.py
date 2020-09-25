@@ -30,9 +30,10 @@ class ExamplesTestCase(unittest.TestCase):
                 notebook = nbformat.read(file, as_version=version)
             execute_preprocessor = nbconvert.preprocessors.ExecutePreprocessor(timeout=self.TIMEOUT)
             try:            
-                execute_preprocessor.preprocess(notebook, {'metadata': {'path': 'de_sim/examples/jupyter_examples'}})
+                execute_preprocessor.preprocess(notebook, {'metadata': {'path': os.path.dirname(filename)}})
             except Exception as e:
                 failed_notebooks.append(f"Notebook {filename} failed with error '{e}'")
 
         if failed_notebooks:
-            raise Exception('The following notebooks could not be executed:\n  {}'.format('\n  '.join(sorted(failed_notebooks))))
+            e_message = '\n  '.join(sorted(failed_notebooks))
+            raise Exception('The following notebooks could not be executed:\n {e_message}')

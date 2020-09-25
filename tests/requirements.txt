@@ -1,3 +1,4 @@
 capturer
 nbconvert
 nbformat
+ipykernel
