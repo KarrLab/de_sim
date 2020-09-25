@@ -469,9 +469,6 @@ class SimulationObjMeta(type):
         elif not event_handlers:
             warnings.warn("SimulationObject '{}' definition does not inherit or provide a "
                           "non-empty '{}'.".format(clsname, EVENT_HANDLERS))
-        elif not messages_sent:
-            warnings.warn("SimulationObject '{}' definition does not inherit or provide a "
-                          "non-empty '{}'.".format(clsname, MESSAGES_SENT))
 
         if event_handlers:
             try:

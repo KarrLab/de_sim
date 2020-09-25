@@ -181,20 +181,6 @@ class TestSimulationObjMeta(unittest.TestCase):
             self.assertTrue(InitMsg in PartlyRegisteredSimulationObject1.metadata.message_types_sent)
             self.assertFalse(PartlyRegisteredSimulationObject1.metadata.event_handlers_dict)
 
-        # missing messages_sent
-        with warnings.catch_warnings(record=True) as w:
-            class PartlyRegisteredSimulationObject2(SimulationObject):
-                event_handlers = [(InitMsg, 'handler')]
-
-                def handler(self):
-                    pass
-            self.assertEqual(str(w[-1].message),
-                             "SimulationObject 'PartlyRegisteredSimulationObject2' definition does not inherit "
-                             "or provide a non-empty '{}'.".format(MESSAGES_SENT))
-            self.assertTrue(InitMsg in PartlyRegisteredSimulationObject2.metadata.event_handlers_dict)
-            self.assertEqual(PartlyRegisteredSimulationObject2.metadata.event_handlers_dict[InitMsg],
-                             PartlyRegisteredSimulationObject2.handler)
-
 
 class TestSimObjClassPriority(unittest.TestCase):
 

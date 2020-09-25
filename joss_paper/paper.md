@@ -109,7 +109,7 @@ DE-Sim is freely and openly available under the MIT license at the locations bel
 * Jupyter notebook tutorials: [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim)
 * Documentation: [docs.karrlab.org](https://docs.karrlab.org/de_sim/)
 
-DE-Sim requires [Python](https://www.python.org/) 3.7 or higher and [pip](https://pip.pypa.io/). This article discusses version 0.1.3 of DE-Sim.
+DE-Sim requires [Python](https://www.python.org/) 3.7 or higher and [pip](https://pip.pypa.io/). This article discusses version 0.1.4 of DE-Sim.
 
 # Acknowledgements
 
