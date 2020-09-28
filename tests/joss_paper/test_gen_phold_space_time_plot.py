@@ -18,6 +18,11 @@ class TestPlotLog(unittest.TestCase):
         # unit-tested because doing so requires that config state be changed before de_sim.plot.file logger is created
         # we run gen_phold_space_time_plot.py in a separate process to execute that code
         # also see comment LoggerConfigurator().from_dict() regarding shared loggers
+        try:
+            result = subprocess.run(["python3", "joss_paper/gen_phold_space_time_plot.py"],
+                                    check=True,
+                                    capture_output=True)
+        except CalledProcessError as e:
+            self.fail(e)
 
-        result = subprocess.run(["python3", "joss_paper/gen_phold_space_time_plot.py"], capture_output=True)
         self.assertIn('space-time diagram written', result.stdout.decode("utf-8"))

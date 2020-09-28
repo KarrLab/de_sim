@@ -18,14 +18,12 @@ import unittest
 
 @unittest.skipIf(os.getenv('CIRCLECI', '0') in ['1', 'true'], 'Jupyter server not setup in CircleCI')
 class ExamplesTestCase(unittest.TestCase):
-    TIMEOUT = 300
+    TIMEOUT = 2
 
     def test_jupyter(self):
-        print()
         failed_notebooks = []
         for filename in itertools.chain(glob.glob('de_sim/examples/jupyter_examples/*.ipynb'),
                                         glob.glob('de_sim/examples/jupyter_examples_for_talk/*.ipynb')):
-            print('filename:', filename)
             with open(filename) as file:
                 version = json.load(file)['nbformat']
             with open(filename) as file:
@@ -35,7 +33,6 @@ class ExamplesTestCase(unittest.TestCase):
                 execute_preprocessor.preprocess(notebook, {'metadata': {'path': os.path.dirname(filename)}})
             except Exception as e:
                 failed_notebooks.append(f"Notebook {filename} failed with error '{e}'")
-            print('failed_notebooks', failed_notebooks)
 
         if failed_notebooks:
             e_message = '\n  '.join(sorted(failed_notebooks))
