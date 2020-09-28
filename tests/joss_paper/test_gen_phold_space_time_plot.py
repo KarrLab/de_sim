@@ -19,10 +19,12 @@ class TestPlotLog(unittest.TestCase):
         # we run gen_phold_space_time_plot.py in a separate process to execute that code
         # also see comment LoggerConfigurator().from_dict() regarding shared loggers
         try:
-            result = subprocess.run(["python3", "joss_paper/gen_phold_space_time_plot.py"],
+            command = ["python3", "joss_paper/gen_phold_space_time_plot.py"]
+            result = subprocess.run(command,
                                     check=True,
                                     capture_output=True)
         except CalledProcessError as e:
-            self.fail(e)
+            e_msg = f"""'{" ".join(command)}' failed: {e.stderr}"""
+            self.fail(e_msg)
 
         self.assertIn('space-time diagram written', result.stdout.decode("utf-8"))
