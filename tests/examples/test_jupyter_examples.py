@@ -18,7 +18,7 @@ import unittest
 
 @unittest.skipIf(os.getenv('CIRCLECI', '0') in ['1', 'true'], 'Jupyter server not setup in CircleCI')
 class ExamplesTestCase(unittest.TestCase):
-    TIMEOUT = 300
+    TIMEOUT = 600
 
     def test_jupyter(self):
         failed_notebooks = []
