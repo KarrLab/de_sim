@@ -11,6 +11,7 @@ from logging2 import LogRegister
 from logging2.levels import LogLevel
 import contextlib
 import cProfile
+import io
 import os
 import pstats
 import random
@@ -531,7 +532,7 @@ class TestSimulator(unittest.TestCase):
 
         @contextlib.contextmanager
         def working_directory(path):
-            """ A context manager that temporarilyt changes the working directory
+            """ A context manager that temporarily changes the working directory
 
             Args:
                 path (:obj:`str`): the temporary working directory
@@ -689,11 +690,15 @@ class TestSimulator(unittest.TestCase):
             self.assertIn(text, measurements)
 
         self.make_one_object_simulation()
-        with CaptureOutput(relay=False) as capturer:
+
+
+        f = io.StringIO()
+        with contextlib.redirect_stdout(f):
             config_dict = dict(max_time=max_time, object_memory_change_interval=10)
             self.simulator.simulate(config_dict=config_dict)
+            stdout = f.getvalue()
             for text in expected_text:
-                self.assertIn(text, capturer.get_text())
+                self.assertIn(text, stdout)
 
 
 class Delicate(de_sim.EventMessage):
