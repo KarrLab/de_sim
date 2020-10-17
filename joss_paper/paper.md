@@ -63,7 +63,7 @@ DE-Sim also provides several features to help users execute, analyze, and debug 
 
 ![**DE-Sim can generate space-time visualizations of simulation trajectories.** 
 This figure illustrates a space-time visualization of all of the events and messages in a simulation of the parallel hold (PHOLD) DES benchmark model [@fujimoto1990performance] with three simulation objects. The timeline (black line) for each object shows its events (grey dots). The blue and purple arrows illustrate events scheduled by simulation objects for themselves and other objects, respectively. The code for this simulation is available in the DE-Sim Git repository. 
-\label{fig:phold_space_time_plot}](phold_space_time_plot.pdf)
+\label{fig:phold_space_time_plot}](figures/phold_space_time_plot.png)
 
 Together, we believe that these features can simplify and accelerate the development of complex, data-intensive models.
 
@@ -74,7 +74,7 @@ Although there are several other DES tools, we believe that DE-Sim uniquely faci
 ![**Comparison of DE-Sim with some of the most popular DES tools.**
 DE-Sim is the only open-source, OO DES tool based on Python.
 This combination of features makes DE-Sim uniquely suitable for creating and simulating complex, data-intensive models. 
-\label{fig:comparison}](comparison.pdf)
+\label{fig:comparison}](figures/comparison.png)
 
 SimPy is an open-source DES tool that enables users to use functions to create simulation processes (SimPy's analog to DE-Sim's simulation objects). As another Python-based tool, SymPy also makes it easy for researchers to leverage the Python ecosystem to build models. However, we believe that DE-Sim makes it easier for researchers to build complex models by enabling them to implement models as collections of classes rather than collections of functions. In addition, we believe that DE-Sim is simpler to use because DE-Sim supports a uniform approach for scheduling events, whereas SimPy simulation processes must use two different approaches: one to schedule events for themselves, and another to schedule events for other processes.
 
@@ -93,7 +93,7 @@ The code for this performance test is available in the DE-Sim Git repository, an
 
 ![**Performance of DE-Sim simulating a range of sizes of a cyclic messaging network.** 
 We executed each simulation for 100 time-units. Each statistic represents the average of three simulation runs in a Docker container running on a 2.9 GHz Intel Core i5 processor. 
-\label{fig:performance}](performance.pdf)
+\label{fig:performance}](figures/performance.png)
 
 # Conclusion
 
