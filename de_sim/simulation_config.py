@@ -10,6 +10,7 @@
 from dataclasses import dataclass
 import os
 
+from de_sim.checkpoint import AccessCheckpoints
 from de_sim.errors import SimulatorError
 from wc_utils.util.misc import EnhancedDataClass
 
@@ -85,9 +86,9 @@ class SimulationConfig(EnhancedDataClass):
                 if not os.path.isdir(absolute_output_dir):
                     raise SimulatorError(f"output_dir '{absolute_output_dir}' must be a directory")
 
-                # raise error if absolute_output_dir is not empty
-                if os.listdir(absolute_output_dir):
-                    raise SimulatorError(f"output_dir '{absolute_output_dir}' is not empty")
+                # prevent output from multiple simulation runs in an output directory
+                if AccessCheckpoints(absolute_output_dir).list_checkpoints(error_if_empty=False):
+                    raise SimulatorError(f"output_dir '{absolute_output_dir}' already contains checkpoints")
 
             # if absolute_output_dir does not exist, make it
             if not os.path.exists(absolute_output_dir):

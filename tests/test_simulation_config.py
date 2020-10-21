@@ -13,6 +13,7 @@ import unittest
 import shutil
 import tempfile
 
+from de_sim.checkpoint import AccessCheckpoints, Checkpoint
 from de_sim.errors import SimulatorError
 from de_sim.simulation_config import SimulationConfig
 
@@ -88,8 +89,11 @@ class TestSimulationConfig(unittest.TestCase):
             cfg = SimulationConfig(self.max_time, output_dir=tmp_file)
             cfg.validate_individual_fields()
 
-        with self.assertRaisesRegex(SimulatorError, "output_dir .* is not empty"):
-            cfg = SimulationConfig(self.max_time, output_dir=self.tmp_dir)
+        with self.assertRaisesRegex(SimulatorError, "output_dir .* already contains checkpoints"):
+            tmp_dir = tempfile.mkdtemp(dir=self.tmp_dir)
+            checkpoint = Checkpoint(2, None, None)
+            AccessCheckpoints(tmp_dir).set_checkpoint(checkpoint)
+            cfg = SimulationConfig(self.max_time, output_dir=tmp_dir)
             cfg.validate_individual_fields()
 
         # output_dir gets created because it does not exist
