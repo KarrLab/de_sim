@@ -20,7 +20,7 @@ class TestPlotLog(unittest.TestCase):
         # to execute that code.
         # also see the comment in LoggerConfigurator().from_dict() regarding shared loggers.
         try:
-            command = ["python3", "joss_paper/gen_phold_space_time_plot.py"]
+            command = ["python3", "joss_paper/figures/gen_phold_space_time_plot.py"]
             result = subprocess.run(command,
                                     check=True,
                                     capture_output=True)
