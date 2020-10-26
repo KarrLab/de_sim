@@ -116,20 +116,20 @@ class SIR(de_sim.SimulationObject):
     messages_sent = MESSAGE_TYPES
 
 
-### SIR epidemic model, version 2 ###
-class TransitionMessage(de_sim.EventMessage):
-    "Message for all model transitions"
-    msg_field_names = ['transition_type']
-
-
-MESSAGE_TYPES = [TransitionMessage]
-
-
 class StateTransitionType(enum.Enum):
     """ State transition types
     """
     s_to_i = 'Transition from Susceptible to Infectious'
     i_to_r = 'Transition from Infectious to Recovered'
+
+
+### SIR epidemic model, version 2 ###
+class TransitionMessage(de_sim.EventMessage):
+    "Message for all model transitions"
+    transition_type: StateTransitionType
+
+
+MESSAGE_TYPES = [TransitionMessage]
 
 
 class SIR2(SIR):

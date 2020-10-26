@@ -703,7 +703,7 @@ class TestSimulator(unittest.TestCase):
 
 class Delicate(de_sim.EventMessage):
     'event message type for testing arrival order'
-    msg_field_names = ['sender_obj_num']
+    sender_obj_num: int
 
 
 class ReproducibleTestSimulationObject(de_sim.SimulationObject):

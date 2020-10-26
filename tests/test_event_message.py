@@ -15,25 +15,25 @@ import de_sim
 
 
 class ExampleEventMessage1(de_sim.EventMessage):
-    ' My docstring '
-    msg_field_names = ['attr1', 'attr2']
+    "My docstring"
+    attr1: str
+    attr2: int
 
 
 class ExampleEventMessage2(de_sim.EventMessage):
-    " docstring "
+    "Docstring"
     pass
 
 
 class ExampleEventMessage3(de_sim.EventMessage):
-    " docstring "
-    pass
+    "Docstring"
 
 
 class TestEventMessageInterface(unittest.TestCase):
 
     def test_utils(self):
-        msg_field_names = ['arg_1', 'arg_2']
-        attrs = {'__slots__': msg_field_names}
+        attributes = ['arg_1', 'arg_2']
+        attrs = {'__slots__': attributes}
         SimMsgType = type('test', (EventMessageInterface,), attrs)
         with self.assertRaisesRegex(SimulatorError, "Constructor .*'test' expects 2 arg.*but 0 provided"):
             SimMsgType()
@@ -41,7 +41,7 @@ class TestEventMessageInterface(unittest.TestCase):
         t = SimMsgType(*vals)
         self.assertIn(str(vals[0]), str(t))
         self.assertIn(vals[1], str(t))
-        for attr in msg_field_names:
+        for attr in attributes:
             self.assertIn(attr, t.attrs())
             self.assertIn(attr, t.header())
             self.assertIn(attr, t.header(as_list=True))
@@ -88,14 +88,29 @@ class TestEventMessageInterface(unittest.TestCase):
         with self.assertRaises(TypeError):
             sim_msg_1_bad_a < sim_msg_1_bad_b
 
+    def test_metadata(self):
+
+        class ExampleEventMessage(de_sim.EventMessage):
+            'My docstring'
+            unit_price: float
+            name: str = 'hi'
+            quantity_on_hand: int = 0
+
+        eem = ExampleEventMessage(2.2, 'bye', 3)
+        self.assertEqual(eem._default_values, dict(name='hi', quantity_on_hand=0))
+        self.assertEqual(eem._annotations, dict(unit_price=float,
+                                                name=str,
+                                                quantity_on_hand=int))
+
 
 class TestEventMessageMeta(unittest.TestCase):
 
     def test_simulation_message_meta(self):
+
         self.assertTrue(issubclass(ExampleEventMessage1, de_sim.EventMessage))
         with warnings.catch_warnings(record=True) as w:
-            class BadEventMessage2(de_sim.EventMessage):
-                msg_field_names = ['x']
+            class IncompleteEventMessage(de_sim.EventMessage):
+                x: float
             self.assertIn("definition does not contain a docstring", str(w[-1].message))
         warnings.simplefilter("ignore")
 
@@ -110,10 +125,14 @@ class TestEventMessageMeta(unittest.TestCase):
         self.assertEqual(example_simulation_message2.attrs(), [])
         self.assertEqual(example_simulation_message2.header(), None)
 
-        with self.assertRaisesRegex(SimulatorError, 'must be a list of strings'):
-            class BadEventMessage1(de_sim.EventMessage):
-                msg_field_names = [2.5]
+        with self.assertRaisesRegex(SimulatorError, 'Wrong type of default value'):
+            class EventMessageBadTypes(de_sim.EventMessage):
+                "Docstring"
+                unit_price: float = 'x'
+                quantity_on_hand: str = 3
 
-        with self.assertRaisesRegex(SimulatorError, 'contains duplicates'):
-            class BadEventMessage3(de_sim.EventMessage):
-                msg_field_names = ['x', 'y', 'x']
+        with self.assertRaisesRegex(SimulatorError, 'Optional attributes must follow required attributes'):
+            class EventMessageRequiredAfterOptional(de_sim.EventMessage):
+                "Docstring"
+                unit_price: float = 10.0
+                quantity_on_hand: int

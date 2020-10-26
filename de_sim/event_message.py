@@ -89,7 +89,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
                 are returned as a :obj:`str`
 
         Returns:
-            :obj:`obj`: `None` if this message has no `msg_field_names`, or a :obj:`str` representation of
+            :obj:`obj`: `None` if this message has no attributes, or a :obj:`str` representation of
             the attribute names for this :obj:`EventMessage`, or a :obj:`list`
             representation if `as_list` is set
         """
@@ -114,7 +114,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
         """ Provide a list of the field names for this :obj:`EventMessage`
 
         Returns:
-            :obj:`list` of :obj:`str`: the `msg_field_names` in this :obj:`EventMessage`
+            :obj:`list` of :obj:`str`: the names of all attributes in this :obj:`EventMessage`
         """
         return self.__slots__
 
@@ -127,7 +127,7 @@ class EventMessageInterface(object, metaclass=ABCMeta):
                 as a string
 
         Returns:
-            :obj:`obj`: :obj:`None` if this message has no `msg_field_names`, or a string representation of
+            :obj:`obj`: :obj:`None` if this message has no attributes, or a string representation of
             the attribute names for this :obj:`EventMessage`, or a :obj:`list`
             representation if `as_list` is set
         """
@@ -187,9 +187,6 @@ class EventMessageMeta(type):
     """ A custom metaclass that customizes the creation of :obj:`EventMessage` subclasses
     """
 
-    # msg_field_names mapping keyword
-    MSG_FIELD_NAMES = 'msg_field_names'
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -199,22 +196,37 @@ class EventMessageMeta(type):
             return super().__new__(cls, clsname, superclasses, namespace)
 
         if '__doc__' not in namespace:
-            warnings.warn("EventMessage '{}' definition does not contain a docstring.".format(
-                clsname))
+            warnings.warn(f"EventMessage '{clsname}' definition does not contain a docstring.")
 
         attrs = {}
-        if cls.MSG_FIELD_NAMES in namespace:
+        msg_attribute_names = []
+        if '__annotations__' in namespace:
+            for attr in namespace['__annotations__']:
+                msg_attribute_names.append(attr)
+            # duplicate attribute names cannot be detected - the last declaration
+            # with a particular name appears in '__annotations__'
+            attrs['__slots__'] = msg_attribute_names
+            # keep '__annotations__', although they're not used
+            attrs['_annotations'] = namespace['__annotations__']
+        else:
+            attrs['__slots__'] = []
 
-            # check types
-            msg_field_names = namespace[cls.MSG_FIELD_NAMES]
-            if not (isinstance(msg_field_names, list) and all([isinstance(attr, str) for attr in msg_field_names])):
-                raise SimulatorError("'{}' must be a list of strings, but is '{}'".format(
-                    cls.MSG_FIELD_NAMES, msg_field_names))
-
-            # error if msg_field_names contains dupes
-            if not len(msg_field_names) == len(set(msg_field_names)):
-                raise SimulatorError("'{}' contains duplicates".format(cls.MSG_FIELD_NAMES))
-            attrs['__slots__'] = msg_field_names
+        # save default values
+        attrs['_default_values'] = {}
+        processing_optional_attributes = False
+        for attr in attrs['__slots__']:
+            if attr in namespace:
+                processing_optional_attributes = True
+                attr_type = attrs['_annotations'][attr]
+                default_val = namespace[attr]
+                if isinstance(default_val, attr_type):
+                    attrs['_default_values'][attr] = default_val
+                else:
+                    raise SimulatorError(f"Wrong type of default value in {clsname}: "
+                                         f"'{attr}' has type {attr_type.__name__}, but default is '{default_val}'")
+            elif processing_optional_attributes:
+                raise SimulatorError(f"Optional attributes must follow required attributes in {clsname}: "
+                                     f"'{attr}' is required but follows optional attribute(s)")
 
         new_simulation_message_class = super().__new__(cls, clsname, superclasses, attrs)
         if '__doc__' in namespace:
@@ -233,8 +245,9 @@ class EventMessage(EventMessageInterface, metaclass=CombinedEventMessageMeta):
     module supports compact declaration of :obj:`EventMessage` subclasses. For example::
 
         class ExampleEventMessage1(EventMessage):
-            " Docstring for ExampleEventMessage1 "
-            msg_field_names = ['attr1', 'attr2']
+            "Docstring for ExampleEventMessage1"
+            attr1: int
+            attr2: float
 
     defines the `ExampleEventMessage1` class with a short docstring and message fields named
     `attr1` and `attr2`.

@@ -16,7 +16,7 @@ import de_sim
 
 class RandomStepMessage(de_sim.EventMessage):
     """ An event message class that stores the value of a random walk step """
-    msg_field_names = ['step_value']
+    step_value: float
 
 
 class RandomWalkSimulationObject(de_sim.SimulationObject):
