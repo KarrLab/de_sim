@@ -203,7 +203,7 @@ class EventMessageMeta(type):
         if '__annotations__' in namespace:
             for attr in namespace['__annotations__']:
                 msg_attribute_names.append(attr)
-            # duplicate attribute names cannot be detected - the last declaration
+            # Note: duplicate attribute names cannot be detected - the last declaration
             # with a particular name appears in '__annotations__'
             attrs['__slots__'] = msg_attribute_names
             # keep '__annotations__', although they're not used
@@ -242,18 +242,30 @@ class EventMessage(EventMessageInterface, metaclass=CombinedEventMessageMeta):
     """ The event message base class
 
     Each simulation event contains an event message object. This
-    module supports compact declaration of :obj:`EventMessage` subclasses. For example::
+    class supports declarative definitions of :obj:`EventMessage` subclasses that automatically
+    define a subclass' variable attributes.
+    Like Python `Data Classes <https://docs.python.org/3/library/dataclasses.html>`_,
+    :obj:`EventMessage`\ s are defined using `PEP 526 <https://www.python.org/dev/peps/pep-0526/>`_
+    type annotations. For example::
 
-        class ExampleEventMessage1(EventMessage):
-            "Docstring for ExampleEventMessage1"
+        class ExampleEventMessage(EventMessage):
+            "Docstring for ExampleEventMessage"
             attr1: int
-            attr2: float
+            attr2: float = 1.1
 
-    defines the `ExampleEventMessage1` class with a short docstring and message fields named
-    `attr1` and `attr2`.
+    defines `ExampleEventMessage` as an :obj:`EventMessage` with a short docstring and message
+    fields named `attr1` and `attr2`, and this::
+
+            example_event_message = ExampleEventMessage(3, 3.14)
+
+    creates an instance of the class.
+
+    However, as of 2020-10, :obj:`EventMessage` does not use default values or types which may be
+    provided.
 
     :obj:`EventMessage` subclasses must support the comparison operations `<`, `<=`, etc. This is
-    provided automatically for message fields that support comparison. :obj:`EventMessage` subclasses with
-    message fields that do not support comparison must override `__lt__`, `__le__`, etc.
+    provided automatically for message fields that support comparison. :obj:`EventMessage`
+    subclasses with message fields that do not support comparison must override `__lt__`,
+    `__le__`, etc.
     """
     pass
