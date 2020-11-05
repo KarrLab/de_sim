@@ -4,6 +4,7 @@
 [![Test coverage](https://coveralls.io/repos/github/KarrLab/de_sim/badge.svg)](https://coveralls.io/github/KarrLab/de_sim)
 [![Code analysis](https://api.codeclimate.com/v1/badges/2fa3ece22f571fd36b12/maintainability)](https://codeclimate.com/github/KarrLab/de_sim)
 [![License](https://img.shields.io/github/license/KarrLab/de_sim.svg)](LICENSE)
+[![status](https://joss.theoj.org/papers/e3ca43be9717d153672c48239939e993/status.svg)](https://joss.theoj.org/papers/e3ca43be9717d153672c48239939e993)
 ![Analytics](https://ga-beacon.appspot.com/UA-86759801-1/de_sim/README.md?pixel)
 
 # *DE-Sim*: a Python-based object-oriented discrete-event simulator for modeling complex systems
