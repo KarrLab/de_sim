@@ -4,7 +4,7 @@ We enthusiastically welcome contributions to `DE-Sim`!
 
 ## Coordinating contributions
 
-Before getting started, please contact the lead developers at [info@karrlab.org](mailto:info@karrlab.org) to coordinate your planned contributions with other ongoing efforts. Please also use GitHub issues to announce your plans to the community so that other developers can provide input into your plans and coordinate their own work. As the development community grows, we will institute additional infrastructure as needed such as a leadership committee and regular online meetings.
+Before getting started, please contact the lead developers at [info@karrlab.org](mailto:info@karrlab.org) and [Arthur Goldberg](mailto:Arthur.Goldberg@mssm.edu) to coordinate your planned contributions with other ongoing efforts. Please also use GitHub issues to announce your plans to the community so that other developers can provide input into your plans and coordinate their own work. As the development community grows, we will institute additional infrastructure as needed such as a leadership committee and regular online meetings.
 
 ## Repository organization
 
@@ -37,14 +37,17 @@ Before getting started, please contact the lead developers at [info@karrlab.org]
 
 We strive to have complete test coverage of `DE-Sim`. As such, all contributions to `DE-Sim` should be tested. 
 
-The tests require additional dependencies. These can be installed by running one of the following commands:
+The tests depend on additional Python packages. These can be installed by running one of the following commands:
 ```
 pip install /path/to/de_sim[tests]
 pip install -r /path/to/de_sim/tests/requirements.txt
 ```
 
-The tests are located in the `tests`  directory. The tests can be executed by running the following command.
+The tests are located in the `tests`  directory. The tests can be executed by running the following commands.
+Note that the current directory must be on the `PYTHONPATH` environment variable.
 ```
+git clone https://github.com/KarrLab/de_sim.git
+cd de_sim
 pip install pytest
 python -m pytest tests
 ```
@@ -56,7 +59,7 @@ python -m pytest tests --cov de_sim
 coverage html
 ```
 
-Upon each push to GitHub, GitHub will trigger CircleCI to execute all of the tests. The latest test results are available at [CircleCI](https://circleci.com/gh/KarrLab/de_sim). The latest coverage results are available at [Coveralls](https://coveralls.io/github/KarrLab/de_sim).
+Upon each push to GitHub, GitHub will trigger CircleCI to execute all of the tests. All test results are available at [CircleCI](https://circleci.com/gh/KarrLab/de_sim). And all coverage reports are available at [Coveralls](https://coveralls.io/github/KarrLab/de_sim).
 
 ## Documentation convention
 
@@ -72,8 +75,8 @@ Contact [info@karrlab.org](mailto:info@karrlab.org) to request release and deplo
 
 ## Reporting issues
 
-Please use [GitHub issues]() to report any issues to the development community.
+Please use [GitHub issues](https://github.com/KarrLab/de_sim/issues) to report any issues to the development community.
 
 ## Getting help
 
-Please use [GitHub issues]() to post questions or contact the lead developers at [info@karrlab.org](mailto:info@karrlab.org).
+Please use [GitHub issues](https://github.com/KarrLab/de_sim/issues) to post questions or contact the lead developers at [info@karrlab.org](mailto:info@karrlab.org) and [Arthur Goldberg](mailto:Arthur.Goldberg@mssm.edu).

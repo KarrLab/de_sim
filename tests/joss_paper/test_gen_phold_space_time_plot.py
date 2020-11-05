@@ -16,7 +16,7 @@ class TestPlotLog(unittest.TestCase):
         # 1) gen_phold_space_time_plot.py
         # 2) the use of self.fast_plot_file_logger in de_sim/de_sim/simulation_object.py, which cannot
         # be conveniently unit-tested because doing so requires that config state be changed before
-        # de_sim.plot.file logger is created we run gen_phold_space_time_plot.py in a separate process
+        # de_sim.plot.file logger is created. This runs gen_phold_space_time_plot.py in a separate process
         # to execute that code.
         # also see the comment in LoggerConfigurator().from_dict() regarding shared loggers.
         try:

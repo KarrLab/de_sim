@@ -39,9 +39,9 @@ Please see [sandbox.karrlab.org](https://sandbox.karrlab.org/tree/de_sim) for in
     * Python >= 3.7
     * pip >= 19
 
-2. Install this package 
+2. Install this package using one of these methods
 
-    * Install latest release from PyPI
+    * Install the latest release from PyPI
       ```
       pip install de_sim
       ```
@@ -51,7 +51,7 @@ Please see [sandbox.karrlab.org](https://sandbox.karrlab.org/tree/de_sim) for in
       docker pull karrlab/de_sim
       ```
 
-    * Install latest revision from GitHub
+    * Install the latest version from GitHub
       ```
       pip install git+https://github.com/KarrLab/de_sim.git#egg=de_sim
       ```

@@ -32,7 +32,7 @@ class ExamplesTestCase(unittest.TestCase):
             try:            
                 execute_preprocessor.preprocess(notebook, {'metadata': {'path': os.path.dirname(filename)}})
             except Exception as e:
-                failed_notebooks.append(f"Notebook {filename} failed with error '{e}'")
+                failed_notebooks.append(f"Notebook '{filename}' failed with error '{e}'")
 
         if failed_notebooks:
             e_message = '\n  '.join(sorted(failed_notebooks))
