@@ -50,26 +50,26 @@ Achieving such comprehensive and detailed models will likely require integrating
 
 # DE-Sim provides critical features for building and simulating data-intensive models
 
-DE-Sim simplifies the construction and simulation of *discrete-event models* through several features. First, DE-Sim structures discrete-event models as OO programs [@zeigler1987hierarchical]. This structure enables researchers to use classes of *simulation objects* to encapsulate the complex logic required to represent each *model component*, and use classes of *event messages* to encapsulate the logic required to describe their *interactions*. With DE-Sim, users define classes of simulation objects by creating subclasses of DE-Sim's simulation object class. DE-Sim simulation object classes can exploit all the features of Python classes. For example, users can encode relationships between the types of components in a model into hierarchies of subclasses of simulation objects. As a concrete example, a model of the biochemistry of RNA transcription and protein translation could be implemented using a superclass that captures the behavior of polymers and three subclasses that represent the specific properties of DNAs, RNAs, and proteins. DE-Sim makes it easy to model complex systems that contain multiple types of components through multiple classes of simulation objects. Users can model arbitrarily many instances of each type of component by creating multiple instances of the corresponding simulation object class. 
+DE-Sim simplifies the construction and simulation of *discrete-event models* through several features. First, DE-Sim structures discrete-event models as OO programs [@zeigler1987hierarchical]. This structure enables researchers to use classes of *simulation objects* to encapsulate the complex logic required to represent each *model component*, and use classes of *event messages* to encapsulate the logic required to describe their *interactions*. With DE-Sim, users define classes of simulation objects by creating subclasses of DE-Sim's simulation object class. DE-Sim simulation object classes can exploit all the features of Python classes. For example, users can encode relationships between the types of components in a model into hierarchies of subclasses of simulation objects. As a concrete example, a model of the biochemistry of RNA transcription and protein translation could be implemented using a superclass that captures the behavior of polymers and three subclasses that represent the specific properties of DNAs, RNAs, and proteins. DE-Sim makes it easy to model complex systems that contain multiple types of components by using multiple classes of simulation objects. Users can then model arbitrarily many instances of each type of component by creating multiple instances of the corresponding simulation object class.
 
-Second, by building on top of Python, DE-Sim makes it easy for researchers to use Python's extensive suite of data science tools to build models from heterogeneous, multidimensional datasets. For example, researchers can use tools such as H5py, ObjTables [@karr2020objtables], pandas, requests, and SQLAlchemy to retrieve diverse data from spreadsheets, HDF5 files, REST APIs, databases, and other sources; use tools such as NumPy [@oliphant2006guide] to integrate this data into a unified model; and use tools such as SciPy to perform calculations during simulations of models. DE-Sim also facilitates use of Python tools to analyze simulation results.
+Second, by building on top of Python, DE-Sim makes it easy for researchers to use Python's extensive suite of data science tools to build models from heterogeneous, multidimensional datasets. For example, researchers can use tools such as ObjTables [@karr2020objtables], H5py, requests, SQLAlchemy, and pandas to access diverse data in spreadsheets, HDF5 files, REST APIs, databases, and other sources; use tools such as NumPy [@oliphant2006guide] to integrate this data into a unified model; and use tools such as SciPy and NumPy to perform calculations during simulations of models. DE-Sim also facilitates use of Python tools to analyze simulation results.
 
-DE-Sim also provides several features to help users execute, analyze, and debug simulations:
+In addition, DE-Sim provides several features to help users execute, analyze, and debug simulations:
 
-* **Stop conditions:** DE-Sim makes it easy to terminate simulations when specific criteria are reached. Researchers can specify stop conditions as functions that return true when the simulation should conclude.
-* **Results checkpointing:** DE-Sim makes it easy to record the results of simulations through an easily-configurable checkpointing module.
-* **Space-time visualizations:** DE-Sim can generate space-time visualizations of simulation trajectories (\autoref{fig:phold_space_time_plot}). These diagrams can help researchers understand and debug simulations.
+* **Stop conditions:** DE-Sim makes it easy to terminate simulations when specific criteria are reached. Researchers can specify stop conditions as functions that return true when a simulation should conclude.
+* **Results checkpointing:** DE-Sim makes it easy to record the results of simulations by using a configurable checkpointing module.
 * **Reproducible simulations:** To help researchers debug simulations, repeated executions of the same simulation with the same configuration and same random number generator seed produce the same results.
+* **Space-time visualizations:** DE-Sim generates space-time visualizations of simulation trajectories (\autoref{fig:phold_space_time_plot}). These diagrams can help researchers understand and debug simulations.
 
 ![**DE-Sim can generate space-time visualizations of simulation trajectories.** 
 This figure illustrates a space-time visualization of all of the events and messages in a simulation of the parallel hold (PHOLD) DES benchmark model [@fujimoto1990performance] with three simulation objects. The timeline (black line) for each object shows its events (grey dots). The blue and purple arrows illustrate events scheduled by simulation objects for themselves and other objects, respectively. The code for this simulation is available in the DE-Sim Git repository. 
 \label{fig:phold_space_time_plot}](figures/phold_space_time_plot.png)
 
-Together, we believe that these features can simplify and accelerate the development of complex, data-intensive models.
+We believe that these features can simplify and accelerate the development of complex, data-intensive models.
 
 # Comparison of DE-Sim with existing discrete-event simulation tools
 
-Although there are several other DES tools, we believe that DE-Sim uniquely facilitates data-intensive modeling through a novel combination of OO modeling and support for numerous high-level data science tools. \autoref{fig:comparison} compares the features and characteristics of DE-Sim with some of the most popular DES tools.
+Although multiple DES tools already exist, we believe that DE-Sim uniquely facilitates data-intensive modeling through a novel combination of OO modeling and support for numerous high-level data science tools. \autoref{fig:comparison} compares the features and characteristics of DE-Sim with some of the most popular DES tools.
 
 ![**Comparison of DE-Sim with some of the most popular DES tools.**
 DE-Sim is the only open-source, OO DES tool based on Python.
@@ -78,7 +78,7 @@ This combination of features makes DE-Sim uniquely suitable for creating and sim
 
 SimPy is an open-source DES tool that enables users to use functions to create simulation processes (SimPy's analog to DE-Sim's simulation objects). As another Python-based tool, SymPy also makes it easy for researchers to leverage the Python ecosystem to build models. However, we believe that DE-Sim makes it easier for researchers to build complex models by enabling them to implement models as collections of classes rather than collections of functions. In addition, we believe that DE-Sim is simpler to use because DE-Sim supports a uniform approach for scheduling events, whereas SimPy simulation processes must use two different approaches: one to schedule events for themselves, and another to schedule events for other processes.
 
-SimEvents is a library for DES within the MATLAB/Simulink environment. While SimEvents' graphical interface makes it easy to create simple models, we believe that DE-Sim makes it easier to implement more complex models. By making it easy to use a variety of Python-based data science tools, DE-Sim makes it easier to use data to create models than SimEvents, which builds on a more limited ecosystem of data science tools.
+SimEvents is a library for DES within the MATLAB/Simulink environment. While SimEvents' graphical interface makes it easy to create simple models, we believe that DE-Sim makes it easier to implement more complex models. By facilitating use of the many Python-based data science tools, DE-Sim makes it easier to use data to create models than SimEvents, which builds on a smaller ecosystem of data science tools.
 
 SystemC is a `C++`-based OO DES tool that is frequently used to model digital systems [@mueller2001simulation]. While SystemC provides many of the same core features as DE-Sim, we believe that DE-Sim is more accessible to researchers than SystemC because DE-Sim builds upon Python, which is more popular than `C++` in many fields of research.
 
@@ -86,18 +86,18 @@ SIMSCRIPT III [@rice2005simscript] and SIMUL8 [@concannon2003dynamic] are commer
 
 # Performance of DE-Sim
 
-\autoref{fig:performance} illustrates the performance of DE-Sim simulating cyclic messaging networks over a range of network sizes. Each messaging network consists of a ring of nodes. 
+\autoref{fig:performance} illustrates the performance of DE-Sim simulating a model of a cyclic messaging network over a range of network sizes. A messaging network consists of a ring of nodes.
 When a node handles an event, it schedules the same type of event for its forward neighbor with a one time-unit delay.
 Each simulation is initialized by sending a message to each node at the first time-unit. 
 The code for this performance test is available in the DE-Sim Git repository, and in a Jupyter notebook at [https://sandbox.karrlab.org/tree/de_sim](https://sandbox.karrlab.org/tree/de_sim/4.%20DE-Sim%20performance%20test.ipynb).
 
-![**Performance of DE-Sim simulating a range of sizes of a cyclic messaging network.** 
-We executed each simulation for 100 time-units. Each statistic represents the average of three simulation runs in a Docker container running on a 2.9 GHz Intel Core i5 processor. 
+![**Performance of DE-Sim simulating a cyclic messaging network over a range of sizes.**
+Each simulation was executed for 100 time-units. Each statistic represents the average of three simulation runs in a Docker container running on a 2.9 GHz Intel Core i5 processor.
 \label{fig:performance}](figures/performance.png)
 
 # Conclusion
 
-In summary, DE-Sim is an open-source, object-oriented, discrete-event simulation tool implemented in Python that makes it easier for modelers to create and simulate complex, data-intensive models. First, DE-Sim enables researchers to conveniently use Python's OO features to manage multiple types of model components and their interactions. Second, DE-Sim enables researchers to directly use Python data science tools, such as pandas and SciPy, and large, heterogeneous datasets to construct models. Together, we anticipate that DE-Sim will accelerate the construction and simulation of unprecedented models of complex systems, leading to new scientific discoveries and engineering innovations.
+In summary, DE-Sim is an open-source, object-oriented, discrete-event simulation tool implemented in Python that makes it easier for modelers to create and simulate complex, data-intensive models. First, DE-Sim enables researchers to conveniently use Python's OO features to manage multiple types of model components and interactions among them. Second, DE-Sim enables researchers to directly use Python data science tools, such as pandas and SciPy, and large, heterogeneous datasets to construct models. Together, we anticipate that DE-Sim will accelerate the construction and simulation of unprecedented models of complex systems, leading to new scientific discoveries and engineering innovations.
 
 To further advance the simulation of data-intensive models, we aim to improve the simulation performance of DE-Sim. One potential direction is to use DE-Sim as a specification language for a parallel DES system such as ROSS [@carothers2000ross]. This combination of DE-Sim and ROSS would enable modelers to both create models with DE-Sim's high-level model specification semantics and quickly simulate models with ROSS.
 

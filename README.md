@@ -14,10 +14,10 @@
 To help users build and simulate complex, data-driven models, *DE-Sim* provides the following features:
 
 * **High-level, object-oriented modeling:** *DE-Sim* makes it easy for users to use object-oriented Python programming to build models. This makes it easy to use large, heterogeneous datasets and high-level data science packages such as NumPy, pandas, SciPy, and SQLAlchemy to build complex models.
-* **Powerful stop conditions:** *DE-Sim* makes it easy to implement complex stop conditions. Stop conditions can be implemented as simple Python functions that return true when the simulation state reaches the desired stop condition.
-* **Simple simulation logging:** *DE-Sim* provides tools for recording the results of simulations, as well as metadata such as the start and run time of each simulation.
-* **Space-time visualizations for analysis and debugging:** *DE-Sim* can generate space-time visualizations of simulation trajectories. These diagrams are valuable tools for understanding and debugging models.
-* **Checkpointing for restarting and debugging:** *DE-Sim* can checkpoint the state of simulations. These checkpoints can be used to restart or debug simulations. Checkpointing is particularly helpful for using *DE-Sim* on clusters that have short time limits, or for using *DE-Sim* on spot-priced virtual machines in commercial clouds.
+* **Stop conditions:** DE-Sim makes it easy to terminate simulations when specific criteria are reached. Researchers can specify stop conditions as functions that return true when a simulation should conclude.
+* **Results checkpointing:** DE-Sim makes it easy to record the results of simulations by using a configurable checkpointing module.
+* **Reproducible simulations:** To help researchers debug simulations, repeated executions of the same simulation with the same configuration and same random number generator seed produce the same results.
+* **Space-time visualizations:** DE-Sim generates space-time visualizations of simulation trajectories (\autoref{fig:phold_space_time_plot}). These diagrams can help researchers understand and debug simulations.
 
 ## Projects that use *DE-Sim*
 *DE-Sim* has been used to develop [WC-Sim](https://github.com/KarrLab/wc_sim), a multi-algorithmic simulator for [whole-cell models](https://www.wholecell.org).
