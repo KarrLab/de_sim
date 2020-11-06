@@ -48,14 +48,16 @@ setuptools.setup(
     tests_require=md.tests_require,
     dependency_links=md.dependency_links,
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
+        'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
+        'Topic :: Scientific/Engineering',
     ],
     entry_points={
         'console_scripts': [
