@@ -72,7 +72,7 @@ The package is released under the [MIT license](LICENSE).
 ## Citing *DE-Sim*
 Please use the following reference to cite *DE-Sim*:
 
-Arthur P. Goldberg & Jonathan Karr. DE-Sim: an object-oriented, discrete-event simulation tool for data-intensive modeling of complex systems in Python. Journal of Open Source Software. 2020 Nov. In press.
+Arthur P. Goldberg & Jonathan Karr. (2020). [DE-Sim: an object-oriented, discrete-event simulation tool for data-intensive modeling of complex systems in Python. Journal of Open Source Software, 5(55), 2685.](https://doi.org/10.21105/joss.02685)
 
 ## Contributing to *DE-Sim*
 We enthusiastically welcome contributions to *DE-Sim*! Please see the [guide to contributing](CONTRIBUTING.md) and the [developer's code of conduct](CODE_OF_CONDUCT.md).
