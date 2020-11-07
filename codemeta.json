@@ -33,7 +33,7 @@
     "codeRepository": "https://github.com/KarrLab/de_sim",
     "contIntegration": "https://circleci.com/gh/KarrLab/de_sim",
     "issueTracker": "https://github.com/KarrLab/de_sim/issues",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "developmentStatus": "active",
     "datePublished": "2020-11-06",
     "dateCreated": "2019-01-20",
