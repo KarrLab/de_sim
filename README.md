@@ -17,7 +17,7 @@ To help users build and simulate complex, data-driven models, *DE-Sim* provides 
 * **Stop conditions:** DE-Sim makes it easy to terminate simulations when specific criteria are reached. Researchers can specify stop conditions as functions that return true when a simulation should conclude.
 * **Results checkpointing:** DE-Sim makes it easy to record the results of simulations by using a configurable checkpointing module.
 * **Reproducible simulations:** To help researchers debug simulations, repeated executions of the same simulation with the same configuration and same random number generator seed produce the same results.
-* **Space-time visualizations:** DE-Sim generates space-time visualizations of simulation trajectories (\autoref{fig:phold_space_time_plot}). These diagrams can help researchers understand and debug simulations.
+* **Space-time visualizations:** DE-Sim generates space-time visualizations of simulation trajectories. These diagrams can help researchers understand and debug simulations.
 
 ## Projects that use *DE-Sim*
 *DE-Sim* has been used to develop [WC-Sim](https://github.com/KarrLab/wc_sim), a multi-algorithmic simulator for [whole-cell models](https://www.wholecell.org).

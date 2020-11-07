@@ -22,8 +22,7 @@
             "affiliation": "Icahn Institute for Data Science and Genomic Technology and Department of Genetics and Genomic Sciences, Icahn School of Medicine at Mount Sinai, New York, NY 10029, USA"
         }
     ],
-    "citation": https://doi.org/10.21105/joss.02685
-    ,
+    "citation": https://doi.org/10.21105/joss.02685,
     "readme": "https://github.com/KarrLab/de_sim/blob/master/README.md",
     "license": "https://spdx.org/licenses/MIT",
     "isAccessibleForFree": true,
