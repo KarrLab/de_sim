@@ -1,5 +1,5 @@
 [![PyPI package](https://img.shields.io/pypi/v/de_sim.svg)](https://pypi.python.org/pypi/de_sim)
-[![Documentation](https://readthedocs.org/projects/de_sim/badge/?version=latest)](https://docs.karrlab.org/de_sim)
+[![Documentation](https://readthedocs.org/projects/de-sim/badge/?version=latest)](https://docs.karrlab.org/de_sim)
 [![Test results](https://circleci.com/gh/KarrLab/de_sim.svg?style=shield)](https://circleci.com/gh/KarrLab/de_sim)
 [![Test coverage](https://coveralls.io/repos/github/KarrLab/de_sim/badge.svg)](https://coveralls.io/github/KarrLab/de_sim)
 [![Code analysis](https://api.codeclimate.com/v1/badges/2fa3ece22f571fd36b12/maintainability)](https://codeclimate.com/github/KarrLab/de_sim)

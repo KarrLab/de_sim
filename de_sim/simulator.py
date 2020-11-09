@@ -21,7 +21,6 @@ from de_sim.event_message import EventMessage
 from de_sim.simulation_metadata import SimulationMetadata, RunMetadata, AuthorMetadata
 from de_sim.errors import SimulatorError
 from de_sim.simulation_config import SimulationConfig
-from de_sim.simulation_object import SimulationObject  # noqa: F401
 from de_sim.utilities import SimulationProgressBar, FastLogger
 from wc_utils.util.git import get_repo_metadata, RepoMetadataCollectionType
 from wc_utils.util.list import elements_to_str
