@@ -8,7 +8,6 @@
 
 from wc_utils.util.misc import round_direct
 from wc_utils.util.list import elements_to_str
-from de_sim.event_message import EventMessage  # noqa: F401
 
 
 class Event(object):

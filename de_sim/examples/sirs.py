@@ -9,7 +9,7 @@
 import enum
 import numpy
 
-from de_sim.checkpoint import AccessCheckpoints, Checkpoint
+from de_sim.checkpoint import AccessCheckpoints
 from de_sim.simulation_checkpoint_object import (AccessStateObjectInterface,
                                                  CheckpointSimulationObject)
 import de_sim

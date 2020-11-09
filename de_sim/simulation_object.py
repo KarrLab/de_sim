@@ -15,7 +15,6 @@ import warnings
 
 from de_sim.config import core
 from de_sim.errors import SimulatorError
-from de_sim.event import Event  # noqa: F401
 from de_sim.event_message import EventMessage
 from de_sim.utilities import ConcreteABCMeta, FastLogger
 from wc_utils.util.misc import most_qual_cls_name, round_direct
