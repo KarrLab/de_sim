@@ -29,6 +29,7 @@ class MinimalSimulationObject(de_sim.SimulationObject):
 
     def handle_simulation_event(self, event):
         """ Handle a simulation event """
+        del event   # Avoid warning W0613, unused-argument
         # Schedule an event `self.delay` in the future
         # The event will be received by this simulation object, and contain a `MessageSentToSelf` instance
         self.send_event(self.delay, self, MessageSentToSelf())

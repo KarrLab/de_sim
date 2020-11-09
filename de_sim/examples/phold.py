@@ -51,6 +51,7 @@ class PholdSimulationObject(de_sim.SimulationObject):
 
     def handle_simulation_event(self, event):
         """ Handle a simulation event """
+        del event   # Avoid PyLint warning W0613, unused-argument
         # schedule event
         if random.random() < self.args.frac_self_events or self.args.num_phold_procs == 1:
             receiver = self

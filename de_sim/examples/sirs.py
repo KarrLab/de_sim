@@ -96,6 +96,7 @@ class SIR(de_sim.SimulationObject):
         Args:
             event (:obj:`~de_sim.event.Event`): simulation event; not used
         """
+        del event   # Avoid PyLint warning W0613, unused-argument
         self.s -= 1
         self.i += 1
         self.schedule_next_event()
@@ -106,6 +107,7 @@ class SIR(de_sim.SimulationObject):
         Args:
             event (:obj:`~de_sim.event.Event`): simulation event; not used
         """
+        del event   # Avoid PyLint warning W0613, unused-argument
         self.i -= 1
         self.schedule_next_event()
 
