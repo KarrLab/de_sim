@@ -11,6 +11,7 @@ import shutil
 import tempfile
 import unittest
 
+from de_sim.testing.utilities_for_testing import unset_env_var
 from de_sim.visualize import EventCoordinates, SimulationEventMessage, SpaceTime
 
 
@@ -55,7 +56,8 @@ class TestVisualize(unittest.TestCase):
                          (self.sample_data[0:2],
                           self.sample_data[2:]))
         plot_file = os.path.join(self.out_dir, 'filename.png')
-        space_time.plot_data(plot_file)
+        with unset_env_var('DISPLAY'):
+            space_time.plot_data(plot_file)
         self.assertTrue(os.path.isfile(plot_file))
 
     def test_get_data(self):

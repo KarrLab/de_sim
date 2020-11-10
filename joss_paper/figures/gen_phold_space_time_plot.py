@@ -11,6 +11,7 @@ import os
 import tempfile
 
 from de_sim.examples.phold import RunPhold
+from de_sim.testing.utilities_for_testing import unset_env_var
 from de_sim.visualize import SpaceTime
 from wc_utils.util.environ import EnvironUtils
 import de_sim
@@ -28,6 +29,7 @@ def run_phold(max_time, num_phold_procs=3, frac_self_events=0.5):
                      frac_self_events=frac_self_events)
     RunPhold.main(args)
 
+
 def create_phold_space_time_diagram():
     """ Run PHOLD, and use plot log to generate a space-time diagram """
     plot_log = os.path.expanduser('~/.wc/log/de_sim.plot.log')
@@ -40,8 +42,10 @@ def create_phold_space_time_diagram():
     space_time.get_data(plot_log)
     temp_dir = tempfile.TemporaryDirectory()
     space_time_plot = os.path.join(temp_dir.name, "phold_space_time_plot.pdf")
-    space_time.plot_data(space_time_plot)
+    with unset_env_var('DISPLAY'):
+        space_time.plot_data(space_time_plot)
     print('space-time diagram written to', space_time_plot)
+
 
 with EnvironUtils.temp_config_env(((['de_sim', 'log_events'], 'True'),
                                    (['debug_logs', 'handlers', 'plot.file', 'level'], 'debug'))):
