@@ -638,6 +638,10 @@ class Simulator(object):
         self.num_handlers_called = 0
         self.log_with_time(f"Simulation to {self.sim_config.max_time} starting")
 
+        # check the stop condition
+        if self.sim_config.stop_condition is not None and self.sim_config.stop_condition(self.time):
+            raise SimulatorError(f"Stop condition true at beginning of simulation at time {self.time}")
+
         try:
             self.progress.start(self.sim_config.max_time)
             self.init_metadata_collection(self.sim_config)
